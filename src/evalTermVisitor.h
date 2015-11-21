@@ -3,6 +3,8 @@
 
 #include "term_visitor.h"
 
+class Context;
+
 class EvalTermVisitor : public TermVisitor {
 public:
     void visitVariable(Variable *) override;
@@ -14,6 +16,9 @@ public:
     void visitConstructor(Constructor *) override;
 
     void visitCoercion(Coercion *) override;
+
+private:
+    Context *context;
 };
 
 #endif //FJ_EVALTERMVISITOR_H

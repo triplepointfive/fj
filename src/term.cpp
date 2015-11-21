@@ -2,30 +2,17 @@
 
 #include "term.h"
 #include "term_visitor.h"
+#include "utils.h"
 
 using namespace std;
 
-string showArgs(Arguments args) {
-    string acc = "";
-    bool firstElement = true;
-
-    for (auto &element : args) {
-        if (firstElement) {
-            firstElement = false;
-        } else {
-            acc += ", ";
-        }
-        acc += element->show();
-    }
-    return acc;
+string Invocation::show() const {
+    return object->show() + "." + methodName +
+           "(" + intercalation(args, ", ") + ")";
 }
 
-string Invocation::show() {
-    return object->show() + "." + methodName + "(" + showArgs(args) + ")";
-}
-
-string Constructor::show() {
-    return "new " + className + "(" + showArgs(args) + ")";
+string Constructor::show() const {
+    return "new " + className + "(" + intercalation(args, ", ") + ")";
 }
 
 void Variable::accept(TermVisitor &visitor) {

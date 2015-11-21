@@ -14,11 +14,11 @@ class Term {
 public:
     virtual ~Term() { }
 
-    virtual string show() = 0;
+    virtual string show() const = 0;
 
     virtual void accept(TermVisitor &) = 0;
 
-    virtual bool isValue() { return false; }
+    virtual bool isValue() const { return false; }
 };
 
 typedef vector<Term *> Arguments;
@@ -29,7 +29,7 @@ public:
         this->name = name;
     }
 
-    string show() override { return name; }
+    string show() const override { return name; }
 
     void accept(TermVisitor &) override;
 
@@ -44,15 +44,17 @@ public:
         this->propertyName = propertyName;
     }
 
-    string show() override {
+    string show() const override {
         return "(" + object->show() + ")." + propertyName;
     }
 
+    string getPropertyName() const { return propertyName; }
+
+    Term *getObject() const { return object; }
+
     void accept(TermVisitor &) override;
 
-    virtual ~Access() {
-        delete object;
-    }
+    virtual ~Access() { delete object; }
 
 private:
     Term *object;
@@ -67,7 +69,7 @@ public:
         this->args = args;
     }
 
-    string show() override;
+    string show() const override;
 
     void accept(TermVisitor &) override;
 
@@ -91,11 +93,11 @@ public:
         this->args = args;
     }
 
-    string show() override;
+    string show() const override;
 
     void accept(TermVisitor &) override;
 
-    bool isValue() override { return true; }
+    bool isValue() const override { return true; }
 
     virtual ~Constructor() {
         for (auto &term : args) {
@@ -115,7 +117,7 @@ public:
         this->object = object;
     }
 
-    string show() override {
+    string show() const override {
         return "(" + className + ") " + object->show();
     }
 
