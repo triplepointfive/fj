@@ -13,6 +13,7 @@ void EvalTermVisitor::visitVariable(Variable *variable) {
 
 void EvalTermVisitor::visitAccess(Access *access) {
     // E-Field
+    // TODO: Might be required to null before accessing.
     access->getObject()->accept(*this);
     // The only accessible term is object.
     assert(calculatedValue != NULL);
@@ -20,7 +21,7 @@ void EvalTermVisitor::visitAccess(Access *access) {
     // This should be found by type checker.
     assert(context->classHasProperty(calculatedValue->getClassName(),
                                      access->getPropertyName()));
-    calculatedValue->getAttribute(access->getPropertyName());
+    calculatedValue->getAttribute(access->getPropertyName())->accept(*this);
 }
 
 void EvalTermVisitor::visitInvocation(Invocation *invocation) {
@@ -32,5 +33,13 @@ void EvalTermVisitor::visitConstructor(Constructor *constructor) {
 }
 
 void EvalTermVisitor::visitCoercion(Coercion *coercion) {
-
+    // E-Cast
+    // TODO: Might be required to null before casting.
+    coercion->getObject()->accept(*this);
+    // The only coercible term is object.
+    assert(calculatedValue != NULL);
+    // E-CastNew
+    // No action for evaluation required, because type casting is about types.
+    assert(context->isASubtype(coercion->getClassName(),
+                               calculatedValue->getClassName()));
 }

@@ -131,6 +131,10 @@ public:
         return "(" + className + ") " + object->show();
     }
 
+    Term *getObject() const { return object; }
+
+    string getClassName() const { return className; }
+
     void accept(TermVisitor &) override;
 
     virtual ~Coercion() {

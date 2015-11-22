@@ -8,6 +8,8 @@ public:
     bool classHasProperty(std::string className, std::string propertyName)
             const;
 
+    bool isASubtype(std::string, std::string) const;
+
 };
 
 #endif //FJ_CONTEXT_H
