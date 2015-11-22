@@ -7,6 +7,8 @@ class Context;
 
 class EvalTermVisitor : public TermVisitor {
 public:
+    EvalTermVisitor();
+
     void visitVariable(Variable *) override;
 
     void visitAccess(Access *) override;
@@ -19,6 +21,7 @@ public:
 
 private:
     Context *context;
+    Constructor *calculatedValue;
 };
 
 #endif //FJ_EVALTERMVISITOR_H

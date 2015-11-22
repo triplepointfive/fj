@@ -1,6 +1,8 @@
 #ifndef FJ_TERM_VISITOR_H
 #define FJ_TERM_VISITOR_H
 
+#include "term.h"
+
 class Variable;
 
 class Access;

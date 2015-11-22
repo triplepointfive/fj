@@ -1,7 +1,9 @@
 #ifndef FJ_TERM_H
 #define FJ_TERM_H
 
+#include <assert.h>
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "type.h"
@@ -21,7 +23,7 @@ public:
     virtual bool isValue() const { return false; }
 };
 
-typedef vector<Term *> Arguments;
+typedef map<string, Term *> Arguments;
 
 class Variable : public Term {
 public:
@@ -75,8 +77,8 @@ public:
 
     virtual ~Invocation() {
         delete object;
-        for (auto &term : args) {
-            delete term;
+        for (auto &pair : args) {
+            delete pair.second;
         }
     }
 
@@ -99,9 +101,17 @@ public:
 
     bool isValue() const override { return true; }
 
+    string getClassName() const { return className; }
+
+    Term *getAttribute(string propertyName) {
+        // Accessing no-existing property, it is type checker's job.
+        assert(args.count(propertyName) != 0);
+        return args.find(propertyName)->second;
+    }
+
     virtual ~Constructor() {
-        for (auto &term : args) {
-            delete term;
+        for (auto &pair : args) {
+            delete pair.second;
         }
     }
 
