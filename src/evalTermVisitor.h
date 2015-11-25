@@ -19,6 +19,8 @@ public:
 
     void visitCoercion(Coercion *) override;
 
+    Constructor *getCalculatedValue() const { return calculatedValue; }
+
 private:
     Context *context;
     Constructor *calculatedValue;

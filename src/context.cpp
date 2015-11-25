@@ -8,3 +8,8 @@ bool Context::classHasProperty(std::string className,
 bool Context::isASubtype(std::string parent, std::string child) const {
     return false;
 }
+
+Constructor *Context::invocateMethod(Constructor *object, string methodName,
+                                     Arguments args) const {
+    return nullptr;
+}

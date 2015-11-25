@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "term.h"
+
 class Context {
 public:
     bool classHasProperty(std::string className, std::string propertyName)
@@ -10,6 +12,7 @@ public:
 
     bool isASubtype(std::string, std::string) const;
 
+    Constructor *invocateMethod(Constructor *, std::string, Arguments) const;
 };
 
 #endif //FJ_CONTEXT_H

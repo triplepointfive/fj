@@ -71,6 +71,12 @@ public:
         this->args = args;
     }
 
+    Term *getObject() const { return object; }
+
+    Arguments getArgs() const { return args; }
+
+    string getMethodName() const { return methodName; }
+
     string show() const override;
 
     void accept(TermVisitor &) override;

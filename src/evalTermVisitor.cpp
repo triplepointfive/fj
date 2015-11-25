@@ -4,7 +4,7 @@
 #include "context.h"
 
 EvalTermVisitor::EvalTermVisitor() {
-    calculatedValue = NULL;
+    calculatedValue = nullptr;
 }
 
 void EvalTermVisitor::visitVariable(Variable *variable) {
@@ -25,7 +25,21 @@ void EvalTermVisitor::visitAccess(Access *access) {
 }
 
 void EvalTermVisitor::visitInvocation(Invocation *invocation) {
-
+    // E-Invk-Recv
+    invocation->getObject()->accept(*this);
+    // The only invocable term is object.
+    assert(calculatedValue != NULL);
+    // E-Invk-Arg
+    Arguments calculatedArguments;
+    for (auto elem : invocation->getArgs()) {
+        EvalTermVisitor visitor(*this);
+        elem.second->accept(visitor);
+        calculatedArguments[elem.first] = visitor.getCalculatedValue();
+    };
+    // E-InvkNew
+    calculatedValue = context->invocateMethod(calculatedValue,
+                                              invocation->getMethodName(),
+                                              calculatedArguments);
 }
 
 void EvalTermVisitor::visitConstructor(Constructor *constructor) {
