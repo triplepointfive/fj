@@ -7,10 +7,6 @@ EvalTermVisitor::EvalTermVisitor() {
     calculatedValue = nullptr;
 }
 
-void EvalTermVisitor::visitVariable(Variable *variable) {
-
-}
-
 void EvalTermVisitor::visitAccess(Access *access) {
     // E-Field
     // TODO: Might be required to null before accessing.
@@ -43,7 +39,18 @@ void EvalTermVisitor::visitInvocation(Invocation *invocation) {
 }
 
 void EvalTermVisitor::visitConstructor(Constructor *constructor) {
-    calculatedValue = constructor;
+    // E-New-Arg
+    Arguments calculatedArguments;
+    for (auto elem : constructor->getArgs()) {
+        EvalTermVisitor visitor(*this);
+        elem.second->accept(visitor);
+        calculatedArguments[elem.first] = visitor.getCalculatedValue();
+    };
+    if (calculatedValue != nullptr) {
+        delete calculatedValue;
+    }
+    calculatedValue = new Constructor(constructor->getClassName(),
+                                      calculatedArguments);
 }
 
 void EvalTermVisitor::visitCoercion(Coercion *coercion) {

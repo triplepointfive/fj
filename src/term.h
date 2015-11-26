@@ -109,6 +109,8 @@ public:
 
     string getClassName() const { return className; }
 
+    Arguments getArgs() const { return args; }
+
     Term *getAttribute(string propertyName) {
         // Accessing no-existing property, it is type checker's job.
         assert(args.count(propertyName) != 0);

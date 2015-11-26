@@ -9,7 +9,7 @@ class EvalTermVisitor : public TermVisitor {
 public:
     EvalTermVisitor();
 
-    void visitVariable(Variable *) override;
+    void visitVariable(Variable *) override { };
 
     void visitAccess(Access *) override;
 
