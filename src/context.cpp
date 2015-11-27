@@ -6,7 +6,7 @@ bool Context::classHasProperty(std::string className,
 }
 
 bool Context::isASubtype(std::string parent, std::string child) const {
-    return false;
+    return true;
 }
 
 Constructor *Context::invocateMethod(Constructor *object, string methodName,

@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 
+#include "base_types.h"
 #include "type.h"
 
 using namespace std;
@@ -41,16 +42,16 @@ private:
 
 class Access : public Term {
 public:
-    Access(Term *object, const string propertyName) {
+    Access(Term *object, PropertyName propertyName) {
         this->object = object;
         this->propertyName = propertyName;
     }
 
     string show() const override {
-        return "(" + object->show() + ")." + propertyName;
+        return "(" + object->show() + ")." + propertyName.t;
     }
 
-    string getPropertyName() const { return propertyName; }
+    PropertyName getPropertyName() const { return propertyName; }
 
     Term *getObject() const { return object; }
 
@@ -60,12 +61,12 @@ public:
 
 private:
     Term *object;
-    string propertyName;
+    PropertyName propertyName;
 };
 
 class Invocation : public Term {
 public:
-    Invocation(Term *object, string methodName, Arguments args) {
+    Invocation(Term *object, MethodName methodName, Arguments args) {
         this->object = object;
         this->methodName = methodName;
         this->args = args;
@@ -75,7 +76,7 @@ public:
 
     Arguments getArgs() const { return args; }
 
-    string getMethodName() const { return methodName; }
+    MethodName getMethodName() const { return methodName; }
 
     string show() const override;
 
@@ -90,13 +91,13 @@ public:
 
 private:
     Term *object;
-    string methodName;
+    MethodName methodName;
     Arguments args;
 };
 
 class Constructor : public Term {
 public:
-    Constructor(string className, Arguments args) {
+    Constructor(ClassName, Arguments args) {
         this->className = className;
         this->args = args;
     }
@@ -107,7 +108,7 @@ public:
 
     bool isValue() const override { return true; }
 
-    string getClassName() const { return className; }
+    ClassName getClassName() const { return className; }
 
     Arguments getArgs() const { return args; }
 
@@ -124,24 +125,24 @@ public:
     }
 
 private:
-    string className;
+    ClassName className;
     Arguments args;
 };
 
 class Coercion : public Term {
 public:
-    Coercion(string className, Term *object) {
+    Coercion(ClassName className, Term *object) {
         this->className = className;
         this->object = object;
     }
 
     string show() const override {
-        return "(" + className + ") " + object->show();
+        return "(" + className.t + ") " + object->show();
     }
 
     Term *getObject() const { return object; }
 
-    string getClassName() const { return className; }
+    ClassName getClassName() const { return className; }
 
     void accept(TermVisitor &) override;
 
@@ -150,7 +151,7 @@ public:
     }
 
 private:
-    string className;
+    ClassName className;
     Term *object;
 };
 

@@ -7,12 +7,12 @@
 using namespace std;
 
 string Invocation::show() const {
-    return object->show() + "." + methodName +
+    return object->show() + "." + methodName.t +
            "(" + intercalation(args, ", ") + ")";
 }
 
 string Constructor::show() const {
-    return "new " + className + "(" + intercalation(args, ", ") + ")";
+    return "new " + className.t + "(" + intercalation(args, ", ") + ")";
 }
 
 void Variable::accept(TermVisitor &visitor) {

@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "evalTermVisitor.h"
+#include "eval_term_visitor.h"
 #include "context.h"
 
 EvalTermVisitor::EvalTermVisitor() {
