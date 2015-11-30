@@ -9,7 +9,7 @@
 
 class Context {
 public:
-    void addClass(ClassName, ClassBody);
+    void addClass(ClassName, ObjectClassBody*);
 
     bool classHasProperty(ClassName className, PropertyName propertyName) const;
 
@@ -18,7 +18,7 @@ public:
     Constructor *invocateMethod(Constructor *, std::string, Arguments) const;
 
 private:
-    map<ClassName, ClassBody> classes;
+    map<ClassName, ObjectClassBody*> classes;
 };
 
 #endif //FJ_CONTEXT_H
