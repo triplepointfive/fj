@@ -3,6 +3,8 @@
 
 #include <map>
 
+#include "term.h"
+
 typedef std::map<std::string, std::string> ArgumentsDeclaration;
 
 class Term;
@@ -12,6 +14,8 @@ public:
     MethodBody(Term *, ArgumentsDeclaration);
 
     virtual ~MethodBody();
+
+    Constructor *invocate(Constructor *, Arguments);
 
 protected:
     Term *body;

@@ -10,3 +10,8 @@ MethodBody::MethodBody(Term *body, ArgumentsDeclaration declaration) {
 MethodBody::~MethodBody() {
     delete body;
 }
+
+Constructor *MethodBody::invocate(Constructor *constructor,
+                                  Arguments arguments) {
+    return nullptr;
+}

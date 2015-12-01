@@ -15,7 +15,7 @@ public:
 
     bool isASubtype(std::string, std::string) const;
 
-    Constructor *invocateMethod(Constructor *, std::string, Arguments) const;
+    Constructor *invocateMethod(Constructor *, MethodName, Arguments) const;
 
 private:
     map<ClassName, ObjectClassBody*> classes;
