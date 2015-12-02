@@ -12,14 +12,14 @@ bool Context::isASubtype(std::string parent, std::string child) const {
 }
 
 Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
-                                     Arguments args) const {
+                                     MethodArguments args) const {
     assert((bool)classes.count(object->getClassName()));
     ObjectClassBody *classBody = classes.find(object->getClassName())->second;
     assert((bool)classBody->getMethods().count(methodName));
     MethodBody *methodBody = classBody->getMethods().find(methodName)->second;
-    return methodBody->invocate(object, args);
+    return methodBody->invocate(object, args, nullptr);
 }
 
 void Context::addClass(ClassName name, ObjectClassBody* body) {
-    classes.insert ( std::pair<ClassName, ObjectClassBody*>(name, body) );
+    classes.insert(std::pair<ClassName, ObjectClassBody*>(name, body));
 }

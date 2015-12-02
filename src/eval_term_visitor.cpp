@@ -26,7 +26,7 @@ void EvalTermVisitor::visitInvocation(Invocation *invocation) {
     // The only invocable term is object.
     assert(calculatedValue != NULL);
     // E-Invk-Arg
-    Arguments calculatedArguments;
+    MethodArguments calculatedArguments;
     for (auto elem : invocation->getArgs()) {
         EvalTermVisitor visitor(*this);
         elem.second->accept(visitor);
@@ -40,7 +40,7 @@ void EvalTermVisitor::visitInvocation(Invocation *invocation) {
 
 void EvalTermVisitor::visitConstructor(Constructor *constructor) {
     // E-New-Arg
-    Arguments calculatedArguments;
+    MethodArguments calculatedArguments;
     for (auto elem : constructor->getArgs()) {
         EvalTermVisitor visitor(*this);
         elem.second->accept(visitor);

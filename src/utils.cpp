@@ -1,6 +1,6 @@
 #include "utils.h"
 
-std::string intercalation(Arguments args, std::string insertion) {
+std::string intercalation(MethodArguments args, std::string insertion) {
     std::string acc = "";
     bool firstElement = true;
 
@@ -10,7 +10,7 @@ std::string intercalation(Arguments args, std::string insertion) {
         } else {
             acc += insertion;
         }
-        acc += pair.second->show();
+        acc += pair.first.t + " = " + pair.second->show();
     }
     return acc;
 }

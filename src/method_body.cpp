@@ -1,6 +1,6 @@
 #include "method_body.h"
 
-#include "term.h"
+#include "context.h"
 
 MethodBody::MethodBody(Term *body, ArgumentsDeclaration declaration) {
     this->body = body;
@@ -12,6 +12,8 @@ MethodBody::~MethodBody() {
 }
 
 Constructor *MethodBody::invocate(Constructor *constructor,
-                                  Arguments arguments) {
+                                  MethodArguments arguments,
+                                  Context *context) {
+
     return nullptr;
 }

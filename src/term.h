@@ -24,7 +24,7 @@ public:
     virtual bool isValue() const { return false; }
 };
 
-typedef map<string, Term *> Arguments;
+typedef map<PropertyName, Term *> MethodArguments;
 
 class Variable : public Term {
 public:
@@ -66,7 +66,7 @@ private:
 
 class Invocation : public Term {
 public:
-    Invocation(Term *object, MethodName methodName, Arguments args) {
+    Invocation(Term *object, MethodName methodName, MethodArguments args) {
         this->object = object;
         this->methodName = methodName;
         this->args = args;
@@ -74,7 +74,7 @@ public:
 
     Term *getObject() const { return object; }
 
-    Arguments getArgs() const { return args; }
+    MethodArguments getArgs() const { return args; }
 
     MethodName getMethodName() const { return methodName; }
 
@@ -92,12 +92,12 @@ public:
 private:
     Term *object;
     MethodName methodName;
-    Arguments args;
+    MethodArguments args;
 };
 
 class Constructor : public Term {
 public:
-    Constructor(ClassName, Arguments args) {
+    Constructor(ClassName, MethodArguments args) {
         this->className = className;
         this->args = args;
     }
@@ -110,9 +110,9 @@ public:
 
     ClassName getClassName() const { return className; }
 
-    Arguments getArgs() const { return args; }
+    MethodArguments getArgs() const { return args; }
 
-    Term *getAttribute(string propertyName) {
+    Term *getAttribute(PropertyName propertyName) {
         // Accessing no-existing property, it is type checker's job.
         assert(args.count(propertyName) != 0);
         return args.find(propertyName)->second;
@@ -126,7 +126,7 @@ public:
 
 private:
     ClassName className;
-    Arguments args;
+    MethodArguments args;
 };
 
 class Coercion : public Term {

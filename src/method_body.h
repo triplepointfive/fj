@@ -5,9 +5,10 @@
 
 #include "term.h"
 
-typedef std::map<std::string, std::string> ArgumentsDeclaration;
+typedef std::map<PropertyName, ClassName> ArgumentsDeclaration;
 
 class Term;
+class Context;
 
 class MethodBody {
 public:
@@ -15,12 +16,12 @@ public:
 
     virtual ~MethodBody();
 
-    Constructor *invocate(Constructor *, Arguments);
+    Constructor *invocate(Constructor *object, MethodArguments arguments,
+                              Context *context);
 
 protected:
     Term *body;
     ArgumentsDeclaration args;
 };
-
 
 #endif //FJ_METHOD_BODY_H

@@ -5,6 +5,6 @@
 
 #include "term.h"
 
-std::string intercalation(Arguments args, std::string insertion);
+std::string intercalation(MethodArguments args, std::string insertion);
 
 #endif //FJ_UTILS_H
