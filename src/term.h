@@ -24,9 +24,7 @@ public:
     virtual bool isValue() const { return false; }
 };
 
-class Constructor;
-
-typedef map<PropertyName, Constructor *> MethodArguments;
+typedef map<PropertyName, Term *> MethodArguments;
 
 class Variable : public Term {
 public:

@@ -18,10 +18,16 @@ Constructor *MethodBody::invocate(Constructor *constructor,
     assert(arguments.size() == args.size());
     for (auto elem : args) {
         assert((bool)arguments.count(elem.first));
-        assert(arguments.find(elem.first)->second->getClassName()
-               == elem.second);
+        // TODO: Validate type casting instead
+//        assert(arguments.find(elem.first)->second->getClassName() == elem.second);
     }
-    context->setVariables(arguments);
+    map<PropertyName, Constructor *> calculatedArgs;
+    for (auto elem : arguments) {
+        EvalTermVisitor evaluator(*context);
+        elem.second->accept(evaluator);
+        calculatedArgs[elem.first] = evaluator.getCalculatedValue();
+    }
+    context->setVariables(calculatedArgs);
     EvalTermVisitor evaluator(*context);
     constructor->accept(evaluator);
     return evaluator.getCalculatedValue();
