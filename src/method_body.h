@@ -16,8 +16,9 @@ public:
 
     virtual ~MethodBody();
 
-    Constructor *invocate(Constructor *object, MethodArguments arguments,
-                              Context *context);
+    Constructor *invocate(Constructor *object,
+                          MethodArguments &arguments,
+                          Context *context);
 
 protected:
     Term *body;

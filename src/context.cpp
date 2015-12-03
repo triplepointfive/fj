@@ -7,7 +7,7 @@ bool Context::classHasProperty(ClassName className,
     return (bool)classBody->getProperties().count(propertyName);
 }
 
-bool Context::isASubtype(std::string parent, std::string child) const {
+bool Context::isASubtype(std::string, std::string) const {
     return true;
 }
 

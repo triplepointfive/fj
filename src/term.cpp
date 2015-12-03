@@ -34,3 +34,10 @@ void Constructor::accept(TermVisitor &visitor) {
 void Coercion::accept(TermVisitor &visitor) {
     visitor.visitCoercion(this);
 }
+
+Invocation::~Invocation() {
+    delete object;
+    for (auto &pair : args) {
+        delete pair.second;
+    }
+}

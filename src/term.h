@@ -24,7 +24,9 @@ public:
     virtual bool isValue() const { return false; }
 };
 
-typedef map<PropertyName, Term *> MethodArguments;
+class Constructor;
+
+typedef map<PropertyName, Constructor *> MethodArguments;
 
 class Variable : public Term {
 public:
@@ -82,12 +84,7 @@ public:
 
     void accept(TermVisitor &) override;
 
-    virtual ~Invocation() {
-        delete object;
-        for (auto &pair : args) {
-            delete pair.second;
-        }
-    }
+    virtual ~Invocation();
 
 private:
     Term *object;
