@@ -3,8 +3,13 @@
 #include "eval_term_visitor.h"
 #include "context.h"
 
-EvalTermVisitor::EvalTermVisitor() {
+EvalTermVisitor::EvalTermVisitor(Context ctx) {
+    this->context = new Context(ctx);
     calculatedValue = nullptr;
+}
+
+void EvalTermVisitor::visitVariable(Variable *variable) {
+    calculatedValue = context->assignedValue(variable->getName());
 }
 
 void EvalTermVisitor::visitAccess(Access *access) {
@@ -63,4 +68,8 @@ void EvalTermVisitor::visitCoercion(Coercion *coercion) {
     // No action for evaluation required, because type casting is about types.
     assert(context->isASubtype(coercion->getClassName(),
                                calculatedValue->getClassName()));
+}
+
+EvalTermVisitor::~EvalTermVisitor() {
+    delete context;
 }

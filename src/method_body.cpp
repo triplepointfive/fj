@@ -21,8 +21,8 @@ Constructor *MethodBody::invocate(Constructor *constructor,
         assert(arguments.find(elem.first)->second->getClassName()
                == elem.second);
     }
-
-
-
-    return nullptr;
+    context->setVariables(arguments);
+    EvalTermVisitor evaluator(*context);
+    constructor->accept(evaluator);
+    return evaluator.getCalculatedValue();
 }

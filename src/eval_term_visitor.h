@@ -7,9 +7,11 @@ class Context;
 
 class EvalTermVisitor : public TermVisitor {
 public:
-    EvalTermVisitor();
+    EvalTermVisitor(Context);
 
-    void visitVariable(Variable *) override { };
+    ~EvalTermVisitor();
+
+    void visitVariable(Variable *) override;
 
     void visitAccess(Access *) override;
 
@@ -21,7 +23,7 @@ public:
 
     Constructor *getCalculatedValue() const { return calculatedValue; }
 
-private:
+protected:
     Context *context;
     Constructor *calculatedValue;
 };

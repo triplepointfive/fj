@@ -23,3 +23,13 @@ Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
 void Context::addClass(ClassName name, ObjectClassBody* body) {
     classes.insert(std::pair<ClassName, ObjectClassBody*>(name, body));
 }
+
+void Context::setVariables(map<PropertyName, Constructor *> vars) {
+    this->assigned_variables = vars;
+
+}
+
+Constructor *Context::assignedValue(PropertyName name) const {
+    assert((bool) assigned_variables.count(name));
+    return assigned_variables.find(name)->second;
+}

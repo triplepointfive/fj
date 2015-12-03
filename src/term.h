@@ -30,16 +30,17 @@ typedef map<PropertyName, Constructor *> MethodArguments;
 
 class Variable : public Term {
 public:
-    Variable(const string name) {
+    Variable(const PropertyName name) {
         this->name = name;
     }
 
-    string show() const override { return name; }
+    string show() const override { return name.t; }
 
+    PropertyName getName() const { return name; }
     void accept(TermVisitor &) override;
 
 private:
-    string name;
+    PropertyName name;
 };
 
 class Access : public Term {
