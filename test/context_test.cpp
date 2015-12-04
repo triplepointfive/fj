@@ -17,7 +17,7 @@ TEST (Context, classHasProperty) {
     ClassBody pairClass(pairClassName, properties, Methods(), &objectClass);
 
     Context ctx;
-    ctx.addClass(pairClassName, &pairClass);
+    ctx.addClass(&pairClass);
 
     EXPECT_TRUE(ctx.classHasProperty(pairClassName, fst));
     EXPECT_TRUE(ctx.classHasProperty(pairClassName, snd));

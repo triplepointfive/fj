@@ -93,7 +93,7 @@ private:
 
 class Constructor : public Term {
 public:
-    Constructor(ClassName, MethodArguments args) {
+    Constructor(ClassName className, MethodArguments args) {
         this->className = className;
         this->args = args;
     }

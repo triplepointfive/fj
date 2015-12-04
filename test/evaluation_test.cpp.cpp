@@ -4,16 +4,16 @@
 #include "context.h"
 
 TEST (Pair, setfst) {
-    ObjectClassBody objectClass;
+    ObjectClassBody *objectClass = new ObjectClassBody();
     ClassName objectClassName("Object");
 
 
     ClassName aClassName("A");
-    ClassBody aClass(aClassName, Properties(), Methods(), &objectClass);
+    ClassBody *aClass = new ClassBody(aClassName, Properties(), Methods(), objectClass);
 
 
     ClassName bClassName("B");
-    ClassBody bClass(bClassName, Properties(), Methods(), &objectClass);
+    ClassBody *bClass = new ClassBody(bClassName, Properties(), Methods(), objectClass);
 
 
     ClassName pairClassName("Pair");
@@ -31,27 +31,42 @@ TEST (Pair, setfst) {
     setFstArgs[newFstName] = objectClassName;
 
     MethodArguments newPairClassArgs;
-    Variable newFstVar(newFstName);
-    Variable thisVar(PropertyName("this"));
-    Access sndAccess(&thisVar, snd);
-    newPairClassArgs[fst] = &newFstVar;
-    newPairClassArgs[snd] = &sndAccess;
+    Variable *newFstVar = new Variable(newFstName);
+    Variable *thisVar = new Variable(PropertyName("this"));
+    Access *sndAccess = new Access(thisVar, snd);
+    newPairClassArgs[fst] = newFstVar;
+    newPairClassArgs[snd] = sndAccess;
 
-    Constructor setFstTerm(pairClassName, newPairClassArgs);
+    Constructor *setFstTerm = new Constructor(pairClassName, newPairClassArgs);
 
-    MethodBody setFstBody(&setFstTerm, setFstArgs);
+    MethodBody *setFstBody = new MethodBody(setFstTerm, setFstArgs);
 
     Methods methods;
-    methods[setFst] = &setFstBody;
+    methods[setFst] = setFstBody;
 
-    ClassBody pairClass(pairClassName, properties, methods, &objectClass);
+    ClassBody *pairClass = new ClassBody(pairClassName, properties, methods, objectClass);
 
     Context ctx;
 
-    ctx.addClass(aClassName, &aClass);
-    ctx.addClass(bClassName, &bClass);
-    ctx.addClass(pairClassName, &pairClass);
+    ctx.addClass(objectClass);
+    ctx.addClass(aClass);
+    ctx.addClass(bClass);
+    ctx.addClass(pairClass);
 
-    EXPECT_TRUE(ctx.classHasProperty(pairClassName, fst));
-    EXPECT_TRUE(ctx.classHasProperty(pairClassName, snd));
+    MethodArguments args;
+    args[fst] = new Constructor(aClassName, MethodArguments());
+    args[snd] = new Constructor(bClassName, MethodArguments());
+
+    Constructor *basePair = new Constructor(pairClassName, args);
+    MethodArguments newArgs;
+    newArgs[newFstName] = new Constructor(bClassName, MethodArguments());
+    std::cout << endl << "Start invocation" << endl;
+//    Constructor *newPair = ctx.invocateMethod(basePair, setFst, newArgs);
+    Constructor *newPair = setFstBody->invocate(basePair, newArgs, &ctx);
+
+
+    std::cout << endl << "Complete invocation" << endl;
+
+    EXPECT_EQ(newPair->getClassName(), pairClassName);
+    EXPECT_TRUE(newPair->getAttribute(fst)->isValue());
 }

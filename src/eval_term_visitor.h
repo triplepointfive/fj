@@ -9,8 +9,6 @@ class EvalTermVisitor : public TermVisitor {
 public:
     EvalTermVisitor(Context);
 
-    ~EvalTermVisitor();
-
     void visitVariable(Variable *) override;
 
     void visitAccess(Access *) override;

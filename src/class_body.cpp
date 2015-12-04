@@ -9,15 +9,28 @@ ClassBody::ClassBody(ClassName className, Properties properties,
     this->properties = properties;
     this->properties.insert(parentProperties.begin(), parentProperties.end());
 
-    Methods parentMethods = parentClass->getMethods();
     this->methods = methods;
-    this->methods.insert(parentMethods.begin(), parentMethods.end());
 }
 
 Properties ClassBody::getProperties() const {
     return properties;
 }
 
-Methods ClassBody::getMethods() const {
-    return methods;
+MethodBody *ClassBody::getMethod(MethodName methodName) const {
+    auto i = methods.find(methodName);
+    if (methods.end() == i) {
+        return i->second;
+    } else {
+        return parentClass->getMethod(methodName);
+    }
+}
+
+ClassName ClassBody::getClassName() const {
+    return className;
+}
+
+ClassBody::~ClassBody() {
+    for (auto elem : methods) {
+        delete elem.second;
+    }
 }

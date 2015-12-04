@@ -12,16 +12,16 @@ bool Context::isASubtype(std::string, std::string) const {
 }
 
 Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
-                                     MethodArguments args) const {
+                                     MethodArguments args) {
+    std::cout << endl << "invocateMethod" << endl;
     assert((bool)classes.count(object->getClassName()));
     ObjectClassBody *classBody = classes.find(object->getClassName())->second;
-    assert((bool)classBody->getMethods().count(methodName));
-    MethodBody *methodBody = classBody->getMethods().find(methodName)->second;
-    return methodBody->invocate(object, args, nullptr);
+    MethodBody *methodBody = classBody->getMethod(methodName);
+    return methodBody->invocate(object, args, this);
 }
 
-void Context::addClass(ClassName name, ObjectClassBody* body) {
-    classes.insert(std::pair<ClassName, ObjectClassBody*>(name, body));
+void Context::addClass(ObjectClassBody* body) {
+    classes.insert(std::pair<ClassName, ObjectClassBody*>(body->getClassName(), body));
 }
 
 void Context::setVariables(map<PropertyName, Constructor *> vars) {
@@ -32,4 +32,12 @@ void Context::setVariables(map<PropertyName, Constructor *> vars) {
 Constructor *Context::assignedValue(PropertyName name) const {
     assert((bool) assigned_variables.count(name));
     return assigned_variables.find(name)->second;
+}
+
+Context::~Context() {
+    // TODO: Free assigned variables?
+    for (auto elem : classes) {
+//        std::cout << elem.first.t;
+//        delete elem.second;
+    }
 }

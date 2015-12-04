@@ -69,7 +69,3 @@ void EvalTermVisitor::visitCoercion(Coercion *coercion) {
     assert(context->isASubtype(coercion->getClassName(),
                                calculatedValue->getClassName()));
 }
-
-EvalTermVisitor::~EvalTermVisitor() {
-    delete context;
-}

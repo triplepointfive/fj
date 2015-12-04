@@ -9,7 +9,7 @@
 
 class Context {
 public:
-    void addClass(ClassName, ObjectClassBody*);
+    void addClass(ObjectClassBody*);
 
     void setVariables(map<PropertyName, Constructor *>);
 
@@ -17,9 +17,11 @@ public:
 
     bool isASubtype(std::string, std::string) const;
 
-    Constructor *invocateMethod(Constructor *, MethodName, MethodArguments) const;
+    Constructor *invocateMethod(Constructor *, MethodName, MethodArguments);
 
     Constructor *assignedValue(PropertyName) const;
+
+    virtual ~Context();
 
 private:
     map<ClassName, ObjectClassBody*> classes;

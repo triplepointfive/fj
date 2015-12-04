@@ -12,7 +12,9 @@ typedef std::map<MethodName, MethodBody*> Methods;
 class ObjectClassBody {
 public:
     virtual Properties getProperties() const { return Properties(); }
-    virtual Methods getMethods() const { return Methods(); }
+    virtual MethodBody *getMethod(MethodName) const { return nullptr; }
+    virtual ClassName getClassName() const { return ClassName("Object"); }
+    virtual ~ObjectClassBody() {}
 };
 
 class ClassBody : public ObjectClassBody {
@@ -20,14 +22,16 @@ public:
     ClassBody(ClassName, Properties, Methods, ObjectClassBody*);
 
     Properties getProperties() const override;
-    Methods getMethods() const override;
+    MethodBody *getMethod(MethodName) const override;
+    ClassName getClassName() const override;
+
+    virtual ~ClassBody();
 
 protected:
     ClassName className;
     Properties properties;
     Methods methods;
     ObjectClassBody *parentClass;
-    // TODO: Cleanup methods bodies
 };
 
 #endif //FJ_CLASS_BODY_H
