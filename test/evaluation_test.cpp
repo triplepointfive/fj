@@ -39,7 +39,7 @@ TEST (Pair, setfst) {
 
     Constructor *setFstTerm = new Constructor(pairClassName, newPairClassArgs);
 
-    MethodBody *setFstBody = new MethodBody(setFstTerm, setFstArgs);
+    MethodBody *setFstBody = new MethodBody(setFst, setFstTerm, setFstArgs);
 
     Methods methods;
     methods[setFst] = setFstBody;
@@ -60,12 +60,7 @@ TEST (Pair, setfst) {
     Constructor *basePair = new Constructor(pairClassName, args);
     MethodArguments newArgs;
     newArgs[newFstName] = new Constructor(bClassName, MethodArguments());
-    std::cout << endl << "Start invocation" << endl;
-//    Constructor *newPair = ctx.invocateMethod(basePair, setFst, newArgs);
-    Constructor *newPair = setFstBody->invocate(basePair, newArgs, &ctx);
-
-
-    std::cout << endl << "Complete invocation" << endl;
+    Constructor *newPair = ctx.invocateMethod(basePair, setFst, newArgs);
 
     EXPECT_EQ(newPair->getClassName(), pairClassName);
     EXPECT_TRUE(newPair->getAttribute(fst)->isValue());

@@ -9,7 +9,7 @@ add_library(fj_lib src/term.cpp src/term_visitor.h src/eval_term_visitor.cpp src
 add_executable(fj src/main.cpp)
 target_link_libraries(fj fj_lib)
 
-add_executable(fj_test test/context_test.cpp test/evaluation_test.cpp.cpp)
+add_executable(fj_test test/class_body_test.cpp test/context_test.cpp test/evaluation_test.cpp)
 include_directories(src)
 target_link_libraries(fj_test gtest gtest_main pthread)
 target_link_libraries(fj_test fj_lib)

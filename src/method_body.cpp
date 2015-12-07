@@ -3,9 +3,12 @@
 #include "context.h"
 #include "eval_term_visitor.h"
 
-MethodBody::MethodBody(Term *body, ArgumentsDeclaration declaration) {
+MethodBody::MethodBody(MethodName name,
+                       Term *body,
+                       ArgumentsDeclaration declaration) {
     this->body = body;
     this->args = declaration;
+    this->name = name;
 }
 
 MethodBody::~MethodBody() {

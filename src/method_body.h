@@ -12,7 +12,7 @@ class Context;
 
 class MethodBody {
 public:
-    MethodBody(Term *, ArgumentsDeclaration);
+    MethodBody(MethodName, Term *, ArgumentsDeclaration);
 
     virtual ~MethodBody();
 
@@ -20,8 +20,11 @@ public:
                           MethodArguments &arguments,
                           Context *context);
 
+    MethodName getName() const { return name; }
+
 protected:
     Term *body;
+    MethodName name;
     ArgumentsDeclaration args;
 };
 

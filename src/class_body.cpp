@@ -19,9 +19,9 @@ Properties ClassBody::getProperties() const {
 MethodBody *ClassBody::getMethod(MethodName methodName) const {
     auto i = methods.find(methodName);
     if (methods.end() == i) {
-        return i->second;
-    } else {
         return parentClass->getMethod(methodName);
+    } else {
+        return i->second;
     }
 }
 

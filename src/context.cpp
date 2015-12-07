@@ -13,7 +13,6 @@ bool Context::isASubtype(std::string, std::string) const {
 
 Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
                                      MethodArguments args) {
-    std::cout << endl << "invocateMethod" << endl;
     assert((bool)classes.count(object->getClassName()));
     ObjectClassBody *classBody = classes.find(object->getClassName())->second;
     MethodBody *methodBody = classBody->getMethod(methodName);
