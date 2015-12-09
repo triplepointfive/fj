@@ -10,12 +10,16 @@ class Tokenizer {
 public:
     Tokenizer(std::string fileName);
 
-    std::vector<std::string> tokenize();
+    std::vector<Token*> tokenize();
 
 private:
-    std::string getNextToken();
+    void releaseToken();
+    char getNextChar();
+    void addToAcc(char);
 
-    std::string content;
+    std::string content, acc;
+    size_t currentLine, currentColumn;
+    size_t positionInFile;
 };
 
 #endif //FJ_TOKENIZER_H
