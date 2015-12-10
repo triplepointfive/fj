@@ -8,9 +8,9 @@ using namespace std;
 
 int main() {
     Tokenizer tokenizer("/home/ilya/Projects/fj/examples/simple_class.java");
-    std::vector<std::string> tokens = tokenizer.tokenize();
+    std::vector<Token*> tokens = tokenizer.tokenize();
     for (auto elem : tokens) {
-        std::cout << elem << std::endl;
+        std::cout << elem->show() << std::endl;
     }
     return 0;
 }

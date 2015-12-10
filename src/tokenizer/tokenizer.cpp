@@ -15,7 +15,10 @@ Tokenizer::Tokenizer(std::string fileName) {
 
 void Tokenizer::releaseToken() {
     if (acc.size() != 0) {
+        Token *newToken = new Token(currentLine, currentColumn, acc);
+        tokens.push_back(newToken);
         acc = "";
+        currentColumn = positionInFile;
     }
 }
 
@@ -25,10 +28,12 @@ std::vector<Token*> Tokenizer::tokenize() {
         switch (nextChat) {
             case 0:
                 releaseToken();
-                break;
+                return tokens;
             case '\n':
                 currentLine++;
                 currentColumn = 1;
+            case ',':
+            case ';':
             case '\t':
             case ' ':
                 releaseToken();
@@ -40,9 +45,9 @@ std::vector<Token*> Tokenizer::tokenize() {
                 releaseToken();
                 break;
             default:
-
+                addToAcc(nextChat);
+                break;
         }
-        break;
     }
 }
 
@@ -51,8 +56,5 @@ void Tokenizer::addToAcc(char c) {
 }
 
 char Tokenizer::getNextChar() {
-    char c = content[positionInFile];
-    positionInFile++;
-    currentColumn++;
-    return c;
+    return content[positionInFile++];
 }

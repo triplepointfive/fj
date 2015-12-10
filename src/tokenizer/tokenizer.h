@@ -17,6 +17,7 @@ private:
     char getNextChar();
     void addToAcc(char);
 
+    std::vector<Token*> tokens;
     std::string content, acc;
     size_t currentLine, currentColumn;
     size_t positionInFile;
