@@ -15,7 +15,7 @@ Tokenizer::Tokenizer(std::string fileName) {
 
 void Tokenizer::releaseToken() {
     if (acc.size() != 0) {
-        Token *newToken = new Token(currentLine, currentColumn, acc);
+        Token *newToken = TokenBuilder().build(currentLine, currentColumn, acc);
         tokens.push_back(newToken);
         acc = "";
         currentColumn = positionInFile;

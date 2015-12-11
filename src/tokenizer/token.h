@@ -2,6 +2,7 @@
 #define FJ_TOKEN_H
 
 #include <string>
+#include <iostream>
 #include "glob.h"
 
 class Token {
@@ -12,9 +13,11 @@ public:
         this->token = token;
     }
     std::string show() const {
+        std::cout << token;
         return std::to_string(line) + "," + std::to_string(column) + ": " + token;
     }
-private:
+
+protected:
     size_t line, column;
     std::string token;
 };
