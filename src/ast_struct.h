@@ -6,6 +6,54 @@
 
 #include <pegtl.hh>
 
+namespace fj {
+    // Parsing rule that matches a literal "class".
+    struct class_keyword
+            : pegtl::string< 'c', 'l', 'a', 's', 's' > {};
+
+    // Parsing rule that matches a literal "extends".
+    struct extends_keyword
+            : pegtl::string< 'e', 'x', 't', 'e', 'n', 'd', 's' > {};
+
+    // Parsing rule that matches a literal "super".
+    struct super_keyword
+            : pegtl::string< 's', 'u', 'p', 'e', 'r' > {};
+
+    // Parsing rule that matches a literal "return".
+    struct return_keyword
+            : pegtl::string< 'r', 'e', 't', 'u', 'r', 'n' > {};
+
+    // Parsing rule that matches a literal "new".
+    struct new_keyword
+            : pegtl::string< 'n', 'e', 'w' > {};
+
+    // Parsing rule that matches a literal "this".
+    struct this_keyword
+            : pegtl::string< 't', 'h', 'i', 's' > {};
+
+    // Parsing rule that matches a non-empty sequence of
+    // alphabetic ascii-characters with greedy-matching.
+    struct class_name
+            : pegtl::plus< pegtl::alpha > {};
+
+    // Parsing rule that matches a non-empty sequence of
+    // alphabetic ascii-characters with greedy-matching.
+    struct method_name
+            : pegtl::plus< pegtl::alpha > {};
+
+    // Parsing rule that matches a non-empty sequence of
+    // alphabetic ascii-characters with greedy-matching.
+    // Could be used for both property and argument names.
+    struct object_name
+            : pegtl::plus< pegtl::alpha > {};
+
+    struct class_def
+            : pegtl::seq< class_keyword, class_name,
+                    extends_keyword, class_name,
+                    pegtl::string < '{' >,
+                    pegtl::string < '}' > > {};
+}
+
 namespace hello
 {
     // Parsing rule that matches a literal "Hello, ".
@@ -48,7 +96,7 @@ namespace hello
 
 } // hello
 
-int main( int argc, char * argv[] )
+int main1( int argc, char * argv[] )
 {
     if ( argc > 1 ) {
         // Start a parsing run of argv[1] with the string
