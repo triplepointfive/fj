@@ -9,7 +9,7 @@ add_library(fj_lib src/term.cpp src/term_visitor.h src/eval_term_visitor.cpp src
 add_executable(fj src/main.cpp src/tokenizer/keyword_token.cpp src/tokenizer/keyword_token.h src/tokenizer/tokenizer.cpp src/tokenizer/tokenizer.h src/tokenizer/token.h src/tokenizer/token_builder.cpp src/tokenizer/token_builder.h src/tokenizer/bracket_token.cpp src/tokenizer/bracket_token.h)
 target_link_libraries(fj fj_lib)
 
-add_executable(fj_test test/class_body_test.cpp test/context_test.cpp test/evaluation_test.cpp)
+add_executable(fj_test test/class_body_test.cpp test/context_test.cpp test/evaluation_test.cpp test/tokenizer_test.cpp)
 include_directories(../PEGTL)
 include_directories(src)
 target_link_libraries(fj_test gtest gtest_main pthread)
