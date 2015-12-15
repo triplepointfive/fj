@@ -48,7 +48,7 @@ namespace fj {
             : pegtl::plus< pegtl::alpha > {};
 
     struct class_def
-            : pegtl::seq< class_keyword, class_name,
+            : pegtl::must< class_keyword, class_name,
                     extends_keyword, class_name,
                     pegtl::string < '{' >,
                     pegtl::string < '}' > > {};
