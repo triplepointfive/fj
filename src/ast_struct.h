@@ -7,51 +7,91 @@
 #include <pegtl.hh>
 
 namespace fj {
+    using namespace pegtl;
+    // Comments are introduced by a '#' and proceed to the end-of-line/file.
+    struct comment
+            : if_must< two< '/' >, until< eolf > > {};
+
+    // The calculator ignores all spaces and comments; space is a pegtl rule
+    // that matches the usual ascii characters ' ', '\t', '\n' etc. In other
+    // words, everything that is space or a comment is ignored.
+    struct ignored
+            : sor< space, comment > {};
+
     // Parsing rule that matches a literal "class".
     struct class_keyword
-            : pegtl::string< 'c', 'l', 'a', 's', 's' > {};
+            : string< 'c', 'l', 'a', 's', 's' > {};
 
     // Parsing rule that matches a literal "extends".
     struct extends_keyword
-            : pegtl::string< 'e', 'x', 't', 'e', 'n', 'd', 's' > {};
+            : string< 'e', 'x', 't', 'e', 'n', 'd', 's' > {};
 
     // Parsing rule that matches a literal "super".
     struct super_keyword
-            : pegtl::string< 's', 'u', 'p', 'e', 'r' > {};
+            : string< 's', 'u', 'p', 'e', 'r' > {};
 
     // Parsing rule that matches a literal "return".
     struct return_keyword
-            : pegtl::string< 'r', 'e', 't', 'u', 'r', 'n' > {};
+            : string< 'r', 'e', 't', 'u', 'r', 'n' > {};
 
     // Parsing rule that matches a literal "new".
     struct new_keyword
-            : pegtl::string< 'n', 'e', 'w' > {};
+            : string< 'n', 'e', 'w' > {};
 
     // Parsing rule that matches a literal "this".
     struct this_keyword
-            : pegtl::string< 't', 'h', 'i', 's' > {};
+            : string< 't', 'h', 'i', 's' > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
     struct class_name
-            : pegtl::plus< pegtl::alpha > {};
+            : seq < space, plus< alpha >, space> {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
     struct method_name
-            : pegtl::plus< pegtl::alpha > {};
+            : plus< alpha > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
     // Could be used for both property and argument names.
     struct object_name
-            : pegtl::plus< pegtl::alpha > {};
+            : plus< alpha > {};
 
     struct class_def
-            : pegtl::must< class_keyword, class_name,
-                    extends_keyword, class_name,
-                    pegtl::string < '{' >,
-                    pegtl::string < '}' > > {};
+            : seq< class_keyword, class_name > {};
+//                    extends_keyword, class_name,
+//                    one < '{' >,
+//                    one < '}' > > {};
+
+//    struct class_def
+//            : seq< class_keyword, class_name,
+//                    extends_keyword, class_name,
+//                    one < '{' >,
+//                    one < '}' > > {};
+
+    // The top-level grammar allows one class defenition and then expects eof.
+    struct grammar
+            : must< class_def, eof > {};
+
+    // Class template for user-defined actions that does
+    // nothing by default.
+
+    template< typename Rule >
+    struct action
+            : pegtl::nothing< Rule > {};
+
+    // Specialisation of the user-defined action to do
+    // something when the 'name' rule succeeds; is called
+    // with the portion of the input that matched the rule.
+
+    template<> struct action< class_name >
+    {
+        static void apply( const pegtl::input & in, std::string & name )
+        {
+            name = in.string();
+        }
+    };
 }
 
 namespace hello
@@ -95,18 +135,5 @@ namespace hello
     };
 
 } // hello
-
-int main1( int argc, char * argv[] )
-{
-    if ( argc > 1 ) {
-        // Start a parsing run of argv[1] with the string
-        // variable 'name' as additional argument to the
-        // action; then print what the action put there.
-
-        std::string name;
-        pegtl::parse< hello::grammar, hello::action >( 1, argv, name );
-        std::cout << "Good bye, " << name << "!" << std::endl;
-    }
-}
 
 #endif //FJ_AST_STRUCT_H
