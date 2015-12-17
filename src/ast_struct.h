@@ -6,17 +6,34 @@
 
 #include <pegtl.hh>
 
+class ClassDeclaration {
+public:
+    ClassDeclaration(std::string name) {
+        this->name = name;
+    };
+    void setParentName(std::string name) { this->parent_name = name; };
+
+    std::string getName() const { return name; };
+    std::string getParentName() const { return parent_name; };
+
+private:
+    std::string name, parent_name;
+};
+
+class ParsedContext {
+public:
+    ParsedContext() {};
+    void addClass(ClassDeclaration newClass) { classes.push_back(newClass); };
+    ClassDeclaration *currentClass() {
+        assert((bool)classes.size());
+        return &classes.back();
+    }
+private:
+    std::vector< ClassDeclaration > classes;
+};
+
 namespace fj {
     using namespace pegtl;
-    // Comments are introduced by a '#' and proceed to the end-of-line/file.
-    struct comment
-            : if_must< two< '/' >, until< eolf > > {};
-
-    // The calculator ignores all spaces and comments; space is a pegtl rule
-    // that matches the usual ascii characters ' ', '\t', '\n' etc. In other
-    // words, everything that is space or a comment is ignored.
-    struct ignored
-            : sor< space, comment > {};
 
     // Parsing rule that matches a literal "class".
     struct class_keyword
@@ -44,8 +61,12 @@ namespace fj {
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
-    struct class_name
-            : seq < space, plus< alpha >, space> {};
+    struct declared_class_name
+            : plus< alpha > {};
+
+    // Matches the class name after the extends keyword.
+    struct inherited_class_name
+            : plus< alpha > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
@@ -58,82 +79,46 @@ namespace fj {
     struct object_name
             : plus< alpha > {};
 
+    // Ignores leading and trailing spaces.
+    template < typename Rule >
+    struct lexeme
+            : seq < space, Rule, space> {};
+
+    // Matches the pattern like "{Rule}"
+    template < typename Rule >
+    struct surrounded_with_braces
+            : seq < one < '{' >, Rule, one < '}' >> {};
+
+    struct class_body
+            : surrounded_with_braces < space > {};
+
     struct class_def
-            : seq< class_keyword, class_name > {};
-//                    extends_keyword, class_name,
-//                    one < '{' >,
-//                    one < '}' > > {};
+            : seq< class_keyword, lexeme < declared_class_name >,
+                   extends_keyword, lexeme < inherited_class_name > > {};
+//                   class_body > {};
 
-//    struct class_def
-//            : seq< class_keyword, class_name,
-//                    extends_keyword, class_name,
-//                    one < '{' >,
-//                    one < '}' > > {};
-
-    // The top-level grammar allows one class defenition and then expects eof.
+    // The top-level grammar allows one class definition and then expects eof.
     struct grammar
             : must< class_def, eof > {};
 
-    // Class template for user-defined actions that does
-    // nothing by default.
-
+    // Top level action for parser.
     template< typename Rule >
     struct action
             : pegtl::nothing< Rule > {};
 
-    // Specialisation of the user-defined action to do
-    // something when the 'name' rule succeeds; is called
-    // with the portion of the input that matched the rule.
+    // Init new class with given name.
+    template<> struct action< declared_class_name > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            context.addClass(ClassDeclaration(in.string()));
+        }
+    };
 
-    template<> struct action< class_name >
-    {
-        static void apply( const pegtl::input & in, std::string & name )
-        {
-            name = in.string();
+    // Assign the parent class name with current class.
+    template<> struct action< inherited_class_name > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            context.currentClass()->setParentName(in.string());
         }
     };
 }
-
-namespace hello
-{
-    // Parsing rule that matches a literal "Hello, ".
-
-    struct prefix
-            : pegtl::string< 'H', 'e', 'l', 'l', 'o', ',', ' ' > {};
-
-    // Parsing rule that matches a non-empty sequence of
-    // alphabetic ascii-characters with greedy-matching.
-
-    struct name
-            : pegtl::plus< pegtl::alpha > {};
-
-    // Parsing rule that matches a sequence of the 'prefix'
-    // rule, the 'name' rule, a literal "!", and 'eof'
-    // (end-of-file/input), and that throws an exception
-    // on failure.
-
-    struct grammar
-            : pegtl::must< prefix, name, pegtl::one< '!' >, pegtl::eof > {};
-
-    // Class template for user-defined actions that does
-    // nothing by default.
-
-    template< typename Rule >
-    struct action
-            : pegtl::nothing< Rule > {};
-
-    // Specialisation of the user-defined action to do
-    // something when the 'name' rule succeeds; is called
-    // with the portion of the input that matched the rule.
-
-    template<> struct action< name >
-    {
-        static void apply( const pegtl::input & in, std::string & name )
-        {
-            name = in.string();
-        }
-    };
-
-} // hello
 
 #endif //FJ_AST_STRUCT_H
