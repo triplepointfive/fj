@@ -28,6 +28,7 @@ public:
         assert((bool)classes.size());
         return &classes.back();
     }
+    std::vector< ClassDeclaration > getClasses() const { return classes; }
 private:
     std::vector< ClassDeclaration > classes;
 };
@@ -90,16 +91,16 @@ namespace fj {
             : seq < one < '{' >, Rule, one < '}' >> {};
 
     struct class_body
-            : surrounded_with_braces < space > {};
+            : surrounded_with_braces < opt < space > > {};
 
     struct class_def
             : seq< class_keyword, lexeme < declared_class_name >,
-                   extends_keyword, lexeme < inherited_class_name > > {};
-//                   class_body > {};
+                   extends_keyword, lexeme < inherited_class_name >,
+                   class_body > {};
 
     // The top-level grammar allows one class definition and then expects eof.
     struct grammar
-            : must< class_def, eof > {};
+            : list< class_def, eof > {};
 
     // Top level action for parser.
     template< typename Rule >
