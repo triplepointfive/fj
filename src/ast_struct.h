@@ -12,6 +12,7 @@ public:
         this->name = name;
     };
     void setParentName(std::string name) { this->parent_name = name; };
+    void addProperty(std::string name) { };
 
     std::string getName() const { return name; };
     std::string getParentName() const { return parent_name; };
@@ -62,11 +63,7 @@ namespace fj {
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
-    struct declared_class_name
-            : plus< alpha > {};
-
-    // Matches the class name after the extends keyword.
-    struct inherited_class_name
+    struct class_name
             : plus< alpha > {};
 
     // Parsing rule that matches a non-empty sequence of
@@ -78,7 +75,25 @@ namespace fj {
     // alphabetic ascii-characters with greedy-matching.
     // Could be used for both property and argument names.
     struct object_name
-            : plus< alpha > {};
+            : plus< alnum > {};
+
+    // Parsing rule that matches a non-empty sequence of
+    // alphabetic ascii-characters with greedy-matching.
+    struct declared_class_name
+            : class_name {};
+
+    // Matches the class name after the extends keyword.
+    struct inherited_class_name
+            : class_name {};
+
+    struct property_def
+            : seq< class_name, space, object_name > {};
+
+    struct class_terms
+            : sor < property_def > {};
+
+    struct semicolon
+            : seq < opt < space >, one < ';' >, opt < space > > {};
 
     // Ignores leading and trailing spaces.
     template < typename Rule >
@@ -91,7 +106,7 @@ namespace fj {
             : seq < one < '{' >, Rule, one < '}' >> {};
 
     struct class_body
-            : surrounded_with_braces < opt < space > > {};
+            : surrounded_with_braces < list < class_terms, semicolon > > {};
 
     struct class_def
             : seq< class_keyword, lexeme < declared_class_name >,
@@ -100,7 +115,7 @@ namespace fj {
 
     // The top-level grammar allows one class definition and then expects eof.
     struct grammar
-            : list< class_def, eof > {};
+            : list< class_def, opt < space > > {};
 
     // Top level action for parser.
     template< typename Rule >
@@ -118,6 +133,13 @@ namespace fj {
     template<> struct action< inherited_class_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             context.currentClass()->setParentName(in.string());
+        }
+    };
+
+    // Process the property name in class declaration.
+    template<> struct action< class_body > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "Prop" << in.string() << std::endl;
         }
     };
 }
