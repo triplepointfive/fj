@@ -6,19 +6,26 @@
 
 #include <pegtl.hh>
 
+typedef std::map<std::string, std::string> Properties;
+
 class ClassDeclaration {
 public:
     ClassDeclaration(std::string name) {
         this->name = name;
     };
-    void setParentName(std::string name) { this->parent_name = name; };
-    void addProperty(std::string name) { };
+    void setParentName(std::string name) { this->parentName = name; };
+    void addProperty(std::string className, std::string propertyName) {
+        // TODO: Fail if not unique.
+        properties[propertyName] = className;
+    };
 
     std::string getName() const { return name; };
-    std::string getParentName() const { return parent_name; };
+    std::string getParentName() const { return parentName; };
+    const Properties *getProperties() const { return &properties; };
 
 private:
-    std::string name, parent_name;
+    std::string name, parentName;
+    Properties properties;
 };
 
 class ParsedContext {
@@ -106,12 +113,12 @@ namespace fj {
             : seq < one < '{' >, Rule, one < '}' >> {};
 
     struct class_body
-            : surrounded_with_braces < list < class_terms, semicolon > > {};
+            : list < class_terms, semicolon > {};
 
     struct class_def
             : seq< class_keyword, lexeme < declared_class_name >,
                    extends_keyword, lexeme < inherited_class_name >,
-                   class_body > {};
+                   surrounded_with_braces < class_body > > {};
 
     // The top-level grammar allows one class definition and then expects eof.
     struct grammar
@@ -137,8 +144,9 @@ namespace fj {
     };
 
     // Process the property name in class declaration.
-    template<> struct action< class_body > {
+    template<> struct action< property_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
+//            context.currentClass()->addProperty();
             std::cout << "Prop" << in.string() << std::endl;
         }
     };
