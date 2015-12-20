@@ -109,20 +109,22 @@ namespace fj {
 
     // Matches the pattern like "{Rule}"
     template < typename Rule >
-    struct surrounded_with_braces
+    struct sur_with_braces
             : seq < one < '{' >, Rule, one < '}' >> {};
 
-    struct class_body
-            : list < class_terms, semicolon > {};
+    // Matches "class A extends B"
+    struct class_header : seq < class_keyword, lexeme < declared_class_name >,
+           extends_keyword, lexeme < inherited_class_name > > {};
 
-    struct class_def
-            : seq< class_keyword, lexeme < declared_class_name >,
-                   extends_keyword, lexeme < inherited_class_name >,
-                   surrounded_with_braces < class_body > > {};
+    // Matches the content of {"..."}.
+    struct class_body : star < class_terms, semicolon > {};
+
+    // Matches the whole class body.
+    struct class_def : at< class_header, sur_with_braces< class_body > > {};
 
     // The top-level grammar allows one class definition and then expects eof.
-    struct grammar
-            : list< class_def, opt < space > > {};
+    struct file
+            : until< eof, class_def > {};
 
     // Top level action for parser.
     template< typename Rule >
