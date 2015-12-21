@@ -45,49 +45,39 @@ namespace fj {
     using namespace pegtl;
 
     // Parsing rule that matches a literal "class".
-    struct class_keyword
-            : string< 'c', 'l', 'a', 's', 's' > {};
+    struct class_keyword : string< 'c', 'l', 'a', 's', 's' > {};
 
     // Parsing rule that matches a literal "extends".
-    struct extends_keyword
-            : string< 'e', 'x', 't', 'e', 'n', 'd', 's' > {};
+    struct extends_keyword : string< 'e', 'x', 't', 'e', 'n', 'd', 's' > {};
 
     // Parsing rule that matches a literal "super".
-    struct super_keyword
-            : string< 's', 'u', 'p', 'e', 'r' > {};
+    struct super_keyword : string< 's', 'u', 'p', 'e', 'r' > {};
 
     // Parsing rule that matches a literal "return".
-    struct return_keyword
-            : string< 'r', 'e', 't', 'u', 'r', 'n' > {};
+    struct return_keyword : string< 'r', 'e', 't', 'u', 'r', 'n' > {};
 
     // Parsing rule that matches a literal "new".
-    struct new_keyword
-            : string< 'n', 'e', 'w' > {};
+    struct new_keyword : string< 'n', 'e', 'w' > {};
 
     // Parsing rule that matches a literal "this".
-    struct this_keyword
-            : string< 't', 'h', 'i', 's' > {};
+    struct this_keyword : string< 't', 'h', 'i', 's' > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
-    struct class_name
-            : plus< alpha > {};
+    struct class_name : plus< alpha > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
-    struct method_name
-            : plus< alpha > {};
+    struct method_name : plus< alpha > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
     // Could be used for both property and argument names.
-    struct object_name
-            : plus< alnum > {};
+    struct object_name : plus< alnum > {};
 
     // Parsing rule that matches a non-empty sequence of
     // alphabetic ascii-characters with greedy-matching.
-    struct declared_class_name
-            : class_name {};
+    struct declared_class_name : class_name {};
 
     // Matches the class name after the extends keyword.
     struct inherited_class_name
@@ -100,7 +90,7 @@ namespace fj {
             : sor < property_def > {};
 
     struct semicolon
-            : seq < opt < space >, one < ';' >, opt < space > > {};
+            : pad < one < ';' >, space, space > {};
 
     // Ignores leading and trailing spaces.
     template < typename Rule >
@@ -117,10 +107,10 @@ namespace fj {
            extends_keyword, lexeme < inherited_class_name > > {};
 
     // Matches the content of {"..."}.
-    struct class_body : star < class_terms, semicolon > {};
+    struct class_body : seq < list < class_terms, semicolon >, semicolon > {};
 
     // Matches the whole class body.
-    struct class_def : at< class_header, sur_with_braces< class_body > > {};
+    struct class_def : seq< class_header, sur_with_braces< class_body > > {};
 
     // The top-level grammar allows one class definition and then expects eof.
     struct file
@@ -134,6 +124,7 @@ namespace fj {
     // Init new class with given name.
     template<> struct action< declared_class_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "declared_class_name: " << in.string() << std::endl;
             context.addClass(ClassDeclaration(in.string()));
         }
     };
@@ -141,6 +132,7 @@ namespace fj {
     // Assign the parent class name with current class.
     template<> struct action< inherited_class_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "inherited_class_name: " << in.string() << std::endl;
             context.currentClass()->setParentName(in.string());
         }
     };
@@ -148,8 +140,13 @@ namespace fj {
     // Process the property name in class declaration.
     template<> struct action< property_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
-//            context.currentClass()->addProperty();
-            std::cout << "Prop" << in.string() << std::endl;
+            std::cout << "property_def: " << in.string() << std::endl;
+            std::string propertyDefinition = in.string();
+            // TODO: Assumes delimiter is a space, should be more abstract.
+            unsigned long space = propertyDefinition.find(" ");
+            std::string className = propertyDefinition.substr(0, space);
+            std::string propertyName = propertyDefinition.substr(space + 1, propertyDefinition.size());
+            context.currentClass()->addProperty(className, propertyName);
         }
     };
 }
