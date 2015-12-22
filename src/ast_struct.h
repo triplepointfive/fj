@@ -100,7 +100,9 @@ namespace fj {
     // Matches the pattern like "{Rule}"
     template < typename Rule >
     struct sur_with_braces
-            : seq < one < '{' >, Rule, one < '}' >> {};
+            : seq < pad < one < '{' >, space, space>,
+                    Rule,
+                    pad < one < '}' >, space, space> > {};
 
     // Matches "class A extends B"
     struct class_header : seq < class_keyword, lexeme < declared_class_name >,
@@ -114,7 +116,7 @@ namespace fj {
 
     // The top-level grammar allows one class definition and then expects eof.
     struct file
-            : until< eof, class_def > {};
+            : until< eof, list < class_def, opt < space > > > {};
 
     // Top level action for parser.
     template< typename Rule >
