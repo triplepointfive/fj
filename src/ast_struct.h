@@ -44,6 +44,8 @@ private:
 namespace fj {
     using namespace pegtl;
 
+    /* Keywords */
+
     // Parsing rule that matches a literal "class".
     struct class_keyword : string< 'c', 'l', 'a', 's', 's' > {};
 
@@ -62,47 +64,66 @@ namespace fj {
     // Parsing rule that matches a literal "this".
     struct this_keyword : string< 't', 'h', 'i', 's' > {};
 
-    // Parsing rule that matches a non-empty sequence of
-    // alphabetic ascii-characters with greedy-matching.
+    /* Special characters with optional paddes */
+
+    struct semicolon : pad < one < ';' >, space, space > {};
+    struct open_brace : pad < one < '{' >, space, space > {};
+    struct close_brace : pad < one < '}' >, space, space > {};
+    struct open_bracket : pad < one < '(' >, space, space > {};
+    struct close_bracket : pad < one < ')' >, space, space > {};
+    struct comma : pad < one < ',' >, space, space > {};
+
+    /* Grammar */
+
     struct class_name : plus< alpha > {};
 
-    // Parsing rule that matches a non-empty sequence of
-    // alphabetic ascii-characters with greedy-matching.
     struct method_name : plus< alpha > {};
 
-    // Parsing rule that matches a non-empty sequence of
-    // alphabetic ascii-characters with greedy-matching.
     // Could be used for both property and argument names.
     struct object_name : plus< alnum > {};
 
-    // Parsing rule that matches a non-empty sequence of
-    // alphabetic ascii-characters with greedy-matching.
+    // Matches the name of new class.
     struct declared_class_name : class_name {};
 
     // Matches the class name after the extends keyword.
-    struct inherited_class_name
-            : class_name {};
+    struct inherited_class_name : class_name {};
 
-    struct property_def
-            : seq< class_name, space, object_name > {};
+    // Matches new property inside class body.
+    struct property_def : seq < class_name, space, object_name > {};
 
-    struct class_terms
-            : sor < property_def > {};
+    // A list of base units inside class body: properties, methods etc.
+    struct class_terms : sor < property_def > {};
 
-    struct semicolon
-            : pad < one < ';' >, space, space > {};
-
-    // Ignores leading and trailing spaces.
+    // Ignores mandatory leading and trailing spaces.
     template < typename Rule >
-    struct lexeme
-            : seq < space, Rule, space> {};
+    struct lexeme : seq < space, Rule, space> {};
 
     // Matches the pattern like "{Rule}"
     template < typename Rule >
-    struct sur_with_braces
-            : seq < pad < one < '{' >, space, space>,
-                    Rule,
-                    pad < one < '}' >, space, space> > {};
+    struct sur_with_braces : seq < open_brace, Rule, close_brace > {};
+
+    // Matches the pattern like "(Rule)"
+    template < typename Rule >
+    struct sur_with_brackets : seq < open_bracket, Rule, close_bracket > {};
+
+    // Matches single method argument, like "Object x".
+    struct method_arg : seq < class_name, space, object_name > {};
+
+    // Matches "Object x, ..." or just nothing for method with no arguments.
+    struct method_arguments : opt < list < method_arg, comma > > {};
+
+    // Matches constructor definition, in this case it should match class name.
+    struct constructor_head : class_name {};
+
+    // TODO: Add method declaration option.
+    struct method_head : seq < sor < constructor_head >,
+            sur_with_brackets < method_arguments > > {};
+
+    // Matches the content of {"..."}.
+    struct method_body : seq < list < class_terms, semicolon >, semicolon > {};
+
+    // Matches single method definition.
+    struct method_def : seq < method_head, sur_with_braces < method_body > > {};
 
     // Matches "class A extends B"
     struct class_header : seq < class_keyword, lexeme < declared_class_name >,
@@ -115,8 +136,7 @@ namespace fj {
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};
 
     // The top-level grammar allows one class definition and then expects eof.
-    struct file
-            : until< eof, list < class_def, opt < space > > > {};
+    struct file : until< eof, list < class_def, opt < space > > > {};
 
     // Top level action for parser.
     template< typename Rule >
@@ -149,6 +169,13 @@ namespace fj {
             std::string className = propertyDefinition.substr(0, space);
             std::string propertyName = propertyDefinition.substr(space + 1, propertyDefinition.size());
             context.currentClass()->addProperty(className, propertyName);
+        }
+    };
+
+    // Process method argument.
+    template<> struct action< method_arg > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "method_arg: " << in.string() << std::endl;
         }
     };
 }

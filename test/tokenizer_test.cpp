@@ -158,3 +158,67 @@ TEST (AST, class_inheritance) {
     EXPECT_EQ("B", newClass->getName());
     EXPECT_EQ("A", newClass->getParentName());
 }
+
+TEST (AST, single_method_argument) {
+    ParsedContext context;
+    const std::string input = "Object prop1";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_arg, fj::action >(
+        input,
+        "input variable",
+        context
+    );
+
+    ASSERT_TRUE(status);
+}
+
+TEST (AST, a_list_of_method_arguments) {
+    ParsedContext context;
+    const std::string input = "Object a, Object b";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_arguments, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
+
+TEST (AST, constructor_header_with_no_arguments) {
+    ParsedContext context;
+    const std::string input = "A()";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_head, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
+
+TEST (AST, constructor_header_with_single_argument) {
+    ParsedContext context;
+    const std::string input = "A( Object a )";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_head, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
