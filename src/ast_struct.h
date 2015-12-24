@@ -7,6 +7,29 @@
 #include <pegtl.hh>
 
 typedef std::map<std::string, std::string> Properties;
+typedef std::map<std::string, std::string> Arguments;
+typedef std::map<std::string, std::string> Methods;
+
+class MethodDeclaration {
+public:
+    MethodDeclaration(std::string name, std::string return_class_name) {
+        this->name = name;
+        this->return_class_name = return_class_name;
+    }
+
+    void addArg(std::string name, std::string class_name) {
+        // TODO: Validate uniqueness
+        args[name] = class_name;
+    }
+
+    Arguments getArgs() const { return args; }
+    std::string getName() const { return name; }
+    std::string getReturnClassName() const { return return_class_name; }
+
+private:
+    std::string name, return_class_name;
+    Arguments args;
+};
 
 class ClassDeclaration {
 public:
@@ -18,7 +41,16 @@ public:
         // TODO: Fail if not unique.
         properties[propertyName] = className;
     };
+    void addMethod(std::string method_name, std::string return_class_name) {
+        methods.push_back(MethodDeclaration(method_name, return_class_name));
+    };
 
+    MethodDeclaration *currentMethod() {
+        assert((bool)methods.size());
+        return &methods.back();
+    }
+
+    std::vector<MethodDeclaration> getMethods() const { return methods; }
     std::string getName() const { return name; };
     std::string getParentName() const { return parentName; };
     const Properties *getProperties() const { return &properties; };
@@ -26,6 +58,7 @@ public:
 private:
     std::string name, parentName;
     Properties properties;
+    std::vector<MethodDeclaration> methods;
 };
 
 class ParsedContext {
@@ -176,6 +209,15 @@ namespace fj {
     template<> struct action< method_arg > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "method_arg: " << in.string() << std::endl;
+        }
+    };
+
+    // Creates new constructor for current class.
+    template<> struct action< constructor_head > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "constructor_head: " << in.string() << std::endl;
+            std::string constructorName = in.string();
+            context.currentClass()->addMethod(constructorName, constructorName);
         }
     };
 }

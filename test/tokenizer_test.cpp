@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "ast_struct.h"
 
-TEST (Ast, class_header) {
+TEST (AST, class_header) {
     ParsedContext context;
     const std::string input = "class A extends Object ";
     bool status = pegtl::parse< fj::class_header, fj::action >(
@@ -205,6 +205,14 @@ TEST (AST, constructor_header_with_no_arguments) {
     );
 
     ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    ASSERT_TRUE((bool)newClass->getMethods().size());
+
+    MethodDeclaration *newMethod = newClass->currentMethod();
+    EXPECT_EQ(0, newMethod->getArgs().size());
+    EXPECT_EQ("A", newMethod->getName());
+    EXPECT_EQ("A", newMethod->getReturnClassName());
 }
 
 TEST (AST, constructor_header_with_single_argument) {
