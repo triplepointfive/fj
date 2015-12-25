@@ -164,6 +164,7 @@ TEST (AST, single_method_argument) {
     const std::string input = "Object prop1";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
+    classA.addMethod("method1", "Object");
     context.addClass(classA);
 
     bool status = pegtl::parse< fj::method_arg, fj::action >(
@@ -173,6 +174,15 @@ TEST (AST, single_method_argument) {
     );
 
     ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    MethodDeclaration *newMethod = newClass->currentMethod();
+
+    Arguments args = newMethod->getArgs();
+    ASSERT_EQ(1, newMethod->getArgs().size());
+
+    EXPECT_EQ("prop1", args.rbegin()->first);
+    EXPECT_EQ("Object", args.rbegin()->second);
 }
 
 TEST (AST, a_list_of_method_arguments) {
@@ -180,6 +190,7 @@ TEST (AST, a_list_of_method_arguments) {
     const std::string input = "Object a, Object b";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
+    classA.addMethod("method1", "Object");
     context.addClass(classA);
 
     bool status = pegtl::parse< fj::method_arguments, fj::action >(
@@ -189,6 +200,18 @@ TEST (AST, a_list_of_method_arguments) {
     );
 
     ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    MethodDeclaration *newMethod = newClass->currentMethod();
+
+    Arguments args = newMethod->getArgs();
+    ASSERT_EQ(2, newMethod->getArgs().size());
+
+    EXPECT_EQ("b", args.rbegin()->first);
+    EXPECT_EQ("Object", args.rbegin()->second);
+
+    EXPECT_EQ("a", args.rend()->first);
+    EXPECT_EQ("Object", args.rend()->second);
 }
 
 TEST (AST, constructor_header_with_no_arguments) {
@@ -217,7 +240,7 @@ TEST (AST, constructor_header_with_no_arguments) {
 
 TEST (AST, constructor_header_with_single_argument) {
     ParsedContext context;
-    const std::string input = "A( Object a )";
+    const std::string input = "A( Object fstArg )";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
     context.addClass(classA);
@@ -229,4 +252,15 @@ TEST (AST, constructor_header_with_single_argument) {
     );
 
     ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    MethodDeclaration *newMethod = newClass->currentMethod();
+    EXPECT_EQ("A", newMethod->getName());
+    EXPECT_EQ("A", newMethod->getReturnClassName());
+
+    Arguments args = newMethod->getArgs();
+    ASSERT_EQ(1, newMethod->getArgs().size());
+
+    EXPECT_EQ("fstArg", args.rbegin()->first);
+    EXPECT_EQ("Object", args.rbegin()->second);
 }

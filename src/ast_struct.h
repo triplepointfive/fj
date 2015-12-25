@@ -171,6 +171,14 @@ namespace fj {
     // The top-level grammar allows one class definition and then expects eof.
     struct file : until< eof, list < class_def, opt < space > > > {};
 
+
+    void splitOnSpace(std::string origin, std::string &fst, std::string &snd) {
+        // TODO: Assumes delimiter is a space, should be more abstract.
+        unsigned long space = origin.find(" ");
+        fst = origin.substr(0, space);
+        snd = origin.substr(space + 1, origin.size());
+    }
+
     // Top level action for parser.
     template< typename Rule >
     struct action
@@ -196,11 +204,8 @@ namespace fj {
     template<> struct action< property_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "property_def: " << in.string() << std::endl;
-            std::string propertyDefinition = in.string();
-            // TODO: Assumes delimiter is a space, should be more abstract.
-            unsigned long space = propertyDefinition.find(" ");
-            std::string className = propertyDefinition.substr(0, space);
-            std::string propertyName = propertyDefinition.substr(space + 1, propertyDefinition.size());
+            std::string className, propertyName;
+            splitOnSpace(in.string(), className, propertyName);
             context.currentClass()->addProperty(className, propertyName);
         }
     };
@@ -209,6 +214,9 @@ namespace fj {
     template<> struct action< method_arg > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "method_arg: " << in.string() << std::endl;
+            std::string className, argName;
+            splitOnSpace(in.string(), className, argName);
+            context.currentClass()->currentMethod()->addArg(argName, className);
         }
     };
 
