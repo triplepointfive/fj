@@ -108,12 +108,12 @@ namespace fj {
 
     /* Grammar */
 
-    struct class_name : plus< alpha > {};
+    struct class_name : plus< identifier > {};
 
-    struct method_name : plus< alpha > {};
+    struct method_name : plus< identifier > {};
 
     // Could be used for both property and argument names.
-    struct object_name : plus< alnum > {};
+    struct object_name : plus< identifier > {};
 
     // Matches the name of new class.
     struct declared_class_name : class_name {};
@@ -148,8 +148,11 @@ namespace fj {
     // Matches constructor definition, in this case it should match class name.
     struct constructor_head : class_name {};
 
-    // TODO: Add method declaration option.
-    struct method_head : seq < sor < constructor_head >,
+    // Matches common method declaration, with return type and name.
+    struct method_ret_and_name : seq < class_name, space, method_name > {};
+
+    // Matches the method head and its args list.
+    struct method_head : must < sor < method_ret_and_name, constructor_head >,
             sur_with_brackets < method_arguments > > {};
 
     // Matches the content of {"..."}.
@@ -226,6 +229,16 @@ namespace fj {
             std::cout << "constructor_head: " << in.string() << std::endl;
             std::string constructorName = in.string();
             context.currentClass()->addMethod(constructorName, constructorName);
+        }
+    };
+
+    // Creates new constructor for current class.
+    template<> struct action< method_ret_and_name > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            std::cout << "method_ret_and_name: " << in.string() << std::endl;
+            std::string className, methodName;
+            splitOnSpace(in.string(), className, methodName);
+            context.currentClass()->addMethod(methodName, className);
         }
     };
 }

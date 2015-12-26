@@ -264,3 +264,54 @@ TEST (AST, constructor_header_with_single_argument) {
     EXPECT_EQ("fstArg", args.rbegin()->first);
     EXPECT_EQ("Object", args.rbegin()->second);
 }
+
+TEST (AST, method_header_with_no_arguments) {
+    ParsedContext context;
+    const std::string input = "Object fun1()";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_head, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    ASSERT_TRUE((bool)newClass->getMethods().size());
+
+    MethodDeclaration *newMethod = newClass->currentMethod();
+    EXPECT_EQ(0, newMethod->getArgs().size());
+    EXPECT_EQ("fun1", newMethod->getName());
+    EXPECT_EQ("Object", newMethod->getReturnClassName());
+}
+
+TEST (AST, method_header_with_single_argument) {
+    ParsedContext context;
+    const std::string input = "Object fun2( Object fstArg )";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::method_head, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+
+    ClassDeclaration *newClass = context.currentClass();
+    MethodDeclaration *newMethod = newClass->currentMethod();
+    EXPECT_EQ("fun2", newMethod->getName());
+    EXPECT_EQ("Object", newMethod->getReturnClassName());
+
+    Arguments args = newMethod->getArgs();
+    ASSERT_EQ(1, newMethod->getArgs().size());
+
+    EXPECT_EQ("fstArg", args.rbegin()->first);
+    EXPECT_EQ("Object", args.rbegin()->second);
+}
