@@ -105,6 +105,7 @@ namespace fj {
     struct open_bracket : pad < one < '(' >, space, space > {};
     struct close_bracket : pad < one < ')' >, space, space > {};
     struct comma : pad < one < ',' >, space, space > {};
+    struct assign : pad < one < '=' >, space, space > {};
 
     /* Grammar */
 
@@ -138,6 +139,17 @@ namespace fj {
     // Matches the pattern like "(Rule)"
     template < typename Rule >
     struct sur_with_brackets : seq < open_bracket, Rule, close_bracket > {};
+
+    // Matches invocation of super.
+    struct super_invocation :
+            seq < super_keyword, sur_with_braces < success > > {};
+
+    // Matches assignment of property like "this.fst = fst".
+    struct assignment : seq < this_keyword, one < '.' >,
+            object_name, assign, object_name > {};
+
+    // Matches the whole content of constructor body.
+    struct constructor_body : sor < super_invocation, assignment > {};
 
     // Matches single method argument, like "Object x".
     struct method_arg : seq < class_name, space, object_name > {};
