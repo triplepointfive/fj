@@ -142,7 +142,7 @@ namespace fj {
 
     // Matches invocation of super.
     struct super_invocation :
-            seq < super_keyword, sur_with_braces < success > > {};
+            seq < super_keyword, sur_with_brackets < success > > {};
 
     // Matches assignment of property like "this.fst = fst".
     struct assignment : seq < this_keyword, one < '.' >,

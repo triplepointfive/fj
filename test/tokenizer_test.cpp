@@ -315,3 +315,29 @@ TEST (AST, method_header_with_single_argument) {
     EXPECT_EQ("fstArg", args.rbegin()->first);
     EXPECT_EQ("Object", args.rbegin()->second);
 }
+
+TEST (AST, constructor_body_super_invocation) {
+    ParsedContext context;
+    const std::string input = "super ( )";
+
+    bool status = pegtl::parse< fj::super_invocation, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
+
+TEST (AST, constructor_body_assignment) {
+    ParsedContext context;
+    const std::string input = "this.fst= fst";
+
+    bool status = pegtl::parse< fj::assignment, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
