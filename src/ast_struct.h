@@ -149,7 +149,9 @@ namespace fj {
             object_name, assign, object_name > {};
 
     // Matches the whole content of constructor body.
-    struct constructor_body : sor < super_invocation, assignment > {};
+    // TODO: Throw local error if failed to match
+    struct constructor_body : seq < super_invocation, semicolon,
+            star_must < assignment, semicolon > > {};
 
     // Matches single method argument, like "Object x".
     struct method_arg : seq < class_name, space, object_name > {};

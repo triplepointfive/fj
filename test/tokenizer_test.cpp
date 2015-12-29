@@ -341,3 +341,16 @@ TEST (AST, constructor_body_assignment) {
 
     ASSERT_TRUE(status);
 }
+
+TEST (AST, constructor_body_with_few_assignments) {
+    ParsedContext context;
+    const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
+
+    bool status = pegtl::parse< fj::constructor_body, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
