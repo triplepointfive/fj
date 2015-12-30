@@ -221,7 +221,7 @@ TEST (AST, constructor_header_with_no_arguments) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::method_head, fj::action >(
+    bool status = pegtl::parse< fj::constructor_head, fj::action >(
             input,
             "input variable",
             context
@@ -245,7 +245,7 @@ TEST (AST, constructor_header_with_single_argument) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::method_head, fj::action >(
+    bool status = pegtl::parse< fj::constructor_head, fj::action >(
             input,
             "input variable",
             context
@@ -347,6 +347,22 @@ TEST (AST, constructor_body_with_few_assignments) {
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
 
     bool status = pegtl::parse< fj::constructor_body, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}
+
+TEST (AST, constructor_empty_definition) {
+    ParsedContext context;
+    const std::string input = "A() { super(); }";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::constructor_def, fj::action >(
             input,
             "input variable",
             context

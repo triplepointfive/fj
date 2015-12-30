@@ -144,29 +144,37 @@ namespace fj {
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
 
-    // Matches assignment of property like "this.fst = fst".
-    struct assignment : seq < this_keyword, one < '.' >,
-            object_name, assign, object_name > {};
-
-    // Matches the whole content of constructor body.
-    // TODO: Throw local error if failed to match
-    struct constructor_body : seq < super_invocation, semicolon,
-            star_must < assignment, semicolon > > {};
-
     // Matches single method argument, like "Object x".
     struct method_arg : seq < class_name, space, object_name > {};
 
     // Matches "Object x, ..." or just nothing for method with no arguments.
     struct method_arguments : opt < list < method_arg, comma > > {};
 
+    // Matches assignment of property like "this.fst = fst".
+    struct assignment : seq < this_keyword, one < '.' >,
+            object_name, assign, object_name > {};
+
     // Matches constructor definition, in this case it should match class name.
-    struct constructor_head : class_name {};
+    struct constructor_name : class_name {};
+
+    // Matches constructor name and its arguments list.
+    struct constructor_head : seq < constructor_name,
+            sur_with_brackets < method_arguments > > {};
+
+    // Matches the whole content of constructor body.
+    // TODO: Throw local error if failed to match
+    struct constructor_body : seq < super_invocation, semicolon,
+            star_must < assignment, semicolon > > {};
+
+    // Matches the whole constructor definition.
+    struct constructor_def : seq < constructor_head,
+            sur_with_braces < constructor_body > > {};
 
     // Matches common method declaration, with return type and name.
     struct method_ret_and_name : seq < class_name, space, method_name > {};
 
     // Matches the method head and its args list.
-    struct method_head : must < sor < method_ret_and_name, constructor_head >,
+    struct method_head : must < method_ret_and_name,
             sur_with_brackets < method_arguments > > {};
 
     // Matches the content of {"..."}.
@@ -238,7 +246,7 @@ namespace fj {
     };
 
     // Creates new constructor for current class.
-    template<> struct action< constructor_head > {
+    template<> struct action< constructor_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "constructor_head: " << in.string() << std::endl;
             std::string constructorName = in.string();
