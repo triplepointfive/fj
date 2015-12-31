@@ -370,3 +370,19 @@ TEST (AST, constructor_empty_definition) {
 
     ASSERT_TRUE(status);
 }
+
+TEST (AST, constructor_with_an_argument_definition) {
+    ParsedContext context;
+    const std::string input = "A(Object fst) { super(); this.fst = fst; }";
+    ClassDeclaration classA("A");
+    classA.setParentName("Object");
+    context.addClass(classA);
+
+    bool status = pegtl::parse< fj::constructor_def, fj::action >(
+            input,
+            "input variable",
+            context
+    );
+
+    ASSERT_TRUE(status);
+}

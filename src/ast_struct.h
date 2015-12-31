@@ -10,6 +10,23 @@ typedef std::map<std::string, std::string> Properties;
 typedef std::map<std::string, std::string> Arguments;
 typedef std::map<std::string, std::string> Methods;
 
+class ConstructorBody {
+public:
+    ConstructorBody() {};
+
+    void setName(std::string name) { this->name = name; }
+    void addProperty(std::string propertyName) {
+        properties.push_back(propertyName);
+    }
+
+    std::string getName() const { return name; }
+    std::vector getProperties() const { return properties; }
+
+private:
+    std::vector<std::string> properties;
+    std::string name;
+};
+
 class MethodDeclaration {
 public:
     MethodDeclaration(std::string name, std::string return_class_name) {
@@ -140,19 +157,23 @@ namespace fj {
     template < typename Rule >
     struct sur_with_brackets : seq < open_bracket, Rule, close_bracket > {};
 
+    /* Terms */
+
     // Matches invocation of super.
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
+
+    // Matches assignment of property like "this.fst = fst".
+    struct assignment : seq < this_keyword, one < '.' >,
+            object_name, assign, object_name > {};
+
+    /* Method defenitions */
 
     // Matches single method argument, like "Object x".
     struct method_arg : seq < class_name, space, object_name > {};
 
     // Matches "Object x, ..." or just nothing for method with no arguments.
     struct method_arguments : opt < list < method_arg, comma > > {};
-
-    // Matches assignment of property like "this.fst = fst".
-    struct assignment : seq < this_keyword, one < '.' >,
-            object_name, assign, object_name > {};
 
     // Matches constructor definition, in this case it should match class name.
     struct constructor_name : class_name {};
@@ -183,6 +204,8 @@ namespace fj {
     // Matches single method definition.
     struct method_def : seq < method_head, sur_with_braces < method_body > > {};
 
+    /* Classes */
+
     // Matches "class A extends B"
     struct class_header : seq < class_keyword, lexeme < declared_class_name >,
            extends_keyword, lexeme < inherited_class_name > > {};
@@ -196,7 +219,6 @@ namespace fj {
     // The top-level grammar allows one class definition and then expects eof.
     struct file : until< eof, list < class_def, opt < space > > > {};
 
-
     void splitOnSpace(std::string origin, std::string &fst, std::string &snd) {
         // TODO: Assumes delimiter is a space, should be more abstract.
         unsigned long space = origin.find(" ");
@@ -204,10 +226,18 @@ namespace fj {
         snd = origin.substr(space + 1, origin.size());
     }
 
+    template< typename Rule >
+    struct build_constructor : pegtl::nothing< Rule > {};
+
+    template<> struct build_constructor< constructor_name > {
+        static void apply( const pegtl::input & in, ConstructorBody & constr ) {
+            constr.setName(in.string());
+        }
+    };
+
     // Top level action for parser.
     template< typename Rule >
-    struct action
-            : pegtl::nothing< Rule > {};
+    struct action : pegtl::nothing< Rule > {};
 
     // Init new class with given name.
     template<> struct action< declared_class_name > {
