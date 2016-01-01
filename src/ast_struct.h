@@ -10,29 +10,9 @@ typedef std::map<std::string, std::string> Properties;
 typedef std::map<std::string, std::string> Arguments;
 typedef std::map<std::string, std::string> Methods;
 
-class ConstructorBody {
+class BaseMethod {
 public:
-    ConstructorBody() {};
-
     void setName(std::string name) { this->name = name; }
-    void addProperty(std::string propertyName) {
-        properties.push_back(propertyName);
-    }
-
-    std::string getName() const { return name; }
-    std::vector getProperties() const { return properties; }
-
-private:
-    std::vector<std::string> properties;
-    std::string name;
-};
-
-class MethodDeclaration {
-public:
-    MethodDeclaration(std::string name, std::string return_class_name) {
-        this->name = name;
-        this->return_class_name = return_class_name;
-    }
 
     void addArg(std::string name, std::string class_name) {
         // TODO: Validate uniqueness
@@ -41,18 +21,50 @@ public:
 
     Arguments getArgs() const { return args; }
     std::string getName() const { return name; }
+
+protected:
+    std::string name;
+    Arguments args;
+};
+
+class ConstructorBody : public BaseMethod {
+public:
+    ConstructorBody() {};
+
+    void addProperty(std::string propertyName) {
+        properties.push_back(propertyName);
+    }
+
+    std::vector<std::string> getProperties() const { return properties; }
+
+private:
+    std::vector<std::string> properties;
+};
+
+class MethodDeclaration : public BaseMethod {
+public:
+    MethodDeclaration(std::string name, std::string return_class_name) {
+        this->name = name;
+        this->return_class_name = return_class_name;
+    }
+
     std::string getReturnClassName() const { return return_class_name; }
 
 private:
-    std::string name, return_class_name;
-    Arguments args;
+    std::string return_class_name;
 };
 
 class ClassDeclaration {
 public:
     ClassDeclaration(std::string name) {
         this->name = name;
+        this->constructorBody = nullptr;
     };
+    ~ClassDeclaration() {
+        if (nullptr != constructorBody) {
+            delete constructorBody;
+        }
+    }
     void setParentName(std::string name) { this->parentName = name; };
     void addProperty(std::string className, std::string propertyName) {
         // TODO: Fail if not unique.
@@ -61,6 +73,15 @@ public:
     void addMethod(std::string method_name, std::string return_class_name) {
         methods.push_back(MethodDeclaration(method_name, return_class_name));
     };
+
+    void setConstructorBody(ConstructorBody *constructorBody) {
+        // TODO: Fail if already presence - means constructor is defined twice.
+        this->constructorBody = constructorBody;
+    }
+
+    ConstructorBody *getConstructorBody() const {
+        return constructorBody;
+    }
 
     MethodDeclaration *currentMethod() {
         assert((bool)methods.size());
@@ -76,6 +97,7 @@ private:
     std::string name, parentName;
     Properties properties;
     std::vector<MethodDeclaration> methods;
+    ConstructorBody *constructorBody;
 };
 
 class ParsedContext {
@@ -235,6 +257,21 @@ namespace fj {
         }
     };
 
+    template<> struct build_constructor< assignment > {
+        static void apply( const pegtl::input & in, ConstructorBody & constr ) {
+            constr.addProperty(in.string());
+        }
+    };
+
+    template<> struct build_constructor< method_arg > {
+        static void apply( const pegtl::input & in, ConstructorBody & constr ) {
+            std::cout << "method_arg: " << in.string() << std::endl;
+            std::string className, argName;
+            splitOnSpace(in.string(), className, argName);
+            constr.addArg(argName, className);
+        }
+    };
+
     // Top level action for parser.
     template< typename Rule >
     struct action : pegtl::nothing< Rule > {};
@@ -276,11 +313,17 @@ namespace fj {
     };
 
     // Creates new constructor for current class.
-    template<> struct action< constructor_name > {
+    template<> struct action< constructor_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "constructor_head: " << in.string() << std::endl;
-            std::string constructorName = in.string();
-            context.currentClass()->addMethod(constructorName, constructorName);
+            ConstructorBody *constructorBody = new ConstructorBody;
+            // TODO: Validate returned status.
+            pegtl::parse< fj::constructor_def, fj::build_constructor >(
+                in.string(),
+                "constructor_def rule",
+                *constructorBody
+            );
+
+            context.currentClass()->setConstructorBody(constructorBody);
         }
     };
 

@@ -215,52 +215,36 @@ TEST (AST, a_list_of_method_arguments) {
 }
 
 TEST (AST, constructor_header_with_no_arguments) {
-    ParsedContext context;
     const std::string input = "A()";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
-    context.addClass(classA);
+    ConstructorBody constructorBody;
 
-    bool status = pegtl::parse< fj::constructor_head, fj::action >(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::constructor_head, fj::build_constructor >(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
-    ASSERT_TRUE((bool)newClass->getMethods().size());
-
-    MethodDeclaration *newMethod = newClass->currentMethod();
-    EXPECT_EQ(0, newMethod->getArgs().size());
-    EXPECT_EQ("A", newMethod->getName());
-    EXPECT_EQ("A", newMethod->getReturnClassName());
+    EXPECT_EQ(0, constructorBody.getArgs().size());
+    EXPECT_EQ("A", constructorBody.getName());
 }
 
 TEST (AST, constructor_header_with_single_argument) {
-    ParsedContext context;
     const std::string input = "A( Object fstArg )";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
-    context.addClass(classA);
+    ConstructorBody constructorBody;
 
-    bool status = pegtl::parse< fj::constructor_head, fj::action >(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::constructor_head, fj::build_constructor >(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+    EXPECT_EQ("A", constructorBody.getName());
 
-    ClassDeclaration *newClass = context.currentClass();
-    MethodDeclaration *newMethod = newClass->currentMethod();
-    EXPECT_EQ("A", newMethod->getName());
-    EXPECT_EQ("A", newMethod->getReturnClassName());
-
-    Arguments args = newMethod->getArgs();
-    ASSERT_EQ(1, newMethod->getArgs().size());
-
+    Arguments args = constructorBody.getArgs();
+    EXPECT_EQ(1, constructorBody.getArgs().size());
     EXPECT_EQ("fstArg", args.rbegin()->first);
     EXPECT_EQ("Object", args.rbegin()->second);
 }
