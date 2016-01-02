@@ -43,8 +43,13 @@ private:
 
 class MethodDeclaration : public BaseMethod {
 public:
+    MethodDeclaration() {};
     MethodDeclaration(std::string name, std::string return_class_name) {
         this->name = name;
+        this->return_class_name = return_class_name;
+    }
+
+    void setReturnClassName(std::string return_class_name) {
         this->return_class_name = return_class_name;
     }
 
@@ -272,6 +277,28 @@ namespace fj {
         }
     };
 
+    template< typename Rule >
+    struct build_method : pegtl::nothing< Rule > {};
+
+    template<> struct build_method< method_ret_and_name > {
+        static void apply(const pegtl::input & in, MethodDeclaration & method) {
+            std::cout << "method_ret_and_name: " << in.string() << std::endl;
+            std::string className, methodName;
+            splitOnSpace(in.string(), className, methodName);
+            method.setName(methodName);
+            method.setReturnClassName(className);
+        }
+    };
+
+    template<> struct build_method< method_arg > {
+        static void apply(const pegtl::input & in, MethodDeclaration & method) {
+            std::cout << "method_arg: " << in.string() << std::endl;
+            std::string className, argName;
+            splitOnSpace(in.string(), className, argName);
+            method.addArg(argName, className);
+        }
+    };
+
     // Top level action for parser.
     template< typename Rule >
     struct action : pegtl::nothing< Rule > {};
@@ -302,16 +329,6 @@ namespace fj {
         }
     };
 
-    // Process method argument.
-    template<> struct action< method_arg > {
-        static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "method_arg: " << in.string() << std::endl;
-            std::string className, argName;
-            splitOnSpace(in.string(), className, argName);
-            context.currentClass()->currentMethod()->addArg(argName, className);
-        }
-    };
-
     // Creates new constructor for current class.
     template<> struct action< constructor_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
@@ -324,16 +341,6 @@ namespace fj {
             );
 
             context.currentClass()->setConstructorBody(constructorBody);
-        }
-    };
-
-    // Creates new constructor for current class.
-    template<> struct action< method_ret_and_name > {
-        static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "method_ret_and_name: " << in.string() << std::endl;
-            std::string className, methodName;
-            splitOnSpace(in.string(), className, methodName);
-            context.currentClass()->addMethod(methodName, className);
         }
     };
 }
