@@ -75,8 +75,11 @@ public:
         // TODO: Fail if not unique.
         properties[propertyName] = className;
     };
+    void addMethod(MethodDeclaration *methodDeclaration) {
+        methods.push_back(methodDeclaration);
+    }
     void addMethod(std::string method_name, std::string return_class_name) {
-        methods.push_back(MethodDeclaration(method_name, return_class_name));
+        methods.push_back(new MethodDeclaration(method_name, return_class_name));
     };
 
     void setConstructorBody(ConstructorBody *constructorBody) {
@@ -90,10 +93,10 @@ public:
 
     MethodDeclaration *currentMethod() {
         assert((bool)methods.size());
-        return &methods.back();
+        return methods.back();
     }
 
-    std::vector<MethodDeclaration> getMethods() const { return methods; }
+    std::vector<MethodDeclaration*> getMethods() const { return methods; }
     std::string getName() const { return name; };
     std::string getParentName() const { return parentName; };
     const Properties *getProperties() const { return &properties; };
@@ -101,7 +104,7 @@ public:
 private:
     std::string name, parentName;
     Properties properties;
-    std::vector<MethodDeclaration> methods;
+    std::vector<MethodDeclaration*> methods;
     ConstructorBody *constructorBody;
 };
 
@@ -341,6 +344,21 @@ namespace fj {
             );
 
             context.currentClass()->setConstructorBody(constructorBody);
+        }
+    };
+
+    // Creates new method for current class.
+    template<> struct action< method_def > {
+        static void apply( const pegtl::input & in, ParsedContext & context ) {
+            MethodDeclaration *methodDeclaration = new MethodDeclaration;
+            // TODO: Validate returned status.
+            pegtl::parse< fj::method_def, fj::build_method >(
+                    in.string(),
+                    "method_def rule",
+                    *methodDeclaration
+            );
+
+            context.currentClass()->addMethod(methodDeclaration);
         }
     };
 }
