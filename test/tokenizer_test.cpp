@@ -4,7 +4,7 @@
 TEST (AST, class_header) {
     ParsedContext context;
     const std::string input = "class A extends Object ";
-    bool status = pegtl::parse< fj::class_header, fj::action >(
+    bool status = pegtl::parse< fj::class_header, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -25,7 +25,7 @@ TEST (AST, single_property_definition) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::property_def, fj::action >(
+    bool status = pegtl::parse< fj::property_def, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -48,7 +48,7 @@ TEST (AST, class_body_with_a_single_property) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::class_body, fj::action >(
+    bool status = pegtl::parse< fj::class_body, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -71,7 +71,7 @@ TEST (AST, class_body_with_few_properties) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::class_body, fj::action >(
+    bool status = pegtl::parse< fj::class_body, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -99,7 +99,7 @@ TEST (AST, class_body_with_few_properties) {
 TEST (AST, single_class_with_one_one_property) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; }";
-    bool status = pegtl::parse< fj::file, fj::action >(
+    bool status = pegtl::parse< fj::file, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -116,7 +116,7 @@ TEST (AST, single_class_with_one_one_property) {
 TEST (AST, class_with_few_properties) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; Object prop2; }";
-    bool status = pegtl::parse< fj::class_def, fj::action >(
+    bool status = pegtl::parse< fj::class_def, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -145,7 +145,7 @@ TEST (AST, class_inheritance) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1;}"
             "\nclass B extends A { Object prop2;}";
-    bool status = pegtl::parse< fj::file, fj::action >(
+    bool status = pegtl::parse< fj::file, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -278,7 +278,7 @@ TEST (AST, constructor_body_super_invocation) {
     ParsedContext context;
     const std::string input = "super ( )";
 
-    bool status = pegtl::parse< fj::super_invocation, fj::action >(
+    bool status = pegtl::parse< fj::super_invocation, fj::build_grammar>(
             input,
             "input variable",
             context
@@ -291,7 +291,7 @@ TEST (AST, constructor_body_assignment) {
     ParsedContext context;
     const std::string input = "this.fst= fst";
 
-    bool status = pegtl::parse< fj::assignment, fj::action >(
+    bool status = pegtl::parse< fj::assignment, fj::build_grammar>(
             input,
             "input variable",
             context
@@ -304,7 +304,7 @@ TEST (AST, constructor_body_with_few_assignments) {
     ParsedContext context;
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
 
-    bool status = pegtl::parse< fj::constructor_body, fj::action >(
+    bool status = pegtl::parse< fj::constructor_body, fj::build_grammar>(
             input,
             "input variable",
             context
@@ -320,7 +320,7 @@ TEST (AST, constructor_empty_definition) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::constructor_def, fj::action >(
+    bool status = pegtl::parse< fj::constructor_def, fj::build_grammar>(
             input,
             "input variable",
             context
@@ -336,7 +336,7 @@ TEST (AST, constructor_with_an_argument_definition) {
     classA.setParentName("Object");
     context.addClass(classA);
 
-    bool status = pegtl::parse< fj::constructor_def, fj::action >(
+    bool status = pegtl::parse< fj::constructor_def, fj::build_grammar>(
             input,
             "input variable",
             context

@@ -304,10 +304,10 @@ namespace fj {
 
     // Top level action for parser.
     template< typename Rule >
-    struct action : pegtl::nothing< Rule > {};
+    struct build_grammar : pegtl::nothing< Rule > {};
 
     // Init new class with given name.
-    template<> struct action< declared_class_name > {
+    template<> struct build_grammar< declared_class_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "declared_class_name: " << in.string() << std::endl;
             context.addClass(ClassDeclaration(in.string()));
@@ -315,7 +315,7 @@ namespace fj {
     };
 
     // Assign the parent class name with current class.
-    template<> struct action< inherited_class_name > {
+    template<> struct build_grammar< inherited_class_name > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "inherited_class_name: " << in.string() << std::endl;
             context.currentClass()->setParentName(in.string());
@@ -323,7 +323,7 @@ namespace fj {
     };
 
     // Process the property name in class declaration.
-    template<> struct action< property_def > {
+    template<> struct build_grammar< property_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             std::cout << "property_def: " << in.string() << std::endl;
             std::string className, propertyName;
@@ -333,7 +333,7 @@ namespace fj {
     };
 
     // Creates new constructor for current class.
-    template<> struct action< constructor_def > {
+    template<> struct build_grammar< constructor_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             ConstructorBody *constructorBody = new ConstructorBody;
             // TODO: Validate returned status.
@@ -348,7 +348,7 @@ namespace fj {
     };
 
     // Creates new method for current class.
-    template<> struct action< method_def > {
+    template<> struct build_grammar< method_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
             MethodDeclaration *methodDeclaration = new MethodDeclaration;
             // TODO: Validate returned status.
