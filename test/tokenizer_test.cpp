@@ -275,72 +275,83 @@ TEST (AST, method_header_with_single_argument) {
 }
 
 TEST (AST, constructor_body_super_invocation) {
-    ParsedContext context;
+    ConstructorBody constructorBody;
     const std::string input = "super ( )";
 
-    bool status = pegtl::parse< fj::super_invocation, fj::build_grammar>(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::super_invocation, fj::build_constructor>(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+    // Nothing to test here - no action applied for that rule.
 }
 
 TEST (AST, constructor_body_assignment) {
-    ParsedContext context;
+    ConstructorBody constructorBody;
     const std::string input = "this.fst= fst";
 
-    bool status = pegtl::parse< fj::assignment, fj::build_grammar>(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::assignment, fj::build_constructor>(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+
+    auto properties = constructorBody.getProperties();
+    ASSERT_EQ(1, properties.size());
+    EXPECT_EQ("fst", properties.front());
 }
 
 TEST (AST, constructor_body_with_few_assignments) {
-    ParsedContext context;
+    ConstructorBody constructorBody;
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
 
-    bool status = pegtl::parse< fj::constructor_body, fj::build_grammar>(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::constructor_body, fj::build_constructor>(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+
+    auto properties = constructorBody.getProperties();
+    ASSERT_EQ(2, properties.size());
+    EXPECT_EQ("snd", properties.front());
+    EXPECT_EQ("fst", properties.back());
 }
 
 TEST (AST, constructor_empty_definition) {
-    ParsedContext context;
+    ConstructorBody constructorBody;
     const std::string input = "A() { super(); }";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
-    context.addClass(classA);
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_grammar>(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor>(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+
+    auto properties = constructorBody.getProperties();
+    ASSERT_EQ(0, properties.size());
 }
 
 TEST (AST, constructor_with_an_argument_definition) {
-    ParsedContext context;
+    ConstructorBody constructorBody;
     const std::string input = "A(Object fst) { super(); this.fst = fst; }";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
-    context.addClass(classA);
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_grammar>(
-            input,
-            "input variable",
-            context
+    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor>(
+        input,
+        "input variable",
+        constructorBody
     );
 
     ASSERT_TRUE(status);
+
+    auto properties = constructorBody.getProperties();
+    ASSERT_EQ(1, properties.size());
+    EXPECT_EQ("fst", properties.front());
 }

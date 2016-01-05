@@ -193,9 +193,13 @@ namespace fj {
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
 
+    // Used just to extract property name.
+    struct assignment_prop_name : object_name {};
+
     // Matches assignment of property like "this.fst = fst".
+    // TODO: Validate the same identifier is used on both sides of assignment.
     struct assignment : seq < this_keyword, one < '.' >,
-            object_name, assign, object_name > {};
+            object_name, assign, assignment_prop_name > {};
 
     /* Method defenitions */
 
@@ -265,7 +269,7 @@ namespace fj {
         }
     };
 
-    template<> struct build_constructor< assignment > {
+    template<> struct build_constructor< assignment_prop_name > {
         static void apply( const pegtl::input & in, ConstructorBody & constr ) {
             constr.addProperty(in.string());
         }
