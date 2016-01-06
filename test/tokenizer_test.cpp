@@ -355,3 +355,16 @@ TEST (AST, constructor_with_an_argument_definition) {
     ASSERT_EQ(1, properties.size());
     EXPECT_EQ("fst", properties.front());
 }
+
+TEST (AST, method_returns_property) {
+    MethodDeclaration methodDeclaration;
+    const std::string input = "return this.fst;";
+
+    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+        input,
+        "input variable",
+        methodDeclaration
+    );
+
+    ASSERT_TRUE(status);
+}

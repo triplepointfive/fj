@@ -193,13 +193,23 @@ namespace fj {
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
 
+    // Left part of assignment, matches "this.fst".
+    struct property_invocation :
+            seq < this_keyword, one < '.' >, object_name> {};
+
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
 
     // Matches assignment of property like "this.fst = fst".
     // TODO: Validate the same identifier is used on both sides of assignment.
-    struct assignment : seq < this_keyword, one < '.' >,
-            object_name, assign, assignment_prop_name > {};
+    struct assignment :
+            seq <property_invocation, assign, assignment_prop_name > {};
+
+    struct method_term : property_invocation {};
+
+    // Required returned value from method. Matches the pattern "return ...".
+    struct return_stat : seq < pad < return_keyword, space, space >,
+            method_term > {};
 
     /* Method defenitions */
 
@@ -233,7 +243,7 @@ namespace fj {
             sur_with_brackets < method_arguments > > {};
 
     // Matches the content of {"..."}.
-    struct method_body : seq < list < class_terms, semicolon >, semicolon > {};
+    struct method_body : seq < return_stat, semicolon > {};
 
     // Matches single method definition.
     struct method_def : seq < method_head, sur_with_braces < method_body > > {};
