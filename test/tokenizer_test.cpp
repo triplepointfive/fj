@@ -161,7 +161,7 @@ TEST (AST, class_inheritance) {
 
 TEST (AST, single_method_argument) {
     const std::string input = "Object prop1";
-    MethodDeclaration methodDeclaration;
+    MethodDeclaration methodDeclaration("methodName", "Object");
 
     bool status = pegtl::parse< fj::method_arg, fj::build_method >(
         input,
@@ -180,7 +180,7 @@ TEST (AST, single_method_argument) {
 
 TEST (AST, a_list_of_method_arguments) {
     const std::string input = "Object a, Object b";
-    MethodDeclaration methodDeclaration;
+    MethodDeclaration methodDeclaration("methodName", "Object");
 
     bool status = pegtl::parse< fj::method_arguments, fj::build_method >(
         input,
@@ -237,7 +237,7 @@ TEST (AST, constructor_header_with_single_argument) {
 
 TEST (AST, method_header_with_no_arguments) {
     const std::string input = "Object fun1()";
-    MethodDeclaration methodDeclaration;
+    MethodDeclaration methodDeclaration("methodName", "Object");
 
     bool status = pegtl::parse< fj::method_head, fj::build_method >(
         input,
@@ -254,7 +254,7 @@ TEST (AST, method_header_with_no_arguments) {
 
 TEST (AST, method_header_with_single_argument) {
     const std::string input = "Object fun2( Object fstArg )";
-    MethodDeclaration methodDeclaration;
+    MethodDeclaration methodDeclaration("methodName", "Object");
 
     bool status = pegtl::parse< fj::method_head, fj::build_method >(
         input,
@@ -357,7 +357,7 @@ TEST (AST, constructor_with_an_argument_definition) {
 }
 
 TEST (AST, method_returns_property) {
-    MethodDeclaration methodDeclaration;
+    MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.fst;";
 
     bool status = pegtl::parse< fj::method_body, fj::build_method>(
@@ -367,4 +367,7 @@ TEST (AST, method_returns_property) {
     );
 
     ASSERT_TRUE(status);
+
+    MethodTerm *methodTerm = methodDeclaration.getBodyTerm();
+    ASSERT_NE(nullptr, methodTerm);
 }

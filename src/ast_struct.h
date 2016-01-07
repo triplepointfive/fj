@@ -10,6 +10,24 @@ typedef std::map<std::string, std::string> Properties;
 typedef std::map<std::string, std::string> Arguments;
 typedef std::map<std::string, std::string> Methods;
 
+class MethodTerm {
+
+};
+
+class PropertyTerm : public MethodTerm {
+public:
+    PropertyTerm(std::string propertyName) {
+        this->propertyName = propertyName;
+    }
+
+    std::string getName() const {
+        return propertyName;
+    }
+
+private:
+    std::string propertyName;
+};
+
 class BaseMethod {
 public:
     void setName(std::string name) { this->name = name; }
@@ -43,11 +61,17 @@ private:
 
 class MethodDeclaration : public BaseMethod {
 public:
-    MethodDeclaration() {};
     MethodDeclaration(std::string name, std::string return_class_name) {
         this->name = name;
         this->return_class_name = return_class_name;
+        this->treeHead = nullptr;
     }
+
+    void setBodyTerm(MethodTerm *methodTerm) {
+        this->treeHead = methodTerm;
+    }
+
+    MethodTerm *getBodyTerm() const { return treeHead; }
 
     void setReturnClassName(std::string return_class_name) {
         this->return_class_name = return_class_name;
@@ -55,8 +79,15 @@ public:
 
     std::string getReturnClassName() const { return return_class_name; }
 
+    ~MethodDeclaration() {
+        if (nullptr != treeHead) {
+            delete treeHead;
+        }
+    }
+
 private:
     std::string return_class_name;
+    MethodTerm *treeHead;
 };
 
 class ClassDeclaration {
@@ -211,7 +242,7 @@ namespace fj {
     struct return_stat : seq < pad < return_keyword, space, space >,
             method_term > {};
 
-    /* Method defenitions */
+    /* Method definitions */
 
     // Matches single method argument, like "Object x".
     struct method_arg : seq < class_name, space, object_name > {};
@@ -271,6 +302,15 @@ namespace fj {
     }
 
     template< typename Rule >
+    struct build_method_body : pegtl::nothing< Rule > {};
+
+    template<> struct build_method_body< method_term > {
+        static void apply( const pegtl::input & in, MethodTerm * methodTerm) {
+            std::cout << "method_term for build_method_body: " << in.string() << std::endl;
+        }
+    };
+
+    template< typename Rule >
     struct build_constructor : pegtl::nothing< Rule > {};
 
     template<> struct build_constructor< constructor_name > {
@@ -313,6 +353,20 @@ namespace fj {
             std::string className, argName;
             splitOnSpace(in.string(), className, argName);
             method.addArg(argName, className);
+        }
+    };
+
+    // Assigns top node of body tree to the current method declaration.
+    template<> struct build_method< method_body > {
+        static void apply(const pegtl::input & in, MethodDeclaration & method) {
+            MethodTerm *methodTerm = nullptr;
+            // TODO: Validate returned status.
+            pegtl::parse< fj::method_body, fj::build_method_body >(
+                in.string(),
+                "method_body rule",
+                methodTerm
+            );
+            method.setBodyTerm(methodTerm);
         }
     };
 
@@ -364,12 +418,14 @@ namespace fj {
     // Creates new method for current class.
     template<> struct build_grammar< method_def > {
         static void apply( const pegtl::input & in, ParsedContext & context ) {
-            MethodDeclaration *methodDeclaration = new MethodDeclaration;
+            // TODO: Check if possible to do without stubs.
+            MethodDeclaration *methodDeclaration =
+                new MethodDeclaration("stubName", "stubRetObject");
             // TODO: Validate returned status.
             pegtl::parse< fj::method_def, fj::build_method >(
-                    in.string(),
-                    "method_def rule",
-                    *methodDeclaration
+                in.string(),
+                "method_def rule",
+                *methodDeclaration
             );
 
             context.currentClass()->addMethod(methodDeclaration);
