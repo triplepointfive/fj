@@ -236,7 +236,7 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct method_term : property_invocation {};
+    struct method_term : sor < property_invocation > {};
 
     // Required returned value from method. Matches the pattern "return ...".
     struct return_stat : seq < pad < return_keyword, space, space >,
@@ -304,9 +304,10 @@ namespace fj {
     template< typename Rule >
     struct build_method_body : pegtl::nothing< Rule > {};
 
-    template<> struct build_method_body< method_term > {
-        static void apply( const pegtl::input & in, MethodTerm * methodTerm) {
+    template<> struct build_method_body< property_invocation > {
+        static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "method_term for build_method_body: " << in.string() << std::endl;
+            *methodTerm = new PropertyTerm(in.string());
         }
     };
 
@@ -364,7 +365,7 @@ namespace fj {
             pegtl::parse< fj::method_body, fj::build_method_body >(
                 in.string(),
                 "method_body rule",
-                methodTerm
+                &methodTerm
             );
             method.setBodyTerm(methodTerm);
         }

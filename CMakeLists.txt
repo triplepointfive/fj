@@ -10,7 +10,7 @@ add_executable(fj src/main.cpp)
 target_link_libraries(fj fj_lib)
 
 add_executable(fj_test test/class_body_test.cpp test/context_test.cpp test/evaluation_test.cpp test/tokenizer_test.cpp)
-include_directories(../PEGTL)
+include_directories(PEGTL)
 include_directories(src)
 target_link_libraries(fj_test gtest gtest_main pthread)
 target_link_libraries(fj_test fj_lib)
