@@ -370,4 +370,22 @@ TEST (AST, method_returns_property) {
 
     MethodTerm *methodTerm = methodDeclaration.getBodyTerm();
     ASSERT_NE(nullptr, methodTerm);
+    EXPECT_EQ("property", methodTerm->type());
+}
+
+TEST (AST, method_returns_input_variable) {
+    MethodDeclaration methodDeclaration("methodName", "Object");
+    const std::string input = "return fstArg;";
+
+    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+        input,
+        "input variable",
+        methodDeclaration
+    );
+
+    ASSERT_TRUE(status);
+
+    MethodTerm *methodTerm = methodDeclaration.getBodyTerm();
+    ASSERT_NE(nullptr, methodTerm);
+    EXPECT_EQ("variable", methodTerm->type());
 }

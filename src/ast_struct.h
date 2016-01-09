@@ -11,21 +11,34 @@ typedef std::map<std::string, std::string> Arguments;
 typedef std::map<std::string, std::string> Methods;
 
 class MethodTerm {
+public:
+    MethodTerm(std::string name) {
+        this->name = name;
+    }
 
+    std::string getName() const {
+        return name;
+    }
+
+    // TODO: This is stub for test to check the actuall state. Review one day.
+    virtual std::string type() const = 0;
+
+    virtual ~MethodTerm() {}
+
+protected:
+    std::string name;
 };
 
 class PropertyTerm : public MethodTerm {
 public:
-    PropertyTerm(std::string propertyName) {
-        this->propertyName = propertyName;
-    }
+    PropertyTerm(std::string propertyName) : MethodTerm(propertyName) {}
+    std::string type() const override { return "property"; }
+};
 
-    std::string getName() const {
-        return propertyName;
-    }
-
-private:
-    std::string propertyName;
+class VariableTerm : public MethodTerm {
+public:
+    VariableTerm(std::string variableName) : MethodTerm(variableName) {}
+    std::string type() const override { return "variable"; }
 };
 
 class BaseMethod {
@@ -224,6 +237,9 @@ namespace fj {
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
 
+    // Just a variable name, matching general restrictions.
+    struct variable_term : object_name {};
+
     // Left part of assignment, matches "this.fst".
     struct property_invocation :
             seq < this_keyword, one < '.' >, object_name> {};
@@ -236,7 +252,7 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct method_term : sor < property_invocation > {};
+    struct method_term : sor < property_invocation, variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".
     struct return_stat : seq < pad < return_keyword, space, space >,
@@ -308,6 +324,13 @@ namespace fj {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "method_term for build_method_body: " << in.string() << std::endl;
             *methodTerm = new PropertyTerm(in.string());
+        }
+    };
+
+    template<> struct build_method_body< variable_term > {
+        static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
+            std::cout << "method_term for variable_term: " << in.string() << std::endl;
+            *methodTerm = new VariableTerm(in.string());
         }
     };
 
