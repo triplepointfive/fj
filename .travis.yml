@@ -1,0 +1,28 @@
+sudo: required
+language: cpp
+
+compiler:
+  - gcc
+
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - cd /usr/src/gtest && sudo cmake . && sudo cmake --build . && sudo mv libg* /usr/local/lib/ ; cd -
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
+      - clang
+      - libboost-dev
+      - libgtest-dev
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make all test

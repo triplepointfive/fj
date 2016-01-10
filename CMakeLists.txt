@@ -15,3 +15,5 @@ include_directories(src)
 target_link_libraries(fj_test gtest gtest_main pthread)
 target_link_libraries(fj_test fj_lib)
 
+enable_testing()
+add_test(A fj_test)
