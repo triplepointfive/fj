@@ -260,11 +260,14 @@ namespace fj {
     // Matches a list of terms used for invocation a method.
     struct method_list_of_args : opt < list < method_term, comma > >{};
 
+    struct method_invocation_head :
+        seq < object_name, one < '.' >, method_name > {};
+
     // Call of a method, this includes both object method called for,
     // method name and the list of arguments.
     struct method_invocation :
-            seq < object_name, one < '.' >, method_name,
-                    sur_with_brackets < method_list_of_args > > {};
+        seq < method_invocation_head,
+            sur_with_brackets < method_list_of_args > > {};
 
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
@@ -352,6 +355,19 @@ namespace fj {
     template< typename Rule >
     struct build_method_body : pegtl::nothing< Rule > {};
 
+    template< typename Rule >
+    struct build_method_invocation : pegtl::nothing< Rule > {};
+
+    template<> struct build_method_invocation< method_invocation_head > {
+        static void apply(const pegtl::input & in,
+                          MethodInvocation **methodInvocation) {
+            std::cout << "method_invocation_head for build_method_invocation: " << in.string() << std::endl;
+            std::string objectName, methodName;
+            splitOnDot(in.string(), objectName, methodName);
+            *methodInvocation = new MethodInvocation(objectName, methodName);
+        }
+    };
+
     template<> struct build_method_body< property_invocation > {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "method_term for build_method_body: " << in.string() << std::endl;
@@ -363,18 +379,22 @@ namespace fj {
 
     template<> struct build_method_body< variable_term > {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
-            std::cout << "method_term for variable_term: " << in.string() << std::endl;
+            std::cout << "variable_term for build_method_body: " << in.string() << std::endl;
             *methodTerm = new VariableTerm(in.string());
         }
     };
 
     template<> struct build_method_body< method_invocation > {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
-            std::cout << "method_invocation for variable_term: " << in.string() << std::endl;
-            std::string basePart, tmp, objectName, methodName;
-            splitOn(in.string(), "(", basePart, tmp);
-            splitOnDot(basePart, objectName, methodName);
-            *methodTerm = new MethodInvocation(objectName, methodName);
+            std::cout << "method_invocation for build_method_body: " << in.string() << std::endl;
+            MethodInvocation *methodInvocation = nullptr;
+            // TODO: Validate returned status.
+            pegtl::parse< fj::method_invocation, fj::build_method_invocation >(
+                in.string(),
+                "method_body rule",
+                &methodInvocation
+            );
+            *methodTerm = methodInvocation;
         }
     };
 

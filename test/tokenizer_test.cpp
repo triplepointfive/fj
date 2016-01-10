@@ -404,8 +404,10 @@ TEST (AST, method_returns_another_method_invocation) {
 
     ASSERT_TRUE(status);
 
+    MethodTerm *builtTerm = methodDeclaration.getBodyTerm();
+    ASSERT_NE(nullptr, builtTerm);
     MethodInvocation * methodInvocation =
-            dynamic_cast<MethodInvocation *>(methodDeclaration.getBodyTerm());
+            dynamic_cast<MethodInvocation *>(builtTerm);
     ASSERT_NE(nullptr, methodInvocation);
     EXPECT_EQ("someMethod", methodInvocation->getName());
     EXPECT_EQ("this", methodInvocation->getObjectName());
