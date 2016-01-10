@@ -371,6 +371,7 @@ TEST (AST, method_returns_property) {
     MethodTerm *methodTerm = methodDeclaration.getBodyTerm();
     ASSERT_NE(nullptr, methodTerm);
     EXPECT_EQ("property", methodTerm->type());
+    EXPECT_EQ("fst", methodTerm->getName());
 }
 
 TEST (AST, method_returns_input_variable) {
@@ -388,4 +389,24 @@ TEST (AST, method_returns_input_variable) {
     MethodTerm *methodTerm = methodDeclaration.getBodyTerm();
     ASSERT_NE(nullptr, methodTerm);
     EXPECT_EQ("variable", methodTerm->type());
+    EXPECT_EQ("fstArg", methodTerm->getName());
+}
+
+TEST (AST, method_returns_another_method_invocation) {
+    MethodDeclaration methodDeclaration("methodName", "Object");
+    const std::string input = "return this.someMethod();";
+
+    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+        input,
+        "input variable",
+        methodDeclaration
+    );
+
+    ASSERT_TRUE(status);
+
+    MethodInvocation * methodInvocation =
+            dynamic_cast<MethodInvocation *>(methodDeclaration.getBodyTerm());
+    ASSERT_NE(nullptr, methodInvocation);
+    EXPECT_EQ("someMethod", methodInvocation->getName());
+    EXPECT_EQ("this", methodInvocation->getObjectName());
 }

@@ -41,6 +41,17 @@ public:
     std::string type() const override { return "variable"; }
 };
 
+class MethodInvocation : public MethodTerm {
+public:
+    MethodInvocation(std::string objectName, std::string methodName) :
+        MethodTerm(methodName) { this->objectName = objectName; }
+    std::string type() const override { return "method"; }
+
+    std::string getObjectName() const { return objectName; }
+private:
+    std::string objectName;
+};
+
 class BaseMethod {
 public:
     void setName(std::string name) { this->name = name; }
@@ -233,6 +244,8 @@ namespace fj {
 
     /* Terms */
 
+    struct method_term; // Forwarding declaration for cycle usage.
+
     // Matches invocation of super.
     struct super_invocation :
             seq < super_keyword, sur_with_brackets < success > > {};
@@ -244,6 +257,15 @@ namespace fj {
     struct property_invocation :
             seq < this_keyword, one < '.' >, object_name> {};
 
+    // Matches a list of terms used for invocation a method.
+    struct method_list_of_args : opt < list < method_term, comma > >{};
+
+    // Call of a method, this includes both object method called for,
+    // method name and the list of arguments.
+    struct method_invocation :
+            seq < object_name, one < '.' >, method_name,
+                    sur_with_brackets < method_list_of_args > > {};
+
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
 
@@ -252,7 +274,8 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct method_term : sor < property_invocation, variable_term > {};
+    struct method_term : sor < method_invocation, property_invocation,
+            variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".
     struct return_stat : seq < pad < return_keyword, space, space >,
@@ -310,11 +333,20 @@ namespace fj {
     // The top-level grammar allows one class definition and then expects eof.
     struct file : until< eof, list < class_def, opt < space > > > {};
 
-    void splitOnSpace(std::string origin, std::string &fst, std::string &snd) {
-        // TODO: Assumes delimiter is a space, should be more abstract.
-        unsigned long space = origin.find(" ");
+    void splitOn(std::string origin, std::string delimiter,
+                 std::string &fst, std::string &snd) {
+        unsigned long space = origin.find(delimiter);
         fst = origin.substr(0, space);
         snd = origin.substr(space + 1, origin.size());
+    }
+
+    void splitOnSpace(std::string origin, std::string &fst, std::string &snd) {
+        // TODO: Assumes delimiter is a space, should be more abstract.
+        splitOn(origin, " ", fst, snd);
+    }
+
+    void splitOnDot(std::string origin, std::string &fst, std::string &snd) {
+        splitOn(origin, ".", fst, snd);
     }
 
     template< typename Rule >
@@ -323,7 +355,9 @@ namespace fj {
     template<> struct build_method_body< property_invocation > {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "method_term for build_method_body: " << in.string() << std::endl;
-            *methodTerm = new PropertyTerm(in.string());
+            std::string thisStr, propName;
+            splitOnDot(in.string(), thisStr, propName);
+            *methodTerm = new PropertyTerm(propName);
         }
     };
 
@@ -331,6 +365,16 @@ namespace fj {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "method_term for variable_term: " << in.string() << std::endl;
             *methodTerm = new VariableTerm(in.string());
+        }
+    };
+
+    template<> struct build_method_body< method_invocation > {
+        static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
+            std::cout << "method_invocation for variable_term: " << in.string() << std::endl;
+            std::string basePart, tmp, objectName, methodName;
+            splitOn(in.string(), "(", basePart, tmp);
+            splitOnDot(basePart, objectName, methodName);
+            *methodTerm = new MethodInvocation(objectName, methodName);
         }
     };
 
