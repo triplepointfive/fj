@@ -12,15 +12,13 @@ typedef std::map<std::string, std::string> Methods;
 
 class MethodTerm {
 public:
-    MethodTerm(std::string name) {
-        this->name = name;
-    }
+    MethodTerm(const std::string &name) : name(name) { }
 
     std::string getName() const {
         return name;
     }
 
-    // TODO: This is stub for test to check the actuall state. Review one day.
+    // TODO: This is stub for test to check the actual state. Review one day.
     virtual std::string type() const = 0;
 
     virtual ~MethodTerm() {}
@@ -43,8 +41,10 @@ public:
 
 class MethodInvocation : public MethodTerm {
 public:
-    MethodInvocation(std::string objectName, std::string methodName) :
-        MethodTerm(methodName) { this->objectName = objectName; }
+    MethodInvocation(const std::string &objectName,
+                     const std::string &methodName)
+        : MethodTerm(methodName)
+        , objectName(objectName) { }
     std::string type() const override { return "method"; }
 
     std::string getObjectName() const { return objectName; }
@@ -54,7 +54,7 @@ private:
 
 class BaseMethod {
 public:
-    void setName(std::string name) { this->name = name; }
+    void setName(const std::string &name) { this->name = name; }
 
     void addArg(std::string name, std::string class_name) {
         // TODO: Validate uniqueness
@@ -73,7 +73,7 @@ class ConstructorBody : public BaseMethod {
 public:
     ConstructorBody() {};
 
-    void addProperty(std::string propertyName) {
+    void addProperty(const std::string &propertyName) {
         properties.push_back(propertyName);
     }
 
@@ -85,10 +85,10 @@ private:
 
 class MethodDeclaration : public BaseMethod {
 public:
-    MethodDeclaration(std::string name, std::string return_class_name) {
+    MethodDeclaration(const std::string &name,
+                      const std::string &return_class_name)
+        : return_class_name(return_class_name) {
         this->name = name;
-        this->return_class_name = return_class_name;
-        this->treeHead = nullptr;
     }
 
     void setBodyTerm(MethodTerm *methodTerm) {
@@ -97,7 +97,7 @@ public:
 
     MethodTerm *getBodyTerm() const { return treeHead; }
 
-    void setReturnClassName(std::string return_class_name) {
+    void setReturnClassName(const std::string &return_class_name) {
         this->return_class_name = return_class_name;
     }
 
@@ -111,30 +111,31 @@ public:
 
 private:
     std::string return_class_name;
-    MethodTerm *treeHead;
+    MethodTerm *treeHead{ nullptr };
 };
 
 class ClassDeclaration {
 public:
-    ClassDeclaration(std::string name) {
-        this->name = name;
-        this->constructorBody = nullptr;
-    };
+    ClassDeclaration(const std::string &name) : name(name) {};
     ~ClassDeclaration() {
         if (nullptr != constructorBody) {
             delete constructorBody;
         }
     }
-    void setParentName(std::string name) { this->parentName = name; };
-    void addProperty(std::string className, std::string propertyName) {
+    void setParentName(const std::string &name) { this->parentName = name; };
+    void addProperty(const std::string &className,
+                     const std::string &propertyName) {
         // TODO: Fail if not unique.
         properties[propertyName] = className;
     };
     void addMethod(MethodDeclaration *methodDeclaration) {
         methods.push_back(methodDeclaration);
     }
-    void addMethod(std::string method_name, std::string return_class_name) {
-        methods.push_back(new MethodDeclaration(method_name, return_class_name));
+    void addMethod(const std::string &method_name,
+                   const std::string &return_class_name) {
+        methods.push_back(
+            new MethodDeclaration(method_name, return_class_name)
+        );
     };
 
     void setConstructorBody(ConstructorBody *constructorBody) {
@@ -160,7 +161,7 @@ private:
     std::string name, parentName;
     Properties properties;
     std::vector<MethodDeclaration*> methods;
-    ConstructorBody *constructorBody;
+    ConstructorBody *constructorBody{ nullptr };
 };
 
 class ParsedContext {
