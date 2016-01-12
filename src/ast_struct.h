@@ -196,6 +196,16 @@ private:
     ConstructorBody *constructorBody{ nullptr };
 };
 
+struct Pair {
+    std::string key;
+    std::string val;
+
+    void success(ClassDeclaration & classDeclaration) {
+        std::cout << "Pair: success" << std::endl;
+        classDeclaration.addProperty(key, val);
+    }
+};
+
 class ParsedContext {
 public:
     ParsedContext() {};
@@ -511,10 +521,25 @@ namespace fj {
     };
 
     template< typename Rule >
+    struct build_class_property : pegtl::nothing< Rule > {};
+
+    template<> struct build_class_property< class_name > {
+        static void apply(const input & in, Pair & pair) {
+            pair.key = in.string();
+        }
+    };
+
+    template<> struct build_class_property< object_name > {
+        static void apply(const input & in, Pair & pair) {
+            pair.val = in.string();
+        }
+    };
+
+    template< typename Rule >
     struct build_class : pegtl::nothing< Rule > {};
 
     template<> struct build_class< declared_class_name > {
-        static void apply(const pegtl::input & in, ClassDeclaration & classDeclaration) {
+        static void apply(const input & in, ClassDeclaration & classDeclaration) {
             std::cout << "declared_class_name: " << in.string() << std::endl;
             classDeclaration.setName(in.string());
         }
@@ -530,32 +555,6 @@ namespace fj {
     // Top level action for parser.
     template< typename Rule >
     struct build_grammar : pegtl::nothing< Rule > {};
-
-    // Init new class with given name.
-    template<> struct build_grammar< declared_class_name > {
-        static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "declared_class_name: " << in.string() << std::endl;
-            context.addClass(ClassDeclaration(in.string()));
-        }
-    };
-
-    // Assign the parent class name with current class.
-    template<> struct build_grammar< inherited_class_name > {
-        static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "inherited_class_name: " << in.string() << std::endl;
-            context.currentClass()->setParentName(in.string());
-        }
-    };
-
-    // Process the property name in class declaration.
-    template<> struct build_grammar< property_def > {
-        static void apply( const pegtl::input & in, ParsedContext & context ) {
-            std::cout << "property_def: " << in.string() << std::endl;
-            std::string className, propertyName;
-            splitOnSpace(in.string(), className, propertyName);
-            context.currentClass()->addProperty(className, propertyName);
-        }
-    };
 
     // Creates new constructor for current class.
     template<> struct build_grammar< constructor_def > {
@@ -590,7 +589,10 @@ namespace fj {
     };
 
     template< typename Rule > struct control : normal< Rule > {};
-    template<> struct control< class_def > : change_state_and_action< class_def, ClassDeclaration, build_class > {};
+    template<> struct control< class_def > :
+        change_state_and_action< class_def, ClassDeclaration, build_class > {};
+    template<> struct control< property_def > :
+        change_state_and_action< property_def, Pair, build_class_property > {};
 }
 
 #endif //FJ_AST_STRUCT_H

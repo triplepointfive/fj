@@ -2,89 +2,67 @@
 #include "ast_struct.h"
 
 TEST (AST, class_header) {
-    ParsedContext context;
+    ClassDeclaration classDeclaration;
     const std::string input = "class A extends Object ";
-    bool status = pegtl::parse< fj::class_header, fj::build_grammar>(
+    bool status = pegtl::parse< fj::class_header, fj::build_class, fj::control>(
         input,
         "input variable",
-        context
+        classDeclaration
     );
 
     ASSERT_TRUE(status);
-    ASSERT_EQ(1, context.getClasses().size());
-
-    ClassDeclaration *newClass = context.currentClass();
-    EXPECT_EQ("A", newClass->getName());
-    EXPECT_EQ("Object", newClass->getParentName());
+    EXPECT_EQ("A", classDeclaration.getName());
+    EXPECT_EQ("Object", classDeclaration.getParentName());
 }
 
 TEST (AST, single_property_definition) {
-    ParsedContext context;
     const std::string input = "Object prop1";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
-    context.addClass(classA);
 
-    bool status = pegtl::parse< fj::property_def, fj::build_grammar>(
+    bool status = pegtl::parse< fj::property_def, fj::build_class, fj::control >(
         input,
         "input variable",
-        context
+        classA
     );
 
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
-    const Properties *properties = newClass->getProperties();
-    EXPECT_EQ(1, context.getClasses().size());
-    EXPECT_EQ("A", newClass->getName());
-    EXPECT_EQ("Object", newClass->getParentName());
+    const Properties *properties = classA.getProperties();
     EXPECT_EQ(1, properties->size());
 }
 
 TEST (AST, class_body_with_a_single_property) {
-    ParsedContext context;
     const std::string input = "Object prop1;";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
-    context.addClass(classA);
 
-    bool status = pegtl::parse< fj::class_body, fj::build_grammar>(
+    bool status = pegtl::parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
-        context
+        classA
     );
 
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
-    const Properties *properties = newClass->getProperties();
-    EXPECT_EQ(1, context.getClasses().size());
-    EXPECT_EQ("A", newClass->getName());
-    EXPECT_EQ("Object", newClass->getParentName());
+    const Properties *properties = classA.getProperties();
     EXPECT_EQ(1, properties->size());
 }
 
 TEST (AST, class_body_with_few_properties) {
-    ParsedContext context;
     const std::string input = "Object prop1 ; Object prop2; ";
     ClassDeclaration classA("A");
     classA.setParentName("Object");
-    context.addClass(classA);
 
-    bool status = pegtl::parse< fj::class_body, fj::build_grammar>(
+    bool status = pegtl::parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
-        context
+        classA
     );
 
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
-    EXPECT_EQ(1, context.getClasses().size());
-    EXPECT_EQ("A", newClass->getName());
-    EXPECT_EQ("Object", newClass->getParentName());
-
-    const Properties *properties = newClass->getProperties();
+    const Properties *properties = classA.getProperties();
     ASSERT_EQ(2, properties->size());
 
     auto firstProperty = properties->begin();
@@ -116,7 +94,7 @@ TEST (AST, single_class_with_one_one_property) {
 TEST (AST, class_with_few_properties) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; Object prop2; }";
-    bool status = pegtl::parse< fj::class_def, fj::build_grammar>(
+    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
         input,
         "input variable",
         context
@@ -145,7 +123,7 @@ TEST (AST, class_inheritance) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1;}"
             "\nclass B extends A { Object prop2;}";
-    bool status = pegtl::parse< fj::grammar, fj::build_grammar>(
+    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
         input,
         "input variable",
         context
