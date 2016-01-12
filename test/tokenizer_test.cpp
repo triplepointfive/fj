@@ -411,4 +411,29 @@ TEST (AST, method_returns_another_method_invocation) {
     ASSERT_NE(nullptr, methodInvocation);
     EXPECT_EQ("someMethod", methodInvocation->getName());
     EXPECT_EQ("this", methodInvocation->getObjectName());
+    EXPECT_EQ(0, methodInvocation->getArgs()->size());
 }
+
+//TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
+//    MethodDeclaration methodDeclaration("methodName", "Object");
+//    const std::string input = "return this.someMethod(var1, this.fst);";
+//
+//    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+//        input,
+//        "input variable",
+//        methodDeclaration
+//    );
+//
+//    ASSERT_TRUE(status);
+//
+//    MethodTerm *builtTerm = methodDeclaration.getBodyTerm();
+//    ASSERT_NE(nullptr, builtTerm);
+//    MethodInvocation * methodInvocation =
+//            dynamic_cast<MethodInvocation *>(builtTerm);
+//    ASSERT_NE(nullptr, methodInvocation);
+//    EXPECT_EQ("someMethod", methodInvocation->getName());
+//    EXPECT_EQ("this", methodInvocation->getObjectName());
+//
+//    auto args = methodInvocation->getArgs();
+//    ASSERT_EQ(2, args->size());
+//}
