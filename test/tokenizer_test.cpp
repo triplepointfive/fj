@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include "ast_struct.h"
 
+using namespace pegtl;
+
 TEST (AST, class_header) {
     ClassDeclaration classDeclaration;
     const std::string input = "class A extends Object ";
-    bool status = pegtl::parse< fj::class_header, fj::build_class, fj::control>(
+    bool status = parse< fj::class_header, fj::build_class, fj::control>(
         input,
         "input variable",
         classDeclaration
@@ -20,7 +22,7 @@ TEST (AST, single_property_definition) {
     ClassDeclaration classA("A");
     classA.setParentName("Object");
 
-    bool status = pegtl::parse< fj::property_def, fj::build_class, fj::control >(
+    bool status = parse< fj::property_def, fj::build_class, fj::control >(
         input,
         "input variable",
         classA
@@ -37,7 +39,7 @@ TEST (AST, class_body_with_a_single_property) {
     ClassDeclaration classA("A");
     classA.setParentName("Object");
 
-    bool status = pegtl::parse< fj::class_body, fj::build_class, fj::control >(
+    bool status = parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
         classA
@@ -54,7 +56,7 @@ TEST (AST, class_body_with_few_properties) {
     ClassDeclaration classA("A");
     classA.setParentName("Object");
 
-    bool status = pegtl::parse< fj::class_body, fj::build_class, fj::control >(
+    bool status = parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
         classA
@@ -77,7 +79,7 @@ TEST (AST, class_body_with_few_properties) {
 TEST (AST, single_class_with_one_one_property) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; }";
-    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
+    bool status = parse< fj::grammar, nothing, fj::control >(
         input,
         "input variable",
         context
@@ -94,7 +96,7 @@ TEST (AST, single_class_with_one_one_property) {
 TEST (AST, class_with_few_properties) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; Object prop2; }";
-    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
+    bool status = parse< fj::grammar, nothing, fj::control >(
         input,
         "input variable",
         context
@@ -123,7 +125,7 @@ TEST (AST, class_inheritance) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1;}"
             "\nclass B extends A { Object prop2;}";
-    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
+    bool status = parse< fj::grammar, nothing, fj::control >(
         input,
         "input variable",
         context
@@ -141,7 +143,7 @@ TEST (AST, single_method_argument) {
     const std::string input = "Object prop1";
     MethodDeclaration methodDeclaration("methodName", "Object");
 
-    bool status = pegtl::parse< fj::method_arg, fj::build_method >(
+    bool status = parse< fj::method_arg, fj::build_method, fj::control >(
         input,
         "input variable",
         methodDeclaration
@@ -160,7 +162,7 @@ TEST (AST, a_list_of_method_arguments) {
     const std::string input = "Object a, Object b";
     MethodDeclaration methodDeclaration("methodName", "Object");
 
-    bool status = pegtl::parse< fj::method_arguments, fj::build_method >(
+    bool status = parse< fj::method_arguments, fj::build_method, fj::control >(
         input,
         "input variable",
         methodDeclaration
@@ -182,7 +184,7 @@ TEST (AST, constructor_header_with_no_arguments) {
     const std::string input = "A()";
     ConstructorBody constructorBody;
 
-    bool status = pegtl::parse< fj::constructor_head, fj::build_constructor >(
+    bool status = parse< fj::constructor_head, fj::build_constructor >(
         input,
         "input variable",
         constructorBody
@@ -198,7 +200,7 @@ TEST (AST, constructor_header_with_single_argument) {
     const std::string input = "A( Object fstArg )";
     ConstructorBody constructorBody;
 
-    bool status = pegtl::parse< fj::constructor_head, fj::build_constructor >(
+    bool status = parse< fj::constructor_head, fj::build_constructor, fj::control >(
         input,
         "input variable",
         constructorBody
@@ -217,7 +219,7 @@ TEST (AST, method_header_with_no_arguments) {
     const std::string input = "Object fun1()";
     MethodDeclaration methodDeclaration("methodName", "Object");
 
-    bool status = pegtl::parse< fj::method_head, fj::build_method >(
+    bool status = parse< fj::method_head, fj::build_method >(
         input,
         "input variable",
         methodDeclaration
@@ -234,7 +236,7 @@ TEST (AST, method_header_with_single_argument) {
     const std::string input = "Object fun2( Object fstArg )";
     MethodDeclaration methodDeclaration("methodName", "Object");
 
-    bool status = pegtl::parse< fj::method_head, fj::build_method >(
+    bool status = parse< fj::method_head, fj::build_method, fj::control >(
         input,
         "input variable",
         methodDeclaration
@@ -256,7 +258,7 @@ TEST (AST, constructor_body_super_invocation) {
     ConstructorBody constructorBody;
     const std::string input = "super ( )";
 
-    bool status = pegtl::parse< fj::super_invocation, fj::build_constructor>(
+    bool status = parse< fj::super_invocation, fj::build_constructor>(
         input,
         "input variable",
         constructorBody
@@ -270,7 +272,7 @@ TEST (AST, constructor_body_assignment) {
     ConstructorBody constructorBody;
     const std::string input = "this.fst= fst";
 
-    bool status = pegtl::parse< fj::assignment, fj::build_constructor>(
+    bool status = parse< fj::assignment, fj::build_constructor>(
         input,
         "input variable",
         constructorBody
@@ -287,7 +289,7 @@ TEST (AST, constructor_body_with_few_assignments) {
     ConstructorBody constructorBody;
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
 
-    bool status = pegtl::parse< fj::constructor_body, fj::build_constructor>(
+    bool status = parse< fj::constructor_body, fj::build_constructor>(
         input,
         "input variable",
         constructorBody
@@ -305,7 +307,7 @@ TEST (AST, constructor_empty_definition) {
     ConstructorBody constructorBody;
     const std::string input = "A() { super(); }";
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor, fj::control>(
+    bool status = parse< fj::constructor_def, fj::build_constructor, fj::control>(
         input,
         "input variable",
         constructorBody
@@ -321,7 +323,7 @@ TEST (AST, constructor_with_an_argument_definition) {
     ConstructorBody constructorBody;
     const std::string input = "A(Object fst) { super(); this.fst = fst; }";
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor, fj::control>(
+    bool status = parse< fj::constructor_def, fj::build_constructor, fj::control>(
         input,
         "input variable",
         constructorBody
@@ -338,7 +340,7 @@ TEST (AST, method_returns_property) {
     MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.fst;";
 
-    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+    bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
         methodDeclaration
@@ -356,7 +358,7 @@ TEST (AST, method_returns_input_variable) {
     MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return fstArg;";
 
-    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+    bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
         methodDeclaration
@@ -374,7 +376,7 @@ TEST (AST, method_returns_another_method_invocation) {
     MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.someMethod();";
 
-    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+    bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
         methodDeclaration
@@ -396,7 +398,7 @@ TEST (AST, method_returns_another_method_invocation) {
 //    MethodDeclaration methodDeclaration("methodName", "Object");
 //    const std::string input = "return this.someMethod(var1, this.fst);";
 //
-//    bool status = pegtl::parse< fj::method_body, fj::build_method>(
+//    bool status = parse< fj::method_body, fj::build_method>(
 //        input,
 //        "input variable",
 //        methodDeclaration
