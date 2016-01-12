@@ -5,10 +5,13 @@
 #include <iostream>
 
 #include <pegtl.hh>
+#include <pegtl/contrib/changes.hh>
 
 typedef std::map<std::string, std::string> Properties;
 typedef std::map<std::string, std::string> Arguments;
 typedef std::map<std::string, std::string> Methods;
+
+class ParsedContext;
 
 class MethodTerm {
 public:
@@ -17,6 +20,9 @@ public:
     std::string getName() const {
         return name;
     }
+
+    MethodTerm(const MethodTerm &) = delete;
+    void operator= (const MethodTerm &) = delete;
 
     // TODO: This is stub for test to check the actual state. Review one day.
     virtual std::string type() const = 0;
@@ -96,6 +102,10 @@ public:
 
     std::vector<std::string> getProperties() const { return properties; }
 
+    void success(ParsedContext & context) {
+        std::cout << "success GOT CALLED: " << std::endl;
+    }
+
 private:
     std::vector<std::string> properties;
 };
@@ -134,11 +144,16 @@ private:
 class ClassDeclaration {
 public:
     ClassDeclaration(const std::string &name) : name(name) {};
+    ClassDeclaration() {};
     ~ClassDeclaration() {
         if (nullptr != constructorBody) {
             delete constructorBody;
         }
     }
+
+    void success(ParsedContext & context);
+
+    void setName(const std::string &name) { this->name = name; };
     void setParentName(const std::string &name) { this->parentName = name; };
     void addProperty(const std::string &className,
                      const std::string &propertyName) {
@@ -193,6 +208,11 @@ public:
 private:
     std::vector< ClassDeclaration > classes;
 };
+
+void ClassDeclaration::success(ParsedContext & context) {
+    std::cout << "ClassDeclaration: success" << std::endl;
+    context.addClass(*this);
+}
 
 namespace fj {
     using namespace pegtl;
@@ -285,7 +305,7 @@ namespace fj {
     // method name and the list of arguments.
     struct method_invocation :
         seq < method_invocation_head,
-            sur_with_brackets < enable < method_list_of_args > > > {};
+            sur_with_brackets < disable < method_list_of_args > > > {};
 
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
@@ -352,7 +372,7 @@ namespace fj {
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};
 
     // The top-level grammar allows one class definition and then expects eof.
-    struct file : until< eof, list < class_def, opt < space > > > {};
+    struct grammar : until< eof, list < class_def, opt < space > > > {};
 
     void splitOn(std::string origin, std::string delimiter,
                  std::string &fst, std::string &snd) {
@@ -376,10 +396,10 @@ namespace fj {
     template< typename Rule >
     struct build_method_invocation : pegtl::nothing< Rule > {};
 
-    template<> struct build_method_invocation< method_invocation > {
+    template<> struct build_method_invocation< method_term > {
         static void apply(const pegtl::input & in,
                           MethodInvocation **methodInvocation) {
-            std::cout << "build_method_invocation: method_invocation: " << in.string() << std::endl;
+            std::cout << "build_method_invocation: method_term: " << in.string() << std::endl;
         }
     };
 
@@ -400,6 +420,20 @@ namespace fj {
         }
     };
 
+    template<> struct build_method_body< method_invocation > {
+        static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
+            std::cout << "build_method_body: method_invocation: " << in.string() << std::endl;
+            MethodInvocation *methodInvocation = nullptr;
+            // TODO: Validate returned status.
+            pegtl::parse< fj::method_invocation, fj::build_method_invocation >(
+                in.string(),
+                "method_body rule",
+                &methodInvocation
+            );
+            *methodTerm = methodInvocation;
+        }
+    };
+
     template<> struct build_method_body< property_invocation > {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "build_method_body: property_term: " << in.string() << std::endl;
@@ -413,20 +447,6 @@ namespace fj {
         static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
             std::cout << "build_method_body: variable_term: " << in.string() << std::endl;
             *methodTerm = new VariableTerm(in.string());
-        }
-    };
-
-    template<> struct build_method_body< method_invocation > {
-        static void apply( const pegtl::input & in, MethodTerm **methodTerm) {
-            std::cout << "build_method_body: method_invocation: " << in.string() << std::endl;
-            MethodInvocation *methodInvocation = nullptr;
-            // TODO: Validate returned status.
-            pegtl::parse< fj::method_invocation, fj::build_method_invocation >(
-                in.string(),
-                "method_body rule",
-                &methodInvocation
-            );
-            *methodTerm = methodInvocation;
         }
     };
 
@@ -487,6 +507,23 @@ namespace fj {
                 &methodTerm
             );
             method.setBodyTerm(methodTerm);
+        }
+    };
+
+    template< typename Rule >
+    struct build_class : pegtl::nothing< Rule > {};
+
+    template<> struct build_class< declared_class_name > {
+        static void apply(const pegtl::input & in, ClassDeclaration & classDeclaration) {
+            std::cout << "declared_class_name: " << in.string() << std::endl;
+            classDeclaration.setName(in.string());
+        }
+    };
+
+    template<> struct build_class< inherited_class_name > {
+        static void apply(const input & in, ClassDeclaration & classDeclaration) {
+            std::cout << "declared_class_name: " << in.string() << std::endl;
+            classDeclaration.setParentName(in.string());
         }
     };
 
@@ -551,6 +588,9 @@ namespace fj {
             context.currentClass()->addMethod(methodDeclaration);
         }
     };
+
+    template< typename Rule > struct control : normal< Rule > {};
+    template<> struct control< class_def > : change_state_and_action< class_def, ClassDeclaration, build_class > {};
 }
 
 #endif //FJ_AST_STRUCT_H

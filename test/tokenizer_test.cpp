@@ -99,7 +99,7 @@ TEST (AST, class_body_with_few_properties) {
 TEST (AST, single_class_with_one_one_property) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1; }";
-    bool status = pegtl::parse< fj::file, fj::build_grammar>(
+    bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
         input,
         "input variable",
         context
@@ -145,7 +145,7 @@ TEST (AST, class_inheritance) {
     ParsedContext context;
     const std::string input = "class A extends Object { Object prop1;}"
             "\nclass B extends A { Object prop2;}";
-    bool status = pegtl::parse< fj::file, fj::build_grammar>(
+    bool status = pegtl::parse< fj::grammar, fj::build_grammar>(
         input,
         "input variable",
         context
@@ -327,7 +327,7 @@ TEST (AST, constructor_empty_definition) {
     ConstructorBody constructorBody;
     const std::string input = "A() { super(); }";
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor>(
+    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor, fj::control>(
         input,
         "input variable",
         constructorBody
@@ -343,7 +343,7 @@ TEST (AST, constructor_with_an_argument_definition) {
     ConstructorBody constructorBody;
     const std::string input = "A(Object fst) { super(); this.fst = fst; }";
 
-    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor>(
+    bool status = pegtl::parse< fj::constructor_def, fj::build_constructor, fj::control>(
         input,
         "input variable",
         constructorBody
