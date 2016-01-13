@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "ast_struct.h"
+#include "lexer/lexer.h"
 
 using namespace pegtl;
 
