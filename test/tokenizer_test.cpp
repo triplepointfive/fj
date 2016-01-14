@@ -3,6 +3,29 @@
 
 using namespace pegtl;
 
+TEST (AST, file_containing_a_class) {
+    ParsedContext context;
+    const std::string input = "class A extends Object { Object a; }";
+    bool status = parse< fj::grammar, nothing, fj::control >(
+        input,
+        "input variable",
+        context
+    );
+
+    ASSERT_TRUE(status);
+    auto classes = context.getClasses();
+    ASSERT_EQ(1, classes.size());
+
+    ClassDeclaration newClass = classes.front();
+    EXPECT_EQ("A", newClass.getName());
+    EXPECT_EQ("Object", newClass.getParentName());
+
+    const Properties *properties = newClass.getProperties();
+    ASSERT_EQ(1, properties->size());
+    EXPECT_EQ("a", properties->begin()->first);
+    EXPECT_EQ("Object", properties->begin()->second);
+}
+
 TEST (AST, class_header) {
     ClassDeclaration classDeclaration;
     const std::string input = "class A extends Object ";
@@ -86,11 +109,12 @@ TEST (AST, single_class_with_one_one_property) {
     );
 
     ASSERT_TRUE(status);
-    ASSERT_EQ(1, context.getClasses().size());
+    auto classes = context.getClasses();
+    ASSERT_EQ(1, classes.size());
 
-    ClassDeclaration *newClass = context.currentClass();
-    EXPECT_EQ("A", newClass->getName());
-    EXPECT_EQ("Object", newClass->getParentName());
+    ClassDeclaration newClass = classes.front();
+    EXPECT_EQ("A", newClass.getName());
+    EXPECT_EQ("Object", newClass.getParentName());
 }
 
 TEST (AST, class_with_few_properties) {
@@ -103,13 +127,13 @@ TEST (AST, class_with_few_properties) {
     );
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
+    ClassDeclaration newClass = context.getClasses().front();
 
     ASSERT_EQ(1, context.getClasses().size());
-    ASSERT_EQ("A", newClass->getName());
-    ASSERT_EQ("Object", newClass->getParentName());
+    EXPECT_EQ("A", newClass.getName());
+    EXPECT_EQ("Object", newClass.getParentName());
 
-    const Properties *properties = newClass->getProperties();
+    const Properties *properties = newClass.getProperties();
     ASSERT_EQ(2, properties->size());
 
     auto firstProperty = properties->begin();
@@ -132,11 +156,11 @@ TEST (AST, class_inheritance) {
     );
     ASSERT_TRUE(status);
 
-    ClassDeclaration *newClass = context.currentClass();
+    ClassDeclaration newClass = context.getClasses().back();
 
     EXPECT_EQ(2, context.getClasses().size());
-    EXPECT_EQ("B", newClass->getName());
-    EXPECT_EQ("A", newClass->getParentName());
+    EXPECT_EQ("B", newClass.getName());
+    EXPECT_EQ("A", newClass.getParentName());
 }
 
 TEST (AST, single_method_argument) {

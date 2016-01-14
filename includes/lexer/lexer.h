@@ -7,8 +7,8 @@
 #include <pegtl.hh>
 #include <pegtl/contrib/changes.hh>
 
-#include "lexer/lexemes.h"
 #include "lexer/structures.h"
+#include "lexer/errors.h"
 
 namespace fj {
     using namespace pegtl;
@@ -35,33 +35,19 @@ namespace fj {
     template< typename Rule >
     struct build_method_invocation : nothing< Rule > {};
 
-    template<> struct build_method_invocation< method_term > {
-        static void apply(const input & in,
-                          MethodInvocation **methodInvocation) {
-            std::cout << "build_method_invocation: method_term: " << in.string() << std::endl;
-        }
-    };
-
     template<> struct build_method_invocation< method_invocation_head > {
         static void apply(const input & in,
                           MethodInvocation **methodInvocation) {
-            std::cout << "build_method_invocation: method_invocation_head: " << in.string() << std::endl;
+//            std::cout << "build_method_invocation: method_invocation_head: " << in.string() << std::endl;
             std::string objectName, methodName;
             splitOnDot(in.string(), objectName, methodName);
             *methodInvocation = new MethodInvocation(objectName, methodName);
         }
     };
 
-    template<> struct build_method_invocation< method_list_of_args > {
-        static void apply(const input &in,
-                          MethodInvocation **methodInvocation) {
-            std::cout << "build_method_invocation: method_list_of_args: " << in.string() << std::endl;
-        }
-    };
-
     template<> struct build_method_body< method_invocation > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-            std::cout << "build_method_body: method_invocation: " << in.string() << std::endl;
+//            std::cout << "build_method_body: method_invocation: " << in.string() << std::endl;
             MethodInvocation *methodInvocation = nullptr;
             // TODO: Validate returned status.
             parse< fj::method_invocation, fj::build_method_invocation >(
@@ -75,7 +61,7 @@ namespace fj {
 
     template<> struct build_method_body< property_invocation > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-            std::cout << "build_method_body: property_term: " << in.string() << std::endl;
+//            std::cout << "build_method_body: property_term: " << in.string() << std::endl;
             std::string thisStr, propName;
             splitOnDot(in.string(), thisStr, propName);
             *methodTerm = new PropertyTerm(propName);
@@ -84,7 +70,7 @@ namespace fj {
 
     template<> struct build_method_body< variable_term > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-            std::cout << "build_method_body: variable_term: " << in.string() << std::endl;
+//            std::cout << "build_method_body: variable_term: " << in.string() << std::endl;
             *methodTerm = new VariableTerm(in.string());
         }
     };
@@ -109,7 +95,7 @@ namespace fj {
 
     template<> struct build_method< method_ret_and_name > {
         static void apply(const input & in, MethodDeclaration & method) {
-            std::cout << "method_ret_and_name: " << in.string() << std::endl;
+//            std::cout << "method_ret_and_name: " << in.string() << std::endl;
             std::string className, methodName;
             splitOnSpace(in.string(), className, methodName);
             method.setName(methodName);
@@ -131,6 +117,7 @@ namespace fj {
         }
     };
 
+    // Builds a pair representing a property.
     template< typename Rule >
     struct build_method_arg : nothing< Rule > {};
 
@@ -146,6 +133,7 @@ namespace fj {
         }
     };
 
+    // Builds a pair representing a property.
     template< typename Rule >
     struct build_class_property : nothing< Rule > {};
 
@@ -161,6 +149,7 @@ namespace fj {
         }
     };
 
+    // Action to build a class.
     template< typename Rule >
     struct build_class : nothing< Rule > {};
 
@@ -176,43 +165,8 @@ namespace fj {
         }
     };
 
-    // Top level action for parser.
-    template< typename Rule >
-    struct build_grammar : nothing< Rule > {};
-
-    // Creates new constructor for current class.
-    template<> struct build_grammar< constructor_def > {
-        static void apply( const input & in, ParsedContext & context ) {
-            ConstructorBody *constructorBody = new ConstructorBody;
-            // TODO: Validate returned status.
-            parse< fj::constructor_def, fj::build_constructor >(
-                in.string(),
-                "constructor_def rule",
-                *constructorBody
-            );
-
-            context.currentClass()->setConstructorBody(constructorBody);
-        }
-    };
-
-    // Creates new method for current class.
-    template<> struct build_grammar< method_def > {
-        static void apply( const input & in, ParsedContext & context ) {
-            // TODO: Check if possible to do without stubs.
-            MethodDeclaration *methodDeclaration =
-                new MethodDeclaration("stubName", "stubRetObject");
-            // TODO: Validate returned status.
-            parse< fj::method_def, fj::build_method >(
-                in.string(),
-                "method_def rule",
-                *methodDeclaration
-            );
-
-            context.currentClass()->addMethod(methodDeclaration);
-        }
-    };
-
-    template< typename Rule > struct control : normal< Rule > {};
+    // Top control switcher.
+    template< typename Rule > struct control : errors< Rule > {};
     template<> struct control< class_def > :
         change_state_and_action< class_def, ClassDeclaration, build_class > {};
     template<> struct control< property_def > :

@@ -5,7 +5,7 @@ project(fj)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic -Wextra -g -Wnon-virtual-dtor")
 
-add_library(fj_lib src/term.cpp includes/term_visitor.h src/eval_term_visitor.cpp includes/eval_term_visitor.h includes/utils.h src/utils.cpp src/context.cpp includes/context.h test/context_test.cpp src/method_body.cpp includes/method_body.h src/class_body.cpp includes/class_body.h includes/base_types.h includes/lexer/lexer.h includes/lexer/lexemes.h src/lexer/structures.cpp includes/lexer/structures.h)
+add_library(fj_lib src/term.cpp includes/term_visitor.h src/eval_term_visitor.cpp includes/eval_term_visitor.h includes/utils.h src/utils.cpp src/context.cpp includes/context.h test/context_test.cpp src/method_body.cpp includes/method_body.h src/class_body.cpp includes/class_body.h includes/base_types.h includes/lexer/lexer.h includes/lexer/lexemes.h src/lexer/structures.cpp includes/lexer/errors.h includes/lexer/structures.h)
 add_executable(fj src/main.cpp)
 target_link_libraries(fj fj_lib)
 

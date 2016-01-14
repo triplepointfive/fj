@@ -7,9 +7,9 @@
 #include <vector>
 #include <assert.h>
 
-typedef std::map<std::string, std::string> Properties;
-typedef std::map<std::string, std::string> Arguments;
-typedef std::map<std::string, std::string> Methods;
+using Properties = std::map<std::string, std::string>;
+using Arguments = std::map<std::string, std::string>;
+using Methods = std::map<std::string, std::string>;
 
 class ParsedContext;
 
@@ -17,12 +17,7 @@ class MethodTerm {
 public:
     MethodTerm(const std::string &name) : name(name) { }
 
-    std::string getName() const {
-        return name;
-    }
-
-    MethodTerm(const MethodTerm &) = delete;
-    void operator= (const MethodTerm &) = delete;
+    std::string getName() const;
 
     // TODO: This is stub for test to check the actual state. Review one day.
     virtual std::string type() const = 0;
@@ -96,15 +91,9 @@ class ConstructorBody : public BaseMethod {
 public:
     ConstructorBody() {};
 
-    void addProperty(const std::string &propertyName) {
-        properties.push_back(propertyName);
-    }
+    void addProperty(const std::string &propertyName);
 
     std::vector<std::string> getProperties() const { return properties; }
-
-    void success(ParsedContext & context) {
-        std::cout << "success GOT CALLED: " << std::endl;
-    }
 
 private:
     std::vector<std::string> properties;
@@ -118,15 +107,11 @@ public:
         this->name = name;
     }
 
-    void setBodyTerm(MethodTerm *methodTerm) {
-        this->treeHead = methodTerm;
-    }
+    void setBodyTerm(MethodTerm *methodTerm) { this->treeHead = methodTerm; }
 
     MethodTerm *getBodyTerm() const { return treeHead; }
 
-    void setReturnClassName(const std::string &return_class_name) {
-        this->return_class_name = return_class_name;
-    }
+    void setReturnClassName(const std::string &return_class_name);
 
     std::string getReturnClassName() const { return return_class_name; }
 
@@ -179,11 +164,6 @@ public:
         return constructorBody;
     }
 
-    MethodDeclaration *currentMethod() {
-        assert((bool)methods.size());
-        return methods.back();
-    }
-
     std::vector<MethodDeclaration*> getMethods() const { return methods; }
     std::string getName() const { return name; };
     std::string getParentName() const { return parentName; };
@@ -200,39 +180,24 @@ struct Pair {
     std::string key;
     std::string val;
 
-    void success(ClassDeclaration & classDeclaration) {
-        classDeclaration.addProperty(key, val);
-    }
+    void success(ClassDeclaration & classDeclaration);
 };
 
 struct MethodArg {
     std::string name;
     std::string returnedClassName;
 
-    void success(ConstructorBody & constructorBody) {
-        constructorBody.addArg(name, returnedClassName);
-    }
-
-    void success(MethodDeclaration & methodDeclaration) {
-        methodDeclaration.addArg(name, returnedClassName);
-    }
+    void success(ConstructorBody & constructorBody);
+    void success(MethodDeclaration & methodDeclaration);
 };
 
 class ParsedContext {
 public:
     ParsedContext() {};
     void addClass(ClassDeclaration newClass) { classes.push_back(newClass); };
-    ClassDeclaration *currentClass() {
-        assert((bool)classes.size());
-        return &classes.back();
-    }
     std::vector< ClassDeclaration > getClasses() const { return classes; }
 private:
     std::vector< ClassDeclaration > classes;
 };
-
-void ClassDeclaration::success(ParsedContext & context) {
-    context.addClass(*this);
-}
 
 #endif //FJ_STRUCTURES_H

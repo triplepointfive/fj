@@ -146,8 +146,11 @@ namespace fj {
     // Matches the whole class body.
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};
 
+    // List of classes.
+    struct classes : list < class_def, opt < space > > {};
+
     // The top-level grammar allows one class definition and then expects eof.
-    struct grammar : until< eof, list < class_def, opt < space > > > {};
+    struct grammar : must < classes, eof > {};
 }
 
 #endif //FJ_LEXEMES_H
