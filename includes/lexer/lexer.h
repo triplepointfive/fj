@@ -13,22 +13,6 @@
 namespace fj {
     using namespace pegtl;
 
-    void splitOn(std::string origin, std::string delimiter,
-                 std::string &fst, std::string &snd) {
-        unsigned long space = origin.find(delimiter);
-        fst = origin.substr(0, space);
-        snd = origin.substr(space + 1, origin.size());
-    }
-
-    void splitOnSpace(std::string origin, std::string &fst, std::string &snd) {
-        // TODO: Assumes delimiter is a space, should be more abstract.
-        splitOn(origin, " ", fst, snd);
-    }
-
-    void splitOnDot(std::string origin, std::string &fst, std::string &snd) {
-        splitOn(origin, ".", fst, snd);
-    }
-
     template< typename Rule >
     struct build_method_body : nothing< Rule > {};
 
