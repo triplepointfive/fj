@@ -2,6 +2,15 @@
 
 namespace fj {
     template<> const std::string errors< classes >::error_message = "Empty file";
+
+    // Identifiers.
+    template<> const std::string errors< declared_class_name_padded >::error_message = "Missed class name";
+    template<> const std::string errors< inherited_class_name_padded >::error_message = "Missed class name";
+
+    // Keywords.
+    template<> const std::string errors< class_keyword >::error_message = "Expected \"class\" keyword";
+    template<> const std::string errors< extends_keyword >::error_message = "Expected \"extends\" keyword";
+
     template<> const std::string errors< method_ret_and_name >::error_message = "invalid method defenition";
     template<> const std::string errors< sur_with_brackets<fj::method_arguments> >::error_message = "invalid method argument defenition";
     template<> const std::string errors< semicolon >::error_message = "missing semicolon";

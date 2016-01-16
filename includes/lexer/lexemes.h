@@ -136,9 +136,12 @@ namespace fj {
 
     /* Classes */
 
+    struct declared_class_name_padded : lexeme < declared_class_name > {};
+    struct inherited_class_name_padded : lexeme < inherited_class_name > {};
+
     // Matches "class A extends B"
-    struct class_header : seq < class_keyword, lexeme < declared_class_name >,
-            extends_keyword, lexeme < inherited_class_name > > {};
+    struct class_header : if_must < class_keyword, declared_class_name_padded,
+        extends_keyword, inherited_class_name_padded > {};
 
     // Matches the content of {"..."}.
     struct class_body : seq < list < class_terms, semicolon >, semicolon > {};
