@@ -49,7 +49,7 @@ namespace fj {
 
     // Matches the pattern like "{Rule}"
     template < typename Rule >
-    struct sur_with_braces : seq < open_brace, Rule, close_brace > {};
+    struct sur_with_braces : must < open_brace, Rule, close_brace > {};
 
     // Matches the pattern like "(Rule)"
     template < typename Rule >
@@ -150,7 +150,7 @@ namespace fj {
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};
 
     // List of classes.
-    struct classes : list < class_def, opt < space > > {};
+    struct classes : list < class_def, success, space > {};
 
     // The top-level grammar allows one class definition and then expects eof.
     struct grammar : must < classes, eof > {};
