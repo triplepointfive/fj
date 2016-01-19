@@ -22,6 +22,17 @@ namespace fj {
         }
     };
 
+    struct ConstructorState {
+        std::shared_ptr< ConstructorBody > constructorBody =
+            std::make_shared< ConstructorBody >();
+
+        void success(ClassState & classState) {
+            classState.classDeclaration->setConstructorBody(
+                std::move(constructorBody)
+            );
+        }
+    };
+
     struct PairState {
         std::string key;
         std::string val;
@@ -35,8 +46,8 @@ namespace fj {
         std::string name;
         std::string returnedClassName;
 
-        void success(ConstructorBody & constructorBody) {
-            constructorBody.addArg(name, returnedClassName);
+        void success(ConstructorState & constructorState) {
+            constructorState.constructorBody->addArg(name, returnedClassName);
         }
 
         void success(MethodDeclaration & methodDeclaration) {
@@ -90,14 +101,14 @@ namespace fj {
     struct build_constructor : nothing< Rule > {};
 
     template<> struct build_constructor< constructor_name > {
-        static void apply(const input & in, ConstructorBody & constructorBody) {
-            constructorBody.setName(in.string());
+        static void apply(const input & in, ConstructorState & constructorState) {
+            constructorState.constructorBody->setName(in.string());
         }
     };
 
     template<> struct build_constructor< assignment_prop_name > {
-        static void apply(const input & in, ConstructorBody & constructorBody) {
-            constructorBody.addProperty(in.string());
+        static void apply(const input & in, ConstructorState & constructorState) {
+            constructorState.constructorBody->addProperty(in.string());
         }
     };
 
@@ -181,6 +192,8 @@ namespace fj {
         change_state_and_action< class_def, ClassState, build_class > {};
     template<> struct control< property_def > :
         change_state_and_action< property_def, PairState, build_class_property > {};
+    template<> struct control< constructor_def > :
+        change_state_and_action< constructor_def, ConstructorState, build_constructor > {};
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }

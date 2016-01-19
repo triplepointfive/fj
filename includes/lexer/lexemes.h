@@ -143,7 +143,7 @@ namespace fj {
     struct property_def : seq < class_name, space, object_name > {};
 
     // A list of base units inside class body: properties, methods etc.
-    struct class_terms : sor < property_def > {};
+    struct class_terms : sor < constructor_def, property_def > {};
 
     // Matches the content of {"..."}.
     struct class_body : seq < list < class_terms, semicolon >, semicolon > {};

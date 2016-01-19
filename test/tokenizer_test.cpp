@@ -220,35 +220,38 @@ TEST (AST, a_list_of_method_arguments) {
 
 TEST (AST, constructor_header_with_no_arguments) {
     const std::string input = "A()";
-    ConstructorBody constructorBody;
+    fj::ConstructorState constructorState;
 
     bool status = parse< fj::constructor_head, fj::build_constructor >(
         input,
         "input variable",
-        constructorBody
+        constructorState
     );
 
     ASSERT_TRUE(status);
 
-    EXPECT_EQ(0, constructorBody.getArgs().size());
-    EXPECT_EQ("A", constructorBody.getName());
+    auto constructorBody = constructorState.constructorBody;
+    EXPECT_EQ(0, constructorBody->getArgs().size());
+    EXPECT_EQ("A", constructorBody->getName());
 }
 
 TEST (AST, constructor_header_with_single_argument) {
     const std::string input = "A( Object fstArg )";
-    ConstructorBody constructorBody;
+    fj::ConstructorState constructorState;
 
     bool status = parse< fj::constructor_head, fj::build_constructor, fj::control >(
         input,
         "input variable",
-        constructorBody
+        constructorState
     );
 
     ASSERT_TRUE(status);
-    EXPECT_EQ("A", constructorBody.getName());
 
-    Arguments args = constructorBody.getArgs();
-    EXPECT_EQ(1, constructorBody.getArgs().size());
+    auto constructorBody = constructorState.constructorBody;
+    EXPECT_EQ("A", constructorBody->getName());
+
+    Arguments args = constructorBody->getArgs();
+    ASSERT_EQ(1, args.size());
     EXPECT_EQ("fstArg", args.rbegin()->first);
     EXPECT_EQ("Object", args.rbegin()->second);
 }
@@ -307,69 +310,73 @@ TEST (AST, constructor_body_super_invocation) {
 }
 
 TEST (AST, constructor_body_assignment) {
-    ConstructorBody constructorBody;
     const std::string input = "this.fst= fst";
+    fj::ConstructorState constructorState;
 
     bool status = parse< fj::assignment, fj::build_constructor>(
         input,
         "input variable",
-        constructorBody
+        constructorState
     );
 
     ASSERT_TRUE(status);
 
-    auto properties = constructorBody.getProperties();
+    auto constructorBody = constructorState.constructorBody;
+    auto properties = constructorBody->getProperties();
     ASSERT_EQ(1, properties.size());
     EXPECT_EQ("fst", properties.front());
 }
 
 TEST (AST, constructor_body_with_few_assignments) {
-    ConstructorBody constructorBody;
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
+    fj::ConstructorState constructorState;
 
     bool status = parse< fj::constructor_body, fj::build_constructor>(
         input,
         "input variable",
-        constructorBody
+        constructorState
     );
 
     ASSERT_TRUE(status);
 
-    auto properties = constructorBody.getProperties();
+    auto constructorBody = constructorState.constructorBody;
+    auto properties = constructorBody->getProperties();
     ASSERT_EQ(2, properties.size());
     EXPECT_EQ("snd", properties.front());
     EXPECT_EQ("fst", properties.back());
 }
 
 TEST (AST, constructor_empty_definition) {
-    ConstructorBody constructorBody;
     const std::string input = "A() { super(); }";
+    fj::ClassState classState;
 
-    bool status = parse< fj::constructor_def, fj::build_constructor, fj::control>(
+    bool status = parse< fj::constructor_def, nothing, fj::control>(
         input,
         "input variable",
-        constructorBody
+        classState
     );
 
     ASSERT_TRUE(status);
 
-    auto properties = constructorBody.getProperties();
+    auto classDeclaration = classState.classDeclaration;
+    auto properties = classDeclaration->getConstructorBody()->getProperties();
     ASSERT_EQ(0, properties.size());
 }
 
 TEST (AST, constructor_with_an_argument_definition) {
-    ConstructorBody constructorBody;
     const std::string input = "A(Object fst) { super(); this.fst = fst; }";
+    fj::ClassState classState;
 
-    bool status = parse< fj::constructor_def, fj::build_constructor, fj::control>(
+    bool status = parse< fj::constructor_def, nothing, fj::control>(
         input,
         "input variable",
-        constructorBody
+        classState
     );
 
     ASSERT_TRUE(status);
 
-    auto properties = constructorBody.getProperties();
+    auto classDeclaration = classState.classDeclaration;
+    auto properties = classDeclaration->getConstructorBody()->getProperties();
     ASSERT_EQ(1, properties.size());
     EXPECT_EQ("fst", properties.front());
 }

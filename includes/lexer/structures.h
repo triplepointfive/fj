@@ -131,11 +131,6 @@ class ClassDeclaration {
 public:
     ClassDeclaration(const std::string &name) : name(name) {};
     ClassDeclaration() {};
-    ~ClassDeclaration() {
-        if (nullptr != constructorBody) {
-            delete constructorBody;
-        }
-    }
 
     void setName(const std::string &name) { this->name = name; };
     void setParentName(const std::string &name) { this->parentName = name; };
@@ -154,13 +149,13 @@ public:
         );
     };
 
-    void setConstructorBody(ConstructorBody *constructorBody) {
+    void setConstructorBody(std::shared_ptr< ConstructorBody > constructorBody) {
         // TODO: Fail if already presence - means constructor is defined twice.
         this->constructorBody = constructorBody;
     }
 
-    ConstructorBody *getConstructorBody() const {
-        return constructorBody;
+    std::shared_ptr< ConstructorBody > getConstructorBody() const {
+        return std::move(constructorBody);
     }
 
     std::vector<MethodDeclaration*> getMethods() const { return methods; }
@@ -172,7 +167,7 @@ private:
     std::string name, parentName;
     Properties properties;
     std::vector<MethodDeclaration*> methods;
-    ConstructorBody *constructorBody{ nullptr };
+    std::shared_ptr< ConstructorBody > constructorBody;
 };
 
 class ParsedContext {

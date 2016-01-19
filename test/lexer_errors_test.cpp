@@ -37,6 +37,11 @@ TEST (lexer_error, missed_open_brace) {
     PARSER_ERROR("input variable:1:23: Missing open brace '{'")
 }
 
+TEST (lexer_error, missed_open_brace_with_property) {
+    const std::string input = "class A extends Object { Object a; ";
+    PARSER_ERROR("input variable:1:35: Missing close brace '}'")
+}
+
 TEST (lexer_error, missed_close_brace_with_property) {
     const std::string input = "class A extends Object { Object a; ";
     PARSER_ERROR("input variable:1:35: Missing close brace '}'")
