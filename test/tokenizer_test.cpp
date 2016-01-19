@@ -16,78 +16,89 @@ TEST (AST, file_containing_a_class) {
     auto classes = context.getClasses();
     ASSERT_EQ(1, classes.size());
 
-    ClassDeclaration newClass = classes.front();
-    EXPECT_EQ("A", newClass.getName());
-    EXPECT_EQ("Object", newClass.getParentName());
+    auto newClass = classes.front();
+    EXPECT_EQ("A", newClass->getName());
+    EXPECT_EQ("Object", newClass->getParentName());
 
-    const Properties *properties = newClass.getProperties();
+    const Properties *properties = newClass->getProperties();
     ASSERT_EQ(1, properties->size());
     EXPECT_EQ("a", properties->begin()->first);
     EXPECT_EQ("Object", properties->begin()->second);
 }
 
 TEST (AST, class_header) {
-    ClassDeclaration classDeclaration;
     const std::string input = "class A extends Object ";
+
+    fj::ClassState classState;
+
     bool status = parse< fj::class_header, fj::build_class, fj::control>(
         input,
         "input variable",
-        classDeclaration
+        classState
     );
 
+    auto classDeclaration = classState.classDeclaration;
+
     ASSERT_TRUE(status);
-    EXPECT_EQ("A", classDeclaration.getName());
-    EXPECT_EQ("Object", classDeclaration.getParentName());
+    EXPECT_EQ("A", classDeclaration->getName());
+    EXPECT_EQ("Object", classDeclaration->getParentName());
 }
 
 TEST (AST, single_property_definition) {
     const std::string input = "Object prop1";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
+
+    fj::ClassState classState;
+    classState.classDeclaration->setName("A");
+    classState.classDeclaration->setParentName("Object");
 
     bool status = parse< fj::property_def, fj::build_class, fj::control >(
         input,
         "input variable",
-        classA
+        classState
     );
 
     ASSERT_TRUE(status);
 
-    const Properties *properties = classA.getProperties();
+    auto classA = classState.classDeclaration;
+    const Properties *properties = classA->getProperties();
     EXPECT_EQ(1, properties->size());
 }
 
 TEST (AST, class_body_with_a_single_property) {
     const std::string input = "Object prop1;";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
+    fj::ClassState classState;
+    classState.classDeclaration->setName("A");
+    classState.classDeclaration->setParentName("Object");
 
     bool status = parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
-        classA
+        classState
     );
 
     ASSERT_TRUE(status);
 
-    const Properties *properties = classA.getProperties();
+    auto classA = classState.classDeclaration;
+    const Properties *properties = classA->getProperties();
     EXPECT_EQ(1, properties->size());
 }
 
 TEST (AST, class_body_with_few_properties) {
     const std::string input = "Object prop1 ; Object prop2; ";
-    ClassDeclaration classA("A");
-    classA.setParentName("Object");
+    fj::ClassState classState;
+    classState.classDeclaration->setName("A");
+    classState.classDeclaration->setParentName("Object");
 
     bool status = parse< fj::class_body, fj::build_class, fj::control >(
         input,
         "input variable",
-        classA
+        classState
     );
 
     ASSERT_TRUE(status);
 
-    const Properties *properties = classA.getProperties();
+    auto classA = classState.classDeclaration;
+    const Properties *properties = classA->getProperties();
     ASSERT_EQ(2, properties->size());
 
     auto firstProperty = properties->begin();
@@ -112,9 +123,9 @@ TEST (AST, single_class_with_one_one_property) {
     auto classes = context.getClasses();
     ASSERT_EQ(1, classes.size());
 
-    ClassDeclaration newClass = classes.front();
-    EXPECT_EQ("A", newClass.getName());
-    EXPECT_EQ("Object", newClass.getParentName());
+    auto newClass = classes.front();
+    EXPECT_EQ("A", newClass->getName());
+    EXPECT_EQ("Object", newClass->getParentName());
 }
 
 TEST (AST, class_with_few_properties) {
@@ -127,13 +138,14 @@ TEST (AST, class_with_few_properties) {
     );
     ASSERT_TRUE(status);
 
-    ClassDeclaration newClass = context.getClasses().front();
+    auto classes = context.getClasses();
+    ASSERT_EQ(1, classes.size());
 
-    ASSERT_EQ(1, context.getClasses().size());
-    EXPECT_EQ("A", newClass.getName());
-    EXPECT_EQ("Object", newClass.getParentName());
+    auto newClass = classes.front();
+    EXPECT_EQ("A", newClass->getName());
+    EXPECT_EQ("Object", newClass->getParentName());
 
-    const Properties *properties = newClass.getProperties();
+    const Properties *properties = newClass->getProperties();
     ASSERT_EQ(2, properties->size());
 
     auto firstProperty = properties->begin();
@@ -156,11 +168,13 @@ TEST (AST, class_inheritance) {
     );
     ASSERT_TRUE(status);
 
-    ClassDeclaration newClass = context.getClasses().back();
+    auto classes = context.getClasses();
+    ASSERT_EQ(2, classes.size());
 
-    EXPECT_EQ(2, context.getClasses().size());
-    EXPECT_EQ("B", newClass.getName());
-    EXPECT_EQ("A", newClass.getParentName());
+    auto newClass = classes.back();
+
+    EXPECT_EQ("B", newClass->getName());
+    EXPECT_EQ("A", newClass->getParentName());
 }
 
 TEST (AST, single_method_argument) {

@@ -13,6 +13,37 @@
 namespace fj {
     using namespace pegtl;
 
+    struct ClassState {
+        std::shared_ptr< ClassDeclaration > classDeclaration =
+            std::make_shared< ClassDeclaration >();
+
+        void success(ParsedContext & context) {
+            context.addClass(std::move(classDeclaration));
+        }
+    };
+
+    struct PairState {
+        std::string key;
+        std::string val;
+
+        void success(ClassState & classState) {
+            classState.classDeclaration->addProperty(key, val);
+        }
+    };
+
+    struct MethodArgState {
+        std::string name;
+        std::string returnedClassName;
+
+        void success(ConstructorBody & constructorBody) {
+            constructorBody.addArg(name, returnedClassName);
+        }
+
+        void success(MethodDeclaration & methodDeclaration) {
+            methodDeclaration.addArg(name, returnedClassName);
+        }
+    };
+
     template< typename Rule >
     struct build_method_body : nothing< Rule > {};
 
@@ -22,7 +53,6 @@ namespace fj {
     template<> struct build_method_invocation< method_invocation_head > {
         static void apply(const input & in,
                           MethodInvocation **methodInvocation) {
-//            std::cout << "build_method_invocation: method_invocation_head: " << in.string() << std::endl;
             std::string objectName, methodName;
             splitOnDot(in.string(), objectName, methodName);
             *methodInvocation = new MethodInvocation(objectName, methodName);
@@ -31,7 +61,6 @@ namespace fj {
 
     template<> struct build_method_body< method_invocation > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-//            std::cout << "build_method_body: method_invocation: " << in.string() << std::endl;
             MethodInvocation *methodInvocation = nullptr;
             // TODO: Validate returned status.
             parse< fj::method_invocation, fj::build_method_invocation >(
@@ -45,7 +74,6 @@ namespace fj {
 
     template<> struct build_method_body< property_invocation > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-//            std::cout << "build_method_body: property_term: " << in.string() << std::endl;
             std::string thisStr, propName;
             splitOnDot(in.string(), thisStr, propName);
             *methodTerm = new PropertyTerm(propName);
@@ -54,7 +82,6 @@ namespace fj {
 
     template<> struct build_method_body< variable_term > {
         static void apply( const input & in, MethodTerm **methodTerm) {
-//            std::cout << "build_method_body: variable_term: " << in.string() << std::endl;
             *methodTerm = new VariableTerm(in.string());
         }
     };
@@ -79,7 +106,6 @@ namespace fj {
 
     template<> struct build_method< method_ret_and_name > {
         static void apply(const input & in, MethodDeclaration & method) {
-//            std::cout << "method_ret_and_name: " << in.string() << std::endl;
             std::string className, methodName;
             splitOnSpace(in.string(), className, methodName);
             method.setName(methodName);
@@ -106,13 +132,13 @@ namespace fj {
     struct build_method_arg : nothing< Rule > {};
 
     template<> struct build_method_arg< class_name > {
-        static void apply(const input & in, MethodArg & methodArg) {
+        static void apply(const input & in, MethodArgState & methodArg) {
             methodArg.returnedClassName = in.string();
         }
     };
 
     template<> struct build_method_arg< object_name > {
-        static void apply(const input & in, MethodArg & methodArg) {
+        static void apply(const input & in, MethodArgState & methodArg) {
             methodArg.name = in.string();
         }
     };
@@ -122,13 +148,13 @@ namespace fj {
     struct build_class_property : nothing< Rule > {};
 
     template<> struct build_class_property< class_name > {
-        static void apply(const input & in, Pair & pair) {
+        static void apply(const input & in, PairState & pair) {
             pair.key = in.string();
         }
     };
 
     template<> struct build_class_property< object_name > {
-        static void apply(const input & in, Pair & pair) {
+        static void apply(const input & in, PairState & pair) {
             pair.val = in.string();
         }
     };
@@ -138,25 +164,25 @@ namespace fj {
     struct build_class : nothing< Rule > {};
 
     template<> struct build_class< declared_class_name > {
-        static void apply(const input & in, ClassDeclaration & classDeclaration) {
-            classDeclaration.setName(in.string());
+        static void apply(const input & in, ClassState & classState) {
+            classState.classDeclaration->setName(in.string());
         }
     };
 
     template<> struct build_class< inherited_class_name > {
-        static void apply(const input & in, ClassDeclaration & classDeclaration) {
-            classDeclaration.setParentName(in.string());
+        static void apply(const input & in, ClassState & classState) {
+            classState.classDeclaration->setParentName(in.string());
         }
     };
 
     // Top control switcher.
     template< typename Rule > struct control : errors< Rule > {};
     template<> struct control< class_def > :
-        change_state_and_action< class_def, ClassDeclaration, build_class > {};
+        change_state_and_action< class_def, ClassState, build_class > {};
     template<> struct control< property_def > :
-        change_state_and_action< property_def, Pair, build_class_property > {};
+        change_state_and_action< property_def, PairState, build_class_property > {};
     template<> struct control< method_arg > :
-        change_state_and_action< method_arg, MethodArg, build_method_arg > {};
+        change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }
 
 #endif //FJ_AST_STRUCT_H

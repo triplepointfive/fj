@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <assert.h>
+#include <memory>
 
 using Properties = std::map<std::string, std::string>;
 using Arguments = std::map<std::string, std::string>;
@@ -136,8 +137,6 @@ public:
         }
     }
 
-    void success(ParsedContext & context);
-
     void setName(const std::string &name) { this->name = name; };
     void setParentName(const std::string &name) { this->parentName = name; };
     void addProperty(const std::string &className,
@@ -176,28 +175,17 @@ private:
     ConstructorBody *constructorBody{ nullptr };
 };
 
-struct Pair {
-    std::string key;
-    std::string val;
-
-    void success(ClassDeclaration & classDeclaration);
-};
-
-struct MethodArg {
-    std::string name;
-    std::string returnedClassName;
-
-    void success(ConstructorBody & constructorBody);
-    void success(MethodDeclaration & methodDeclaration);
-};
-
 class ParsedContext {
 public:
     ParsedContext() {};
-    void addClass(ClassDeclaration newClass) { classes.push_back(newClass); };
-    std::vector< ClassDeclaration > getClasses() const { return classes; }
+    void addClass(std::shared_ptr< ClassDeclaration > newClass) {
+        classes.push_back(std::move(newClass));
+    };
+    std::vector< std::shared_ptr< ClassDeclaration > > getClasses() const {
+        return classes;
+    }
 private:
-    std::vector< ClassDeclaration > classes;
+    std::vector< std::shared_ptr< ClassDeclaration > > classes;
 };
 
 #endif //FJ_STRUCTURES_H
