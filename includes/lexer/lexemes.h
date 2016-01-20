@@ -140,13 +140,14 @@ namespace fj {
         extends_keyword, inherited_class_name_padded > {};
 
     // Matches new property inside class body.
-    struct property_def : seq < class_name, space, object_name > {};
+    struct property_def :
+        if_must < seq < class_name, space, object_name >, semicolon > {};
 
     // A list of base units inside class body: properties, methods etc.
-    struct class_terms : sor < constructor_def, property_def > {};
+    struct class_term : sor < constructor_def, property_def > {};
 
     // Matches the content of {"..."}.
-    struct class_body : seq < list < class_terms, semicolon >, semicolon > {};
+    struct class_body : list < class_term, star< space > > {};
 
     // Matches the whole class body.
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};

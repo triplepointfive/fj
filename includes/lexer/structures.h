@@ -17,14 +17,8 @@ class ParsedContext;
 class MethodTerm {
 public:
     MethodTerm(const std::string &name) : name(name) { }
-
     std::string getName() const;
-
-    // TODO: This is stub for test to check the actual state. Review one day.
-    virtual std::string type() const = 0;
-
     virtual ~MethodTerm() {}
-
 protected:
     std::string name;
 };
@@ -32,13 +26,11 @@ protected:
 class PropertyTerm : public MethodTerm {
 public:
     PropertyTerm(std::string propertyName) : MethodTerm(propertyName) {}
-    std::string type() const override { return "property"; }
 };
 
 class VariableTerm : public MethodTerm {
 public:
     VariableTerm(std::string variableName) : MethodTerm(variableName) {}
-    std::string type() const override { return "variable"; }
 };
 
 class ArgumentTerm : public MethodTerm {
@@ -64,8 +56,6 @@ public:
                      const std::string &methodName)
             : ArgumentTerm(methodName)
             , objectName(objectName) { }
-    std::string type() const override { return "method"; }
-
     std::string getObjectName() const { return objectName; }
 private:
     std::string objectName;
@@ -129,7 +119,6 @@ private:
 
 class ClassDeclaration {
 public:
-    ClassDeclaration(const std::string &name) : name(name) {};
     ClassDeclaration() {};
 
     void setName(const std::string &name) { this->name = name; };

@@ -14,13 +14,13 @@ namespace fj {
     // Chars.
     template<> const std::string errors< close_brace >::error_message = "Missing close brace '}'";
     template<> const std::string errors< open_brace >::error_message = "Missing open brace '{'";
+    template<> const std::string errors< semicolon >::error_message = "Missing semicolon";
 
     // Stubs.
     template<> const std::string errors< constructor_body >::error_message = "stub1";
     template<> const std::string errors< class_body >::error_message = "stub2";
     template<> const std::string errors< method_ret_and_name >::error_message = "invalid method defenition";
     template<> const std::string errors< sur_with_brackets<fj::method_arguments> >::error_message = "invalid method argument defenition";
-    template<> const std::string errors< semicolon >::error_message = "missing semicolon";
 
     template<> const std::string errors< pegtl::eof >::error_message = "unexpected character";
 
