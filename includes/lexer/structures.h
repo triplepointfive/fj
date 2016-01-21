@@ -92,11 +92,13 @@ private:
 
 class MethodDeclaration : public BaseMethod {
 public:
+    // TODO: Remove this constructor
     MethodDeclaration(const std::string &name,
                       const std::string &return_class_name)
             : return_class_name(return_class_name) {
         this->name = name;
     }
+    MethodDeclaration() {}
 
     void setBodyTerm(MethodTerm *methodTerm) { this->treeHead = methodTerm; }
 
@@ -128,15 +130,9 @@ public:
         // TODO: Fail if not unique.
         properties[propertyName] = className;
     };
-    void addMethod(MethodDeclaration *methodDeclaration) {
+    void addMethod(std::shared_ptr< MethodDeclaration > methodDeclaration) {
         methods.push_back(methodDeclaration);
     }
-    void addMethod(const std::string &method_name,
-                   const std::string &return_class_name) {
-        methods.push_back(
-                new MethodDeclaration(method_name, return_class_name)
-        );
-    };
 
     void setConstructorBody(std::shared_ptr< ConstructorBody > constructorBody) {
         // TODO: Fail if already presence - means constructor is defined twice.
@@ -147,7 +143,9 @@ public:
         return std::move(constructorBody);
     }
 
-    std::vector<MethodDeclaration*> getMethods() const { return methods; }
+    std::vector< std::shared_ptr< MethodDeclaration > > getMethods() const {
+        return methods;
+    }
     std::string getName() const { return name; };
     std::string getParentName() const { return parentName; };
     const Properties *getProperties() const { return &properties; };
@@ -155,7 +153,7 @@ public:
 private:
     std::string name, parentName;
     Properties properties;
-    std::vector<MethodDeclaration*> methods;
+    std::vector< std::shared_ptr< MethodDeclaration > > methods;
     std::shared_ptr< ConstructorBody > constructorBody;
 };
 

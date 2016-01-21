@@ -33,6 +33,17 @@ namespace fj {
         }
     };
 
+    struct MethodState {
+        std::shared_ptr< MethodDeclaration > methodDeclaration =
+            std::make_shared< MethodDeclaration >();
+
+        void success(ClassState & classState) {
+            classState.classDeclaration->addMethod(
+                std::move(methodDeclaration)
+            );
+        }
+    };
+
     struct PairState {
         std::string key;
         std::string val;
@@ -50,8 +61,8 @@ namespace fj {
             constructorState.constructorBody->addArg(name, returnedClassName);
         }
 
-        void success(MethodDeclaration & methodDeclaration) {
-            methodDeclaration.addArg(name, returnedClassName);
+        void success(MethodState & methodState) {
+            methodState.methodDeclaration->addArg(name, returnedClassName);
         }
     };
 
@@ -116,17 +127,17 @@ namespace fj {
     struct build_method : nothing< Rule > {};
 
     template<> struct build_method< method_ret_and_name > {
-        static void apply(const input & in, MethodDeclaration & method) {
+        static void apply(const input & in, MethodState & methodState) {
             std::string className, methodName;
             splitOnSpace(in.string(), className, methodName);
-            method.setName(methodName);
-            method.setReturnClassName(className);
+            methodState.methodDeclaration->setName(methodName);
+            methodState.methodDeclaration->setReturnClassName(className);
         }
     };
 
     // Assigns top node of body tree to the current method declaration.
     template<> struct build_method< method_body > {
-        static void apply(const input & in, MethodDeclaration & method) {
+        static void apply(const input & in, MethodState & methodState) {
             MethodTerm *methodTerm = nullptr;
             // TODO: Validate returned status.
             parse< fj::method_body, fj::build_method_body >(
@@ -134,7 +145,7 @@ namespace fj {
                 "method_body rule",
                 &methodTerm
             );
-            method.setBodyTerm(methodTerm);
+            methodState.methodDeclaration->setBodyTerm(methodTerm);
         }
     };
 
@@ -194,6 +205,8 @@ namespace fj {
         change_state_and_action< property_def, PairState, build_class_property > {};
     template<> struct control< constructor_def > :
         change_state_and_action< constructor_def, ConstructorState, build_constructor > {};
+    template<> struct control< method_def > :
+        change_state_and_action< method_def, MethodState, build_method > {};
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }

@@ -179,17 +179,18 @@ TEST (AST, class_inheritance) {
 
 TEST (AST, single_method_argument) {
     const std::string input = "Object prop1";
-    MethodDeclaration methodDeclaration("methodName", "Object");
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_arg, fj::build_method, fj::control >(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    Arguments args = methodDeclaration.getArgs();
+    auto methodDeclaration = methodState.methodDeclaration;
+    Arguments args = methodDeclaration->getArgs();
     ASSERT_EQ(1, args.size());
 
     EXPECT_EQ("prop1", args.rbegin()->first);
@@ -198,17 +199,18 @@ TEST (AST, single_method_argument) {
 
 TEST (AST, a_list_of_method_arguments) {
     const std::string input = "Object a, Object b";
-    MethodDeclaration methodDeclaration("methodName", "Object");
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_arguments, fj::build_method, fj::control >(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    Arguments args = methodDeclaration.getArgs();
+    auto methodDeclaration = methodState.methodDeclaration;
+    Arguments args = methodDeclaration->getArgs();
     ASSERT_EQ(2, args.size());
 
     EXPECT_EQ("b", args.rbegin()->first);
@@ -258,37 +260,39 @@ TEST (AST, constructor_header_with_single_argument) {
 
 TEST (AST, method_header_with_no_arguments) {
     const std::string input = "Object fun1()";
-    MethodDeclaration methodDeclaration("methodName", "Object");
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_head, fj::build_method >(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    EXPECT_EQ(0, methodDeclaration.getArgs().size());
-    EXPECT_EQ("fun1", methodDeclaration.getName());
-    EXPECT_EQ("Object", methodDeclaration.getReturnClassName());
+    auto methodDeclaration = methodState.methodDeclaration;
+    EXPECT_EQ(0, methodDeclaration->getArgs().size());
+    EXPECT_EQ("fun1", methodDeclaration->getName());
+    EXPECT_EQ("Object", methodDeclaration->getReturnClassName());
 }
 
 TEST (AST, method_header_with_single_argument) {
     const std::string input = "Object fun2( Object fstArg )";
-    MethodDeclaration methodDeclaration("methodName", "Object");
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_head, fj::build_method, fj::control >(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    EXPECT_EQ("fun2", methodDeclaration.getName());
-    EXPECT_EQ("Object", methodDeclaration.getReturnClassName());
+    auto methodDeclaration = methodState.methodDeclaration;
+    EXPECT_EQ("fun2", methodDeclaration->getName());
+    EXPECT_EQ("Object", methodDeclaration->getReturnClassName());
 
-    Arguments args = methodDeclaration.getArgs();
+    Arguments args = methodDeclaration->getArgs();
     ASSERT_EQ(1, args.size());
 
     EXPECT_EQ("fstArg", args.rbegin()->first);
@@ -382,54 +386,57 @@ TEST (AST, constructor_with_an_argument_definition) {
 }
 
 TEST (AST, method_returns_property) {
-    MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.fst;";
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
+    auto methodDeclaration = methodState.methodDeclaration;
     PropertyTerm * propertyTerm =
-        dynamic_cast<PropertyTerm *>(methodDeclaration.getBodyTerm());
+        dynamic_cast<PropertyTerm *>(methodDeclaration->getBodyTerm());
     ASSERT_NE(nullptr, propertyTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 }
 
 TEST (AST, method_returns_input_variable) {
-    MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return fstArg;";
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
+    auto methodDeclaration = methodState.methodDeclaration;
     VariableTerm * variableTerm =
-        dynamic_cast<VariableTerm *>(methodDeclaration.getBodyTerm());
+        dynamic_cast<VariableTerm *>(methodDeclaration->getBodyTerm());
     ASSERT_NE(nullptr, variableTerm);
     EXPECT_EQ("fstArg", variableTerm->getName());
 }
 
 TEST (AST, method_returns_another_method_invocation) {
-    MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.someMethod();";
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    MethodTerm *builtTerm = methodDeclaration.getBodyTerm();
+    auto methodDeclaration = methodState.methodDeclaration;
+    MethodTerm *builtTerm = methodDeclaration->getBodyTerm();
     ASSERT_NE(nullptr, builtTerm);
     MethodInvocation * methodInvocation =
             dynamic_cast<MethodInvocation *>(builtTerm);
@@ -440,18 +447,19 @@ TEST (AST, method_returns_another_method_invocation) {
 }
 
 TEST (AST, DISABLED_method_returns_another_method_invocation_with_2_input_args) {
-    MethodDeclaration methodDeclaration("methodName", "Object");
     const std::string input = "return this.someMethod(var1, this.fst);";
+    fj::MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method>(
         input,
         "input variable",
-        methodDeclaration
+        methodState
     );
 
     ASSERT_TRUE(status);
 
-    MethodTerm *builtTerm = methodDeclaration.getBodyTerm();
+    auto methodDeclaration = methodState.methodDeclaration;
+    MethodTerm *builtTerm = methodDeclaration->getBodyTerm();
     ASSERT_NE(nullptr, builtTerm);
     MethodInvocation * methodInvocation =
             dynamic_cast<MethodInvocation *>(builtTerm);
