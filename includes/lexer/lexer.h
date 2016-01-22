@@ -44,6 +44,16 @@ namespace fj {
         }
     };
 
+    struct MethodTermState {
+        std::shared_ptr< MethodTerm > methodTerm = nullptr;
+
+        void success(MethodState & methodState) {
+            methodState.methodDeclaration->setBodyTerm(
+                std::move(methodTerm)
+            );
+        }
+    };
+
     struct PairState {
         std::string key;
         std::string val;
@@ -82,29 +92,33 @@ namespace fj {
     };
 
     template<> struct build_method_body< method_invocation > {
-        static void apply( const input & in, MethodTerm **methodTerm) {
+        static void apply(const input & in, MethodTermState & methodTermState) {
             MethodInvocation *methodInvocation = nullptr;
             // TODO: Validate returned status.
             parse< fj::method_invocation, fj::build_method_invocation >(
                 in.string(),
-                "method_body rule",
+                "method_invocation rule",
                 &methodInvocation
             );
-            *methodTerm = methodInvocation;
+            // TODO: Validate assignment
+            methodTermState.methodTerm =
+                std::make_shared< MethodInvocation >(*methodInvocation);
         }
     };
 
     template<> struct build_method_body< property_invocation > {
-        static void apply( const input & in, MethodTerm **methodTerm) {
+        static void apply(const input & in, MethodTermState & methodTermState) {
             std::string thisStr, propName;
             splitOnDot(in.string(), thisStr, propName);
-            *methodTerm = new PropertyTerm(propName);
+            methodTermState.methodTerm =
+                std::make_shared < PropertyTerm >(propName);
         }
     };
 
     template<> struct build_method_body< variable_term > {
-        static void apply( const input & in, MethodTerm **methodTerm) {
-            *methodTerm = new VariableTerm(in.string());
+        static void apply(const input & in, MethodTermState & methodTermState) {
+            methodTermState.methodTerm =
+                std::make_shared < VariableTerm >(in.string());
         }
     };
 
@@ -126,26 +140,15 @@ namespace fj {
     template< typename Rule >
     struct build_method : nothing< Rule > {};
 
-    template<> struct build_method< method_ret_and_name > {
+    template<> struct build_method< met_class > {
         static void apply(const input & in, MethodState & methodState) {
-            std::string className, methodName;
-            splitOnSpace(in.string(), className, methodName);
-            methodState.methodDeclaration->setName(methodName);
-            methodState.methodDeclaration->setReturnClassName(className);
+            methodState.methodDeclaration->setReturnClassName(in.string());
         }
     };
 
-    // Assigns top node of body tree to the current method declaration.
-    template<> struct build_method< method_body > {
+    template<> struct build_method< met_name > {
         static void apply(const input & in, MethodState & methodState) {
-            MethodTerm *methodTerm = nullptr;
-            // TODO: Validate returned status.
-            parse< fj::method_body, fj::build_method_body >(
-                in.string(),
-                "method_body rule",
-                &methodTerm
-            );
-            methodState.methodDeclaration->setBodyTerm(methodTerm);
+            methodState.methodDeclaration->setName(in.string());
         }
     };
 
@@ -207,6 +210,8 @@ namespace fj {
         change_state_and_action< constructor_def, ConstructorState, build_constructor > {};
     template<> struct control< method_def > :
         change_state_and_action< method_def, MethodState, build_method > {};
+    template<> struct control< method_body > :
+        change_state_and_action< method_body, MethodTermState, build_method_body > {};
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }

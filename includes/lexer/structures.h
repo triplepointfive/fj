@@ -100,23 +100,19 @@ public:
     }
     MethodDeclaration() {}
 
-    void setBodyTerm(MethodTerm *methodTerm) { this->treeHead = methodTerm; }
+    void setBodyTerm(std::shared_ptr< MethodTerm > methodTerm) {
+        this->treeHead = methodTerm;
+    }
 
-    MethodTerm *getBodyTerm() const { return treeHead; }
+    std::shared_ptr< MethodTerm > getBodyTerm() const { return treeHead; }
 
     void setReturnClassName(const std::string &return_class_name);
 
     std::string getReturnClassName() const { return return_class_name; }
 
-    ~MethodDeclaration() {
-        if (nullptr != treeHead) {
-            delete treeHead;
-        }
-    }
-
 private:
     std::string return_class_name;
-    MethodTerm *treeHead{ nullptr };
+    std::shared_ptr< MethodTerm > treeHead = nullptr;
 };
 
 class ClassDeclaration {

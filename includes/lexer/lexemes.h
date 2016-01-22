@@ -111,8 +111,11 @@ namespace fj {
 
     /* Methods */
 
+    struct met_class : class_name {};
+    struct met_name : method_name {};
+
     // Matches common method declaration, with return type and name.
-    struct method_ret_and_name : seq < class_name, space, method_name > {};
+    struct method_ret_and_name : seq < met_class, space, met_name > {};
 
     // Matches the method head and its args list.
     struct method_head : must < method_ret_and_name,
