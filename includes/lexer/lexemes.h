@@ -81,7 +81,8 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct method_term : sor < method_invocation, property_invocation,
+    struct propety_invocation_m : property_invocation {};
+    struct method_term : sor < method_invocation, propety_invocation_m,
             variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".

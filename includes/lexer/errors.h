@@ -4,14 +4,6 @@
 #include "lexemes.h"
 
 namespace fj {
-    // TODO: Wipe them out.
-    void splitOn(std::string origin, std::string delimiter,
-                 std::string &fst, std::string &snd);
-
-    void splitOnSpace(std::string origin, std::string &fst, std::string &snd);
-
-    void splitOnDot(std::string origin, std::string &fst, std::string &snd);
-
     template< typename Rule >
     struct errors : public pegtl::normal< Rule > {
         static const std::string error_message;

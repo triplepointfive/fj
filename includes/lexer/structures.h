@@ -17,6 +17,8 @@ class ParsedContext;
 class MethodTerm {
 public:
     MethodTerm(const std::string &name) : name(name) { }
+    MethodTerm() { }
+    void setName(std::string name) { this->name = name; }
     std::string getName() const;
     virtual ~MethodTerm() {}
 protected:
@@ -35,7 +37,6 @@ public:
 
 class ArgumentTerm : public MethodTerm {
 public:
-    ArgumentTerm(std::string name) : MethodTerm(name) {};
     void addArg(MethodTerm *term) { terms.push_back(term); }
 
     const std::vector<MethodTerm *> *getArgs() const { return &terms; }
@@ -52,10 +53,9 @@ private:
 
 class MethodInvocation : public ArgumentTerm {
 public:
-    MethodInvocation(const std::string &objectName,
-                     const std::string &methodName)
-            : ArgumentTerm(methodName)
-            , objectName(objectName) { }
+    void setObjectName(const std::string &objectName) {
+        this->objectName = objectName;
+    }
     std::string getObjectName() const { return objectName; }
 private:
     std::string objectName;
