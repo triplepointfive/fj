@@ -71,7 +71,7 @@ namespace fj {
     // method name and the list of arguments.
     struct method_invocation :
             seq < method_invocation_head,
-                    sur_with_brackets < disable < method_list_of_args > > > {};
+                    sur_with_brackets < method_list_of_args > > {};
 
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};

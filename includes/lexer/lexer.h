@@ -13,78 +13,6 @@
 namespace fj {
     using namespace pegtl;
 
-    struct ClassState {
-        std::shared_ptr< ClassDeclaration > classDeclaration =
-            std::make_shared< ClassDeclaration >();
-
-        void success(ParsedContext & context) {
-            context.addClass(std::move(classDeclaration));
-        }
-    };
-
-    struct ConstructorState {
-        std::shared_ptr< ConstructorBody > constructorBody =
-            std::make_shared< ConstructorBody >();
-
-        void success(ClassState & classState) {
-            classState.classDeclaration->setConstructorBody(
-                std::move(constructorBody)
-            );
-        }
-    };
-
-    struct MethodState {
-        std::shared_ptr< MethodDeclaration > methodDeclaration =
-            std::make_shared< MethodDeclaration >();
-
-        void success(ClassState & classState) {
-            classState.classDeclaration->addMethod(
-                std::move(methodDeclaration)
-            );
-        }
-    };
-
-    struct MethodTermState {
-        std::shared_ptr< MethodTerm > methodTerm = nullptr;
-
-        void success(MethodState & methodState) {
-            methodState.methodDeclaration->setBodyTerm(
-                std::move(methodTerm)
-            );
-        }
-    };
-
-    struct MethodInvocationState {
-        std::shared_ptr< MethodInvocation > methodInvocation =
-            std::make_shared< MethodInvocation >();
-
-        void success(MethodTermState & methodTermState) {
-            methodTermState.methodTerm = std::move(methodInvocation);
-        }
-    };
-
-    struct PairState {
-        std::string key;
-        std::string val;
-
-        void success(ClassState & classState) {
-            classState.classDeclaration->addProperty(key, val);
-        }
-    };
-
-    struct MethodArgState {
-        std::string name;
-        std::string returnedClassName;
-
-        void success(ConstructorState & constructorState) {
-            constructorState.constructorBody->addArg(name, returnedClassName);
-        }
-
-        void success(MethodState & methodState) {
-            methodState.methodDeclaration->addArg(name, returnedClassName);
-        }
-    };
-
     template< typename Rule >
     struct build_method_body : nothing< Rule > {};
 
@@ -111,6 +39,12 @@ namespace fj {
             methodTermState.methodTerm =
                 std::make_shared < PropertyTerm >(in.string());
         }
+
+        static void apply(const input & in, MethodInvocationState & methodInvocationState) {
+            methodInvocationState.methodInvocation->addArg(
+                std::make_shared < PropertyTerm >(in.string())
+            );
+        }
     };
 
     template< typename Rule > struct build_variable_term : nothing< Rule > {};
@@ -118,6 +52,12 @@ namespace fj {
         static void apply(const input & in, MethodTermState & methodTermState) {
             methodTermState.methodTerm =
                 std::make_shared < VariableTerm >(in.string());
+        }
+
+        static void apply(const input & in, MethodInvocationState & methodInvocationState) {
+            methodInvocationState.methodInvocation->addArg(
+                std::make_shared < VariableTerm >(in.string())
+            );
         }
     };
 

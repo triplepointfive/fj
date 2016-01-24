@@ -389,7 +389,7 @@ TEST (AST, method_returns_property) {
     const std::string input = "return this.fst;";
     fj::MethodState methodState;
 
-    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+    bool status = parse< fj::method_body, nothing, fj::control>(
         input,
         "input variable",
         methodState
@@ -445,10 +445,10 @@ TEST (AST, method_returns_another_method_invocation) {
         dynamic_cast<MethodInvocation *>(methodTerm);
     EXPECT_EQ("someMethod", methodInvocation->getName());
     EXPECT_EQ("this", methodInvocation->getObjectName());
-    EXPECT_EQ(0, methodInvocation->getArgs()->size());
+    EXPECT_EQ(0, methodInvocation->getArgs().size());
 }
 
-TEST (AST, DISABLED_method_returns_another_method_invocation_with_2_input_args) {
+TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
     const std::string input = "return this.someMethod(var1, this.fst);";
     fj::MethodState methodState;
 
@@ -470,5 +470,15 @@ TEST (AST, DISABLED_method_returns_another_method_invocation_with_2_input_args) 
     EXPECT_EQ("this", methodInvocation->getObjectName());
 
     auto args = methodInvocation->getArgs();
-    ASSERT_EQ(2, args->size());
+    ASSERT_EQ(2, args.size());
+
+    VariableTerm * variableTerm = dynamic_cast<VariableTerm *>(
+        args.front().get()
+    );
+    EXPECT_EQ("var1", variableTerm->getName());
+
+    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+        args.back().get()
+    );
+    EXPECT_EQ("fst", propertyTerm->getName());
 }
