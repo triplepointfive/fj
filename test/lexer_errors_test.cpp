@@ -2,6 +2,7 @@
 #include "lexer/lexer.h"
 
 using namespace pegtl;
+using namespace fj;
 
 #define PARSER_ERROR(error_message) \
     ParsedContext context; \

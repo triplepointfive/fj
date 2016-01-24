@@ -2,6 +2,7 @@
 #include "lexer/lexer.h"
 
 using namespace pegtl;
+using namespace fj;
 
 TEST (AST, file_containing_a_class) {
     ParsedContext context;
@@ -29,7 +30,7 @@ TEST (AST, file_containing_a_class) {
 TEST (AST, class_header) {
     const std::string input = "class A extends Object ";
 
-    fj::ClassState classState;
+    ClassState classState;
 
     bool status = parse< fj::class_header, fj::build_class, fj::control>(
         input,
@@ -47,7 +48,7 @@ TEST (AST, class_header) {
 TEST (AST, single_property_definition) {
     const std::string input = "Object prop1;";
 
-    fj::ClassState classState;
+    ClassState classState;
     classState.classDeclaration->setName("A");
     classState.classDeclaration->setParentName("Object");
 
@@ -66,7 +67,7 @@ TEST (AST, single_property_definition) {
 
 TEST (AST, class_body_with_a_single_property) {
     const std::string input = "Object prop1;";
-    fj::ClassState classState;
+    ClassState classState;
     classState.classDeclaration->setName("A");
     classState.classDeclaration->setParentName("Object");
 
@@ -85,7 +86,7 @@ TEST (AST, class_body_with_a_single_property) {
 
 TEST (AST, class_body_with_few_properties) {
     const std::string input = "Object prop1 ; Object prop2; ";
-    fj::ClassState classState;
+    ClassState classState;
     classState.classDeclaration->setName("A");
     classState.classDeclaration->setParentName("Object");
 
@@ -179,7 +180,7 @@ TEST (AST, class_inheritance) {
 
 TEST (AST, single_method_argument) {
     const std::string input = "Object prop1";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_arg, fj::build_method, fj::control >(
         input,
@@ -199,7 +200,7 @@ TEST (AST, single_method_argument) {
 
 TEST (AST, a_list_of_method_arguments) {
     const std::string input = "Object a, Object b";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_arguments, fj::build_method, fj::control >(
         input,
@@ -222,7 +223,7 @@ TEST (AST, a_list_of_method_arguments) {
 
 TEST (AST, constructor_header_with_no_arguments) {
     const std::string input = "A()";
-    fj::ConstructorState constructorState;
+    ConstructorState constructorState;
 
     bool status = parse< fj::constructor_head, fj::build_constructor >(
         input,
@@ -239,7 +240,7 @@ TEST (AST, constructor_header_with_no_arguments) {
 
 TEST (AST, constructor_header_with_single_argument) {
     const std::string input = "A( Object fstArg )";
-    fj::ConstructorState constructorState;
+    ConstructorState constructorState;
 
     bool status = parse< fj::constructor_head, fj::build_constructor, fj::control >(
         input,
@@ -260,7 +261,7 @@ TEST (AST, constructor_header_with_single_argument) {
 
 TEST (AST, method_header_with_no_arguments) {
     const std::string input = "Object fun1()";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_head, fj::build_method, fj::control >(
         input,
@@ -278,7 +279,7 @@ TEST (AST, method_header_with_no_arguments) {
 
 TEST (AST, method_header_with_single_argument) {
     const std::string input = "Object fun2( Object fstArg )";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_head, fj::build_method, fj::control >(
         input,
@@ -315,7 +316,7 @@ TEST (AST, constructor_body_super_invocation) {
 
 TEST (AST, constructor_body_assignment) {
     const std::string input = "this.fst= fst";
-    fj::ConstructorState constructorState;
+    ConstructorState constructorState;
 
     bool status = parse< fj::assignment, fj::build_constructor, fj::control>(
         input,
@@ -333,7 +334,7 @@ TEST (AST, constructor_body_assignment) {
 
 TEST (AST, constructor_body_with_few_assignments) {
     const std::string input = "super();\n  this.snd =snd; this.fst= fst;";
-    fj::ConstructorState constructorState;
+    ConstructorState constructorState;
 
     bool status = parse< fj::constructor_body, fj::build_constructor, fj::control>(
         input,
@@ -352,7 +353,7 @@ TEST (AST, constructor_body_with_few_assignments) {
 
 TEST (AST, constructor_empty_definition) {
     const std::string input = "A() { super(); }";
-    fj::ClassState classState;
+    ClassState classState;
 
     bool status = parse< fj::constructor_def, nothing, fj::control>(
         input,
@@ -369,7 +370,7 @@ TEST (AST, constructor_empty_definition) {
 
 TEST (AST, constructor_with_an_argument_definition) {
     const std::string input = "A(Object fst) { super(); this.fst = fst; }";
-    fj::ClassState classState;
+    ClassState classState;
 
     bool status = parse< fj::constructor_def, nothing, fj::control>(
         input,
@@ -387,7 +388,7 @@ TEST (AST, constructor_with_an_argument_definition) {
 
 TEST (AST, method_returns_property) {
     const std::string input = "return this.fst;";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_body, nothing, fj::control>(
         input,
@@ -407,7 +408,7 @@ TEST (AST, method_returns_property) {
 
 TEST (AST, method_returns_input_variable) {
     const std::string input = "return fstArg;";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method, fj::control>(
         input,
@@ -427,7 +428,7 @@ TEST (AST, method_returns_input_variable) {
 
 TEST (AST, method_returns_another_method_invocation) {
     const std::string input = "return this.someMethod();";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method, fj::control>(
         input,
@@ -450,7 +451,7 @@ TEST (AST, method_returns_another_method_invocation) {
 
 TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
     const std::string input = "return this.someMethod(var1, this.fst);";
-    fj::MethodState methodState;
+    MethodState methodState;
 
     bool status = parse< fj::method_body, fj::build_method, fj::control>(
         input,
@@ -481,4 +482,45 @@ TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
         args.back().get()
     );
     EXPECT_EQ("fst", propertyTerm->getName());
+}
+
+TEST (AST, method_returns_another_method_invocation_with_another_invocation) {
+    const std::string input = "return this.someMethod(\n"
+        "var1.anotherMethod(this.third));";
+    MethodState methodState;
+
+    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto methodDeclaration = methodState.methodDeclaration;
+    auto methodTerm = methodDeclaration->getBodyTerm().get();
+    ASSERT_NE(nullptr, methodTerm);
+    MethodInvocation * methodInvocation =
+        dynamic_cast<MethodInvocation *>(methodTerm);
+    ASSERT_NE(nullptr, methodInvocation);
+    EXPECT_EQ("someMethod", methodInvocation->getName());
+    EXPECT_EQ("this", methodInvocation->getObjectName());
+
+    auto args = methodInvocation->getArgs();
+    ASSERT_EQ(1, args.size());
+
+    MethodInvocation * methodMethodTerm = dynamic_cast<MethodInvocation *>(
+        args.front().get()
+    );
+    ASSERT_NE(nullptr, methodMethodTerm);
+    EXPECT_EQ("anotherMethod", methodMethodTerm->getName());
+    EXPECT_EQ("var1", methodMethodTerm->getObjectName());
+
+    args = methodMethodTerm->getArgs();
+    ASSERT_EQ(1, args.size());
+
+    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+        args.back().get()
+    );
+    EXPECT_EQ("third", propertyTerm->getName());
 }

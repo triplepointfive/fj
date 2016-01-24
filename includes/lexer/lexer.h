@@ -153,8 +153,8 @@ namespace fj {
         change_state_and_action< method_body, MethodTermState, build_method_body > {};
     template<> struct control< variable_term > :
         change_action< variable_term, build_variable_term > {};
-    template<> struct control< propety_invocation_m > :
-        change_action< propety_invocation_m, build_property_term > {};
+    template<> struct control<property_invocation_m> :
+        change_action<property_invocation_m, build_property_term > {};
     template<> struct control< method_invocation > :
         change_state_and_action< method_invocation, MethodInvocationState, build_method_invocation > {};
     template<> struct control< method_arg > :
