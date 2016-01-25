@@ -97,14 +97,19 @@ namespace fj {
     struct constructor_head : seq < constructor_name,
             sur_with_brackets < method_arguments > > {};
 
+    struct super_arg : object_name {};
+    struct super_args : opt < list < super_arg, comma > > {};
+
     // Matches invocation of super.
     struct super_invocation :
-        seq < super_keyword, sur_with_brackets < success > > {};
+        seq < super_keyword, sur_with_brackets < super_args > > {};
+
+    struct properties_list : star_must < assignment, semicolon > {};
 
     // Matches the whole content of constructor body.
     // TODO: Throw local error if failed to match
-    struct constructor_body : seq < super_invocation, semicolon,
-            star_must < assignment, semicolon > > {};
+    struct constructor_body : must < super_invocation, semicolon,
+        properties_list > {};
 
     // Matches the whole constructor definition.
     struct constructor_def : seq < constructor_head,

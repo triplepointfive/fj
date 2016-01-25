@@ -63,3 +63,10 @@ TEST (lexer_error, missed_semicolon_with_property) {
     const std::string input = "class A extends Object { Object a }";
     PARSER_ERROR("input variable:1:33: Missing semicolon")
 }
+
+// Terms
+
+TEST (lexer_error, missed_super_invocation) {
+    const std::string input = "class A extends Object { A() {} }";
+    PARSER_ERROR("input variable:1:30: Call of super is a must")
+}

@@ -17,11 +17,15 @@ namespace fj {
     template<> const string errors< open_brace >::error_message = "Missing open brace '{'";
     template<> const string errors< semicolon >::error_message = "Missing semicolon";
 
+    // Terms.
+    template<> const string errors< super_invocation >::error_message = "Call of super is a must";
+
     // Stubs.
     template<> const string errors< constructor_body >::error_message = "stub1";
     template<> const string errors< class_body >::error_message = "stub2";
     template<> const string errors< method_ret_and_name >::error_message = "invalid method defenition";
     template<> const string errors< sur_with_brackets<fj::method_arguments> >::error_message = "invalid method argument defenition";
+    template<> const string errors< properties_list >::error_message = "invalid properties list";
 
     template<> const string errors< pegtl::eof >::error_message = "unexpected character";
 }

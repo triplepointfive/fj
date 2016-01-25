@@ -301,13 +301,13 @@ TEST (AST, method_header_with_single_argument) {
 }
 
 TEST (AST, constructor_body_super_invocation) {
-    ConstructorBody constructorBody;
+    ConstructorState constructorState;
     const std::string input = "super ( )";
 
     bool status = parse< fj::super_invocation, fj::build_constructor, fj::control>(
         input,
         "input variable",
-        constructorBody
+        constructorState
     );
 
     ASSERT_TRUE(status);
@@ -381,9 +381,34 @@ TEST (AST, constructor_with_an_argument_definition) {
     ASSERT_TRUE(status);
 
     auto classDeclaration = classState.classDeclaration;
+    auto args = classDeclaration->getConstructorBody()->getSuperArgs();
+    EXPECT_EQ(0, args.size());
+
     auto properties = classDeclaration->getConstructorBody()->getProperties();
     ASSERT_EQ(1, properties.size());
     EXPECT_EQ("fst", properties.front());
+}
+
+TEST (AST, constructor_with_a_super_argument) {
+    const std::string input = "A(Object fst) { super(fst); }";
+    ClassState classState;
+
+    bool status = parse< fj::constructor_def, nothing, fj::control>(
+        input,
+        "input variable",
+        classState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto classDeclaration = classState.classDeclaration;
+    auto properties = classDeclaration->getConstructorBody()->getProperties();
+    EXPECT_EQ(0, properties.size());
+
+    auto args = classDeclaration->getConstructorBody()->getSuperArgs();
+    ASSERT_EQ(1, args.size());
+
+    EXPECT_EQ("fst", args.front());
 }
 
 TEST (AST, method_returns_property) {

@@ -9,6 +9,10 @@ namespace fj {
         properties.push_back(propertyName);
     }
 
+    void ConstructorBody::addSuperArg(const std::string &variableName){
+        superArgs.push_back(variableName);
+    }
+
     void MethodDeclaration::setReturnClassName(const std::string &return_class_name) {
         this->return_class_name = return_class_name;
     }

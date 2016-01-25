@@ -80,11 +80,13 @@ namespace fj {
         ConstructorBody() {};
 
         void addProperty(const std::string &propertyName);
+        void addSuperArg(const std::string &variableName);
 
         std::vector<std::string> getProperties() const { return properties; }
-
+        std::vector<std::string> getSuperArgs() const { return superArgs; }
     private:
         std::vector<std::string> properties;
+        std::vector<std::string> superArgs;
     };
 
     class MethodDeclaration : public BaseMethod {

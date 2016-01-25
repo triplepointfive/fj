@@ -76,6 +76,12 @@ namespace fj {
         }
     };
 
+    template<> struct build_constructor< super_arg > {
+        static void apply(const input & in, ConstructorState & constructorState) {
+            constructorState.constructorBody->addSuperArg(in.string());
+        }
+    };
+
     template< typename Rule >
     struct build_method : nothing< Rule > {};
 
