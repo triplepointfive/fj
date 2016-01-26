@@ -58,6 +58,8 @@ namespace fj {
         std::string objectName;
     };
 
+    class Initiation : public ArgumentTerm {};
+
     class BaseMethod {
     public:
         void setName(const std::string &name) { this->name = name; }
@@ -187,11 +189,23 @@ namespace fj {
     };
 
     struct MethodInvocationState;
+    struct InitiationState;
     struct MethodTermState {
         std::shared_ptr< MethodTerm > methodTerm = nullptr;
 
         void success(MethodState & methodState);
         void success(MethodInvocationState & methodInvocationState);
+        void success(InitiationState & initiationState);
+    };
+
+    struct InitiationState {
+        std::shared_ptr<Initiation> initiation =
+            std::make_shared<Initiation>();
+
+        void success(MethodTermState & methodTermState);
+        void success(MethodState & methodState);
+        void success(MethodInvocationState & methodInvocationState);
+        void success(InitiationState & initiationState);
     };
 
     struct MethodInvocationState {
@@ -200,6 +214,7 @@ namespace fj {
 
         void success(MethodTermState & methodTermState);
         void success(MethodInvocationState & methodInvocationState);
+        void success(InitiationState & initiationState);
     };
 
     struct PairState {

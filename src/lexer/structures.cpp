@@ -62,4 +62,37 @@ namespace fj {
     void ClassState::success(ParsedContext & context) {
         context.addClass(std::move(classDeclaration));
     }
+
+    void MethodTermState::success(InitiationState &initiationState) {
+        initiationState.initiation->addArg(std::move(methodTerm));
+    }
+
+    void MethodInvocationState::success(
+        InitiationState &initiationState) {
+        initiationState.initiation->addArg(std::move(methodInvocation));
+    }
+
+    void InitiationState::success(MethodState &methodState) {
+        methodState.methodDeclaration->setBodyTerm(
+            std::move(initiation)
+        );
+    }
+
+    void InitiationState::success(
+        MethodInvocationState &methodInvocationState) {
+        methodInvocationState.methodInvocation->addArg(
+            std::move(initiation)
+        );
+    }
+
+    void InitiationState::success(InitiationState &initiationState) {
+        initiationState.initiation->addArg(
+            std::move(initiation)
+        );
+    }
+
+    void InitiationState::success(MethodTermState &methodTermState) {
+        // TODO: Check if pattern for MethodTermState is mandatory
+        methodTermState.methodTerm = std::move(initiation);
+    }
 }

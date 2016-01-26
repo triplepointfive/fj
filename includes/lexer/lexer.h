@@ -13,6 +13,7 @@
 namespace fj {
     using namespace pegtl;
 
+    // TODO: Wipe out?
     template< typename Rule >
     struct build_method_body : nothing< Rule > {};
 
@@ -33,6 +34,16 @@ namespace fj {
         }
     };
 
+    template< typename Rule >
+    struct build_instantiation : nothing< Rule > {};
+
+    template<> struct build_instantiation< instantiation_class > {
+        static void apply(const input & in,
+                          InitiationState & initiationState) {
+            initiationState.initiation->setName(in.string());
+        }
+    };
+
     template< typename Rule > struct build_property_term : nothing< Rule > {};
     template<> struct build_property_term< object_name > {
         static void apply(const input & in, MethodTermState & methodTermState) {
@@ -42,6 +53,12 @@ namespace fj {
 
         static void apply(const input & in, MethodInvocationState & methodInvocationState) {
             methodInvocationState.methodInvocation->addArg(
+                std::make_shared < PropertyTerm >(in.string())
+            );
+        }
+
+        static void apply(const input & in, InitiationState & initiationState) {
+            initiationState.initiation->addArg(
                 std::make_shared < PropertyTerm >(in.string())
             );
         }
@@ -56,6 +73,12 @@ namespace fj {
 
         static void apply(const input & in, MethodInvocationState & methodInvocationState) {
             methodInvocationState.methodInvocation->addArg(
+                std::make_shared < VariableTerm >(in.string())
+            );
+        }
+
+        static void apply(const input & in, InitiationState & initiationState) {
+            initiationState.initiation->addArg(
                 std::make_shared < VariableTerm >(in.string())
             );
         }
@@ -163,6 +186,8 @@ namespace fj {
         change_action<property_invocation_m, build_property_term > {};
     template<> struct control< method_invocation > :
         change_state_and_action< method_invocation, MethodInvocationState, build_method_invocation > {};
+    template<> struct control< instantiation > :
+        change_state_and_action< instantiation, InitiationState, build_instantiation > {};
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }

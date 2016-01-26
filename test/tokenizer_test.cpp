@@ -549,3 +549,59 @@ TEST (AST, method_returns_another_method_invocation_with_another_invocation) {
     );
     EXPECT_EQ("third", propertyTerm->getName());
 }
+
+TEST (AST, method_returns_initiated_object) {
+    const std::string input = "return new A();";
+    MethodState methodState;
+
+    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto methodDeclaration = methodState.methodDeclaration;
+    auto methodTerm = methodDeclaration->getBodyTerm().get();
+    ASSERT_NE(nullptr, methodTerm);
+
+    Initiation * initiation =
+        dynamic_cast<Initiation *>(methodTerm);
+    EXPECT_EQ("A", initiation->getName());
+    EXPECT_EQ(0, initiation->getArgs().size());
+}
+
+TEST (AST, method_returns_initiated_object_with_few_args) {
+    const std::string input = "return new Point(x, this.y);";
+    MethodState methodState;
+
+    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto methodDeclaration = methodState.methodDeclaration;
+    auto methodTerm = methodDeclaration->getBodyTerm().get();
+    ASSERT_NE(nullptr, methodTerm);
+
+    Initiation * initiation =
+        dynamic_cast<Initiation *>(methodTerm);
+    auto args = initiation->getArgs();
+    EXPECT_EQ("Point", initiation->getName());
+    EXPECT_EQ(2, args.size());
+
+    VariableTerm * variableTerm = dynamic_cast<VariableTerm *>(
+        args.front().get()
+    );
+    ASSERT_NE(nullptr, variableTerm);
+    EXPECT_EQ("x", variableTerm->getName());
+
+    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+        args.back().get()
+    );
+    EXPECT_EQ("y", propertyTerm->getName());
+}

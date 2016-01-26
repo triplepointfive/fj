@@ -65,6 +65,7 @@ namespace fj {
     // Matches a list of terms used for invocation a method.
     struct method_list_of_args : opt < list < method_term, comma > >{};
 
+    // TODO: Make more strict
     struct method_invocation_head : seq < object_name, dot, method_name > {};
 
     // Call of a method, this includes both object method called for,
@@ -72,6 +73,14 @@ namespace fj {
     struct method_invocation :
             seq < method_invocation_head,
                     sur_with_brackets < method_list_of_args > > {};
+
+    struct instantiation_class : class_name {};
+    // TODO: Make more strict
+    struct instantiation_head : seq < new_keyword, space, instantiation_class > {};
+
+    // Creation of new object, includes "new" keyword and a list of arguments.
+    struct instantiation :
+        seq < instantiation_head, sur_with_brackets < method_list_of_args > > {};
 
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
@@ -82,8 +91,8 @@ namespace fj {
             seq <property_invocation, assign, assignment_prop_name > {};
 
     struct property_invocation_m : property_invocation {};
-    struct method_term : sor < method_invocation, property_invocation_m,
-            variable_term > {};
+    struct method_term : sor < instantiation, method_invocation,
+        property_invocation_m, variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".
     struct return_stat : seq < pad < return_keyword, space, space >,
