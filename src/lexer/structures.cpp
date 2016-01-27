@@ -92,7 +92,53 @@ namespace fj {
     }
 
     void InitiationState::success(MethodTermState &methodTermState) {
-        // TODO: Check if pattern for MethodTermState is mandatory
         methodTermState.methodTerm = std::move(initiation);
+    }
+
+    void TypeCastingState::success(MethodTermState &methodTermState) {
+        methodTermState.methodTerm = std::move(typeCastingTerm);
+    }
+
+    void TypeCastingState::success(MethodState &methodState) {
+        methodState.methodDeclaration->setBodyTerm(
+            std::move(typeCastingTerm)
+        );
+    }
+
+    void TypeCastingState::success(
+        MethodInvocationState &methodInvocationState) {
+        methodInvocationState.methodInvocation->addArg(
+            std::move(typeCastingTerm)
+        );
+    }
+
+    void TypeCastingState::success(InitiationState &initiationState) {
+        initiationState.initiation->addArg(
+            std::move(typeCastingTerm)
+        );
+    }
+
+    void TypeCastingState::success(TypeCastingState &typeCastingState) {
+        typeCastingState.typeCastingTerm->setTerm(
+            std::move(typeCastingTerm)
+        );
+    }
+
+    void MethodTermState::success(TypeCastingState &typeCastingState) {
+        typeCastingState.typeCastingTerm->setTerm(
+            std::move(methodTerm)
+        );
+    }
+
+    void InitiationState::success(TypeCastingState &typeCastingState) {
+        typeCastingState.typeCastingTerm->setTerm(
+            std::move(initiation)
+        );
+    }
+
+    void MethodInvocationState::success(TypeCastingState &typeCastingState) {
+        typeCastingState.typeCastingTerm->setTerm(
+            std::move(methodInvocation)
+        );
     }
 }

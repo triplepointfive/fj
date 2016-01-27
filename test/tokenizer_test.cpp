@@ -605,3 +605,56 @@ TEST (AST, method_returns_initiated_object_with_few_args) {
     );
     EXPECT_EQ("y", propertyTerm->getName());
 }
+
+TEST (AST, method_returns_type_casting_with_variable) {
+    const std::string input = "return (A) fst;";
+    MethodState methodState;
+
+    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto methodDeclaration = methodState.methodDeclaration;
+    auto methodTerm = methodDeclaration->getBodyTerm().get();
+    ASSERT_NE(nullptr, methodTerm);
+
+    TypeCastingTerm *typeCasting =
+        dynamic_cast<TypeCastingTerm *>(methodTerm);
+    auto term = typeCasting->getTerm();
+    EXPECT_EQ("A", typeCasting->getName());
+    ASSERT_NE(nullptr, term);
+
+    VariableTerm * variableTerm = dynamic_cast<VariableTerm *>(term.get());
+    ASSERT_NE(nullptr, variableTerm);
+    EXPECT_EQ("fst", variableTerm->getName());
+}
+
+TEST (AST, method_returns_type_casting_with_property) {
+    const std::string input = "return (A) this.snd;";
+    MethodState methodState;
+
+    bool status = parse< fj::method_body, fj::build_method, fj::control>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
+
+    auto methodDeclaration = methodState.methodDeclaration;
+    auto methodTerm = methodDeclaration->getBodyTerm().get();
+    ASSERT_NE(nullptr, methodTerm);
+
+    TypeCastingTerm *typeCasting =
+        dynamic_cast<TypeCastingTerm *>(methodTerm);
+    auto term = typeCasting->getTerm();
+    EXPECT_EQ("A", typeCasting->getName());
+    ASSERT_NE(nullptr, term);
+
+    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(term.get());
+    EXPECT_EQ("snd", propertyTerm->getName());
+}

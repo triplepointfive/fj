@@ -44,11 +44,27 @@ namespace fj {
         }
     };
 
+    template< typename Rule >
+    struct build_casting : nothing< Rule > {};
+
+    template<> struct build_casting< type_casting_class > {
+        static void apply(const input & in,
+                          TypeCastingState & typeCastingState) {
+            typeCastingState.typeCastingTerm->setName(in.string());
+        }
+    };
+
     template< typename Rule > struct build_property_term : nothing< Rule > {};
     template<> struct build_property_term< object_name > {
         static void apply(const input & in, MethodTermState & methodTermState) {
             methodTermState.methodTerm =
                 std::make_shared < PropertyTerm >(in.string());
+        }
+
+        static void apply(const input & in, TypeCastingState & typeCastingState) {
+            typeCastingState.typeCastingTerm->setTerm(
+                std::make_shared < PropertyTerm >(in.string())
+            );
         }
 
         static void apply(const input & in, MethodInvocationState & methodInvocationState) {
@@ -69,6 +85,12 @@ namespace fj {
         static void apply(const input & in, MethodTermState & methodTermState) {
             methodTermState.methodTerm =
                 std::make_shared < VariableTerm >(in.string());
+        }
+
+        static void apply(const input & in, TypeCastingState & typeCastingState) {
+            typeCastingState.typeCastingTerm->setTerm(
+                std::make_shared < VariableTerm >(in.string())
+            );
         }
 
         static void apply(const input & in, MethodInvocationState & methodInvocationState) {
@@ -188,6 +210,8 @@ namespace fj {
         change_state_and_action< method_invocation, MethodInvocationState, build_method_invocation > {};
     template<> struct control< instantiation > :
         change_state_and_action< instantiation, InitiationState, build_instantiation > {};
+    template<> struct control< type_casting > :
+        change_state_and_action< type_casting, TypeCastingState, build_casting > {};
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }

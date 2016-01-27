@@ -36,6 +36,19 @@ namespace fj {
         VariableTerm(std::string variableName) : MethodTerm(variableName) {}
     };
 
+    class TypeCastingTerm : public MethodTerm {
+    public:
+        void setTerm(std::shared_ptr< MethodTerm > term) {
+            this->term = term;
+        }
+
+        std::shared_ptr< MethodTerm > getTerm() const {
+            return std::move(term);
+        }
+    private:
+        std::shared_ptr< MethodTerm > term{ nullptr };
+    };
+
     class ArgumentTerm : public MethodTerm {
     public:
         void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
@@ -190,22 +203,26 @@ namespace fj {
 
     struct MethodInvocationState;
     struct InitiationState;
+    struct TypeCastingState;
+
     struct MethodTermState {
         std::shared_ptr< MethodTerm > methodTerm = nullptr;
 
         void success(MethodState & methodState);
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);
+        void success(TypeCastingState & typeCastingState);
     };
 
     struct InitiationState {
-        std::shared_ptr<Initiation> initiation =
+        std::shared_ptr< Initiation > initiation =
             std::make_shared<Initiation>();
 
         void success(MethodTermState & methodTermState);
         void success(MethodState & methodState);
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);
+        void success(TypeCastingState & typeCastingState);
     };
 
     struct MethodInvocationState {
@@ -215,6 +232,18 @@ namespace fj {
         void success(MethodTermState & methodTermState);
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);
+        void success(TypeCastingState & typeCastingState);
+    };
+
+    struct TypeCastingState {
+        std::shared_ptr< TypeCastingTerm > typeCastingTerm =
+            std::make_shared< TypeCastingTerm >();
+
+        void success(MethodTermState & methodTermState);
+        void success(MethodState & methodState);
+        void success(MethodInvocationState & methodInvocationState);
+        void success(InitiationState & initiationState);
+        void success(TypeCastingState & typeCastingState);
     };
 
     struct PairState {

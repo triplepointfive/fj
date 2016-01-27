@@ -30,6 +30,7 @@ namespace fj {
 
     /* Identifiers */
 
+    // TODO: Exclude keywords
     struct class_name  : plus< identifier > {};
     struct method_name : plus< identifier > {};
     struct object_name : plus< identifier > {};
@@ -82,6 +83,11 @@ namespace fj {
     struct instantiation :
         seq < instantiation_head, sur_with_brackets < method_list_of_args > > {};
 
+    struct type_casting_class : class_name {};
+    // Cast type of object to one its parent classes.
+    struct type_casting : seq < sur_with_brackets < type_casting_class >,
+        method_term > {};
+
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
 
@@ -91,7 +97,7 @@ namespace fj {
             seq <property_invocation, assign, assignment_prop_name > {};
 
     struct property_invocation_m : property_invocation {};
-    struct method_term : sor < instantiation, method_invocation,
+    struct method_term : sor < type_casting, instantiation, method_invocation,
         property_invocation_m, variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".
