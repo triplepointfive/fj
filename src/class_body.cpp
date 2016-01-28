@@ -1,10 +1,9 @@
 #include "class_body.h"
 
 ClassBody::ClassBody(ClassName className, Properties properties,
-                     Methods methods, ObjectClassBody *parentClass) {
-    this->parentClass = parentClass;
-    this->className = className;
-
+                     Methods methods, std::shared_ptr< ObjectClassBody > parentClass) :
+    className(className),
+    parentClass(parentClass) {
     Properties parentProperties = parentClass->getProperties();
     this->properties = properties;
     this->properties.insert(parentProperties.begin(), parentProperties.end());

@@ -4,7 +4,8 @@
 #include "context.h"
 
 TEST (ClassBody, getMethod) {
-    ObjectClassBody *objectClass = new ObjectClassBody();
+    std::shared_ptr< ObjectClassBody > objectClass =
+        std::make_shared< ObjectClassBody >();
 
     ClassName pairClassName("Pair");
 

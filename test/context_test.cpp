@@ -12,12 +12,15 @@ TEST (Context, classHasProperty) {
     Properties properties;
     properties[fst] = objectClassName;
     properties[snd] = objectClassName;
-    ObjectClassBody objectClass;
+    std::shared_ptr< ObjectClassBody > objectClass =
+        std::make_shared< ObjectClassBody >();
 
-    ClassBody pairClass(pairClassName, properties, Methods(), &objectClass);
+    auto pairClass = std::make_shared< ClassBody >(
+        pairClassName, properties, Methods(), std::move(objectClass)
+    );
 
     Context ctx;
-    ctx.addClass(&pairClass);
+    ctx.addClass(std::move(pairClass));
 
     EXPECT_TRUE(ctx.classHasProperty(pairClassName, fst));
     EXPECT_TRUE(ctx.classHasProperty(pairClassName, snd));

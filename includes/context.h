@@ -9,7 +9,7 @@
 
 class Context {
 public:
-    void addClass(ObjectClassBody*);
+    void addClass(std::shared_ptr< ObjectClassBody >);
 
     void setVariables(map<PropertyName, Constructor *>);
 
@@ -21,10 +21,8 @@ public:
 
     Constructor *assignedValue(PropertyName) const;
 
-    virtual ~Context();
-
 private:
-    map<ClassName, ObjectClassBody*> classes;
+    map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
     map<PropertyName, Constructor *> assigned_variables;
 };
 

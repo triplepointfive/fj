@@ -4,17 +4,19 @@
 #include "context.h"
 
 TEST (Pair, setfst) {
-    ObjectClassBody *objectClass = new ObjectClassBody();
+    std::shared_ptr< ObjectClassBody > objectClass =
+        std::make_shared< ObjectClassBody >();
     ClassName objectClassName("Object");
 
-
     ClassName aClassName("A");
-    ClassBody *aClass = new ClassBody(aClassName, Properties(), Methods(), objectClass);
-
+    std::shared_ptr< ClassBody > aClass = std::make_shared< ClassBody >(
+        aClassName, Properties(), Methods(), objectClass
+    );
 
     ClassName bClassName("B");
-    ClassBody *bClass = new ClassBody(bClassName, Properties(), Methods(), objectClass);
-
+    std::shared_ptr< ClassBody > bClass = std::make_shared< ClassBody >(
+        bClassName, Properties(), Methods(), objectClass
+    );
 
     ClassName pairClassName("Pair");
     PropertyName fst("fst");
@@ -44,7 +46,9 @@ TEST (Pair, setfst) {
     Methods methods;
     methods[setFst] = setFstBody;
 
-    ClassBody *pairClass = new ClassBody(pairClassName, properties, methods, objectClass);
+    std::shared_ptr< ClassBody > pairClass = std::make_shared< ClassBody >(
+        pairClassName, properties, methods, objectClass
+    );
 
     Context ctx;
 

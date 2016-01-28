@@ -2,12 +2,13 @@
 #define FJ_CLASS_BODY_H
 
 #include <map>
+#include <memory>
 
 #include "base_types.h"
 #include "method_body.h"
 
-typedef std::map<PropertyName, ClassName> Properties;
-typedef std::map<MethodName, MethodBody*> Methods;
+using Properties = std::map<PropertyName, ClassName>;
+using Methods = std::map<MethodName, MethodBody*>;
 
 class ObjectClassBody {
 public:
@@ -19,7 +20,7 @@ public:
 
 class ClassBody : public ObjectClassBody {
 public:
-    ClassBody(ClassName, Properties, Methods, ObjectClassBody*);
+    ClassBody(ClassName, Properties, Methods, std::shared_ptr< ObjectClassBody >);
 
     Properties getProperties() const override;
     MethodBody *getMethod(MethodName) const override;
@@ -31,7 +32,7 @@ protected:
     ClassName className;
     Properties properties;
     Methods methods;
-    ObjectClassBody *parentClass;
+    std::shared_ptr< ObjectClassBody > parentClass;
 };
 
 #endif //FJ_CLASS_BODY_H
