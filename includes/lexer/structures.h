@@ -129,6 +129,7 @@ namespace fj {
         std::shared_ptr< MethodTerm > treeHead = nullptr;
     };
 
+    // TODO: Forbid to clone
     class ClassDeclaration {
     public:
         ClassDeclaration() {};
@@ -158,7 +159,9 @@ namespace fj {
         }
         std::string getName() const { return name; };
         std::string getParentName() const { return parentName; };
-        const Properties *getProperties() const { return &properties; };
+        const Properties getProperties() const {
+            return std::move(properties);
+        };
 
     private:
         std::string name, parentName;
@@ -174,7 +177,7 @@ namespace fj {
             classes.push_back(std::move(newClass));
         };
         std::vector< std::shared_ptr< ClassDeclaration > > getClasses() const {
-            return classes;
+            return std::move(classes);
         }
     private:
         std::vector< std::shared_ptr< ClassDeclaration > > classes;

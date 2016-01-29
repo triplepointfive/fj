@@ -1,19 +1,35 @@
 #include "ast/builder.h"
 
 namespace fj {
-    void ContextBuilder::buildAST(ParsedContext &parsedContext,
+    ContextBuilder::ContextBuilder() {
+        classTable.addClass(std::make_shared< ObjectClassBody >());
+    }
+
+    void ContextBuilder::buildAST(const ParsedContext &parsedContext,
         Context &context) {
+        for (auto elem : parsedContext.getClasses()) {
+            context.addClass(buildClass(elem));
+        }
     }
 
     shared_ptr<ObjectClassBody> ContextBuilder::buildClass(
-        shared_ptr<ClassDeclaration> classDeclaration) {
+        const shared_ptr<ClassDeclaration> &classDeclaration) {
         ClassName className(classDeclaration->getName());
-        auto properties;
+        std::map<PropertyName, ClassName> properties;
         for (auto elem : classDeclaration->getProperties()) {
             properties[PropertyName(elem.first)] = ClassName(elem.second);
         }
 
-        return std::make_shared< ObjectClassBody >(
+        std::map<MethodName, MethodBody*> methods;
+        auto parentClass = classTable.getClass(
+            ClassName(classDeclaration->getParentName())
+        );
+
+        return std::make_shared< ClassBody >(
+            className,
+            properties,
+            methods,
+            parentClass
         );
     }
 }

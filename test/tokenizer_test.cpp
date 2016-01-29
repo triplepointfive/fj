@@ -21,10 +21,10 @@ TEST (AST, file_containing_a_class) {
     EXPECT_EQ("A", newClass->getName());
     EXPECT_EQ("Object", newClass->getParentName());
 
-    const Properties *properties = newClass->getProperties();
-    ASSERT_EQ(1, properties->size());
-    EXPECT_EQ("a", properties->begin()->first);
-    EXPECT_EQ("Object", properties->begin()->second);
+    auto properties = newClass->getProperties();
+    ASSERT_EQ(1, properties.size());
+    EXPECT_EQ("a", properties.begin()->first);
+    EXPECT_EQ("Object", properties.begin()->second);
 }
 
 TEST (AST, class_header) {
@@ -61,8 +61,8 @@ TEST (AST, single_property_definition) {
     ASSERT_TRUE(status);
 
     auto classA = classState.classDeclaration;
-    const Properties *properties = classA->getProperties();
-    EXPECT_EQ(1, properties->size());
+    auto properties = classA->getProperties();
+    EXPECT_EQ(1, properties.size());
 }
 
 TEST (AST, class_body_with_a_single_property) {
@@ -80,8 +80,8 @@ TEST (AST, class_body_with_a_single_property) {
     ASSERT_TRUE(status);
 
     auto classA = classState.classDeclaration;
-    const Properties *properties = classA->getProperties();
-    EXPECT_EQ(1, properties->size());
+    auto properties = classA->getProperties();
+    EXPECT_EQ(1, properties.size());
 }
 
 TEST (AST, class_body_with_few_properties) {
@@ -99,14 +99,14 @@ TEST (AST, class_body_with_few_properties) {
     ASSERT_TRUE(status);
 
     auto classA = classState.classDeclaration;
-    const Properties *properties = classA->getProperties();
-    ASSERT_EQ(2, properties->size());
+    auto properties = classA->getProperties();
+    ASSERT_EQ(2, properties.size());
 
-    auto firstProperty = properties->begin();
+    auto firstProperty = properties.begin();
     EXPECT_EQ("prop1", firstProperty->first);
     EXPECT_EQ("Object", firstProperty->second);
 
-    auto lastProperty = properties->rbegin();
+    auto lastProperty = properties.rbegin();
     EXPECT_EQ("prop2", lastProperty->first);
     EXPECT_EQ("Object", lastProperty->second);
 }
@@ -146,14 +146,14 @@ TEST (AST, class_with_few_properties) {
     EXPECT_EQ("A", newClass->getName());
     EXPECT_EQ("Object", newClass->getParentName());
 
-    const Properties *properties = newClass->getProperties();
-    ASSERT_EQ(2, properties->size());
+    auto properties = newClass->getProperties();
+    ASSERT_EQ(2, properties.size());
 
-    auto firstProperty = properties->begin();
+    auto firstProperty = properties.begin();
     EXPECT_EQ("prop1", firstProperty->first);
     EXPECT_EQ("Object", firstProperty->second);
 
-    auto lastProperty = properties->rbegin();
+    auto lastProperty = properties.rbegin();
     EXPECT_EQ("prop2", lastProperty->first);
     EXPECT_EQ("Object", lastProperty->second);
 }

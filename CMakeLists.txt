@@ -16,6 +16,7 @@ add_library(fj_lib
         src/method_body.cpp
         src/class_body.cpp
         includes/ast/builder.h
+        includes/ast/class_table.h
         includes/ast/structures.h
         includes/term_visitor.h
         includes/eval_term_visitor.h
