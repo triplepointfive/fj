@@ -2,6 +2,7 @@
 #define FJ_METHOD_BODY_H
 
 #include <map>
+#include <memory>
 
 #include "term.h"
 
@@ -12,9 +13,7 @@ class Context;
 
 class MethodBody {
 public:
-    MethodBody(MethodName, Term *, ArgumentsDeclaration);
-
-    virtual ~MethodBody();
+    MethodBody(const MethodName&, std::shared_ptr< Term >, ArgumentsDeclaration);
 
     Constructor *invocate(Constructor *object,
                           MethodArguments &arguments,
@@ -23,7 +22,7 @@ public:
     MethodName getName() const { return name; }
 
 protected:
-    Term *body;
+    std::shared_ptr< Term > body;
     MethodName name;
     ArgumentsDeclaration args;
 };

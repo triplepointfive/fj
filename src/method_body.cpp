@@ -3,17 +3,12 @@
 #include "context.h"
 #include "eval_term_visitor.h"
 
-MethodBody::MethodBody(MethodName name,
-                       Term *body,
-                       ArgumentsDeclaration declaration) {
-    this->body = body;
-    this->args = declaration;
-    this->name = name;
-}
-
-MethodBody::~MethodBody() {
-    delete body;
-}
+MethodBody::MethodBody(const MethodName & name,
+                       std::shared_ptr< Term > body,
+                       ArgumentsDeclaration declaration) :
+    name(name),
+    body(body),
+    args(declaration) {}
 
 Constructor *MethodBody::invocate(Constructor *constructor,
                                   MethodArguments &arguments,

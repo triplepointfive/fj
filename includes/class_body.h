@@ -8,25 +8,26 @@
 #include "method_body.h"
 
 using Properties = std::map<PropertyName, ClassName>;
-using Methods = std::map<MethodName, MethodBody*>;
+using Methods = std::map<MethodName, std::shared_ptr< MethodBody >>;
 
 class ObjectClassBody {
 public:
     virtual Properties getProperties() const { return Properties(); }
-    virtual MethodBody *getMethod(MethodName) const { return nullptr; }
+    virtual std::shared_ptr< MethodBody > getMethod(MethodName) const {
+        return nullptr;
+    }
     virtual ClassName getClassName() const { return ClassName("Object"); }
     virtual ~ObjectClassBody() {}
 };
 
 class ClassBody : public ObjectClassBody {
 public:
-    ClassBody(ClassName, Properties, Methods, std::shared_ptr< ObjectClassBody >);
+    ClassBody(const ClassName&, Properties, Methods,
+              std::shared_ptr< ObjectClassBody >);
 
     Properties getProperties() const override;
-    MethodBody *getMethod(MethodName) const override;
+    std::shared_ptr< MethodBody > getMethod(MethodName) const override;
     ClassName getClassName() const override;
-
-    virtual ~ClassBody();
 
 protected:
     ClassName className;

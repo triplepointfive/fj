@@ -15,7 +15,7 @@ Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
                                      MethodArguments args) {
     assert((bool)classes.count(object->getClassName()));
     auto classBody = classes.find(object->getClassName())->second;
-    MethodBody *methodBody = classBody->getMethod(methodName);
+    auto methodBody = classBody->getMethod(methodName);
     return methodBody->invocate(object, args, this);
 }
 

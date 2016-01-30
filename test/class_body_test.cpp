@@ -11,12 +11,14 @@ TEST (ClassBody, getMethod) {
 
     MethodName setFst("setfst");
 
-    Constructor *setFstTerm = new Constructor(pairClassName, MethodArguments());
-    MethodBody *setFstBody = new MethodBody(setFst, setFstTerm, ArgumentsDeclaration());
+    auto setFstTerm = std::make_shared< Constructor >(
+        pairClassName, MethodArguments());
+    auto setFstBody = std::make_shared< MethodBody >(
+        setFst, setFstTerm, ArgumentsDeclaration());
 
     ClassBody *pairClass = new ClassBody(pairClassName, Properties(), {{ setFst , setFstBody }}, objectClass);
 
-    MethodBody *foundMethod = pairClass->getMethod(setFst);
+    auto foundMethod = pairClass->getMethod(setFst);
 
     EXPECT_EQ(setFst, foundMethod->getName());
 }

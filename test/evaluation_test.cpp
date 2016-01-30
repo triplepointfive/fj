@@ -39,9 +39,11 @@ TEST (Pair, setfst) {
     newPairClassArgs[fst] = newFstVar;
     newPairClassArgs[snd] = sndAccess;
 
-    Constructor *setFstTerm = new Constructor(pairClassName, newPairClassArgs);
+    auto setFstTerm = std::make_shared< Constructor >(
+        pairClassName, newPairClassArgs);
 
-    MethodBody *setFstBody = new MethodBody(setFst, setFstTerm, setFstArgs);
+    auto setFstBody = std::make_shared< MethodBody >(
+        setFst, setFstTerm, setFstArgs);
 
     Methods methods;
     methods[setFst] = setFstBody;
