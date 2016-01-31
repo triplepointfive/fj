@@ -7,14 +7,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic -Wextra -g -W
 
 add_library(fj_lib
         src/ast/builder.cpp
-        src/term.cpp
+        src/ast/term.cpp
         src/lexer/structures.cpp
         src/lexer/errors.cpp
         src/eval_term_visitor.cpp
         src/utils.cpp
         src/context.cpp
-        src/method_body.cpp
-        src/class_body.cpp
+        src/ast/method_body.cpp
+        src/ast/class_body.cpp
         includes/ast/builder.h
         includes/ast/class_table.h
         includes/ast/structures.h
@@ -22,8 +22,8 @@ add_library(fj_lib
         includes/eval_term_visitor.h
         includes/utils.h
         includes/context.h
-        includes/method_body.h
-        includes/class_body.h
+        includes/ast/method_body.h
+        includes/ast/class_body.h
         includes/base_types.h
         includes/lexer/lexer.h
         includes/lexer/lexemes.h

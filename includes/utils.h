@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "term.h"
+#include "ast/term.h"
 
 std::string intercalation(MethodArguments args, std::string insertion);
 

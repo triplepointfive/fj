@@ -1,4 +1,4 @@
-#include "method_body.h"
+#include "ast/method_body.h"
 
 #include "context.h"
 #include "eval_term_visitor.h"

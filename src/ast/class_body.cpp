@@ -1,4 +1,4 @@
-#include "class_body.h"
+#include "ast/class_body.h"
 
 ClassBody::ClassBody(const ClassName &className, Properties properties,
                      Methods methods, std::shared_ptr< ObjectClassBody > parentClass) :

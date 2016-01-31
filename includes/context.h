@@ -5,7 +5,7 @@
 #include <map>
 
 #include "term.h"
-#include "class_body.h"
+#include "ast/class_body.h"
 
 class Context {
 public:
