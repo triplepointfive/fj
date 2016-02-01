@@ -3,27 +3,31 @@
 
 #include "term_visitor.h"
 
-class Context;
+namespace fj {
 
-class EvalTermVisitor : public TermVisitor {
-public:
-    EvalTermVisitor(Context);
+    class Context;
 
-    void visitVariable(Variable *) override;
+    class EvalTermVisitor : public TermVisitor {
+    public:
+        EvalTermVisitor(Context);
 
-    void visitAccess(Access *) override;
+        void visitVariable(Variable *) override;
 
-    void visitInvocation(Invocation *) override;
+        void visitAccess(Access *) override;
 
-    void visitConstructor(Constructor *) override;
+        void visitInvocation(Invocation *) override;
 
-    void visitCoercion(Coercion *) override;
+        void visitConstructor(Constructor *) override;
 
-    Constructor *getCalculatedValue() const { return calculatedValue; }
+        void visitCoercion(Coercion *) override;
 
-protected:
-    Context *context;
-    Constructor *calculatedValue;
-};
+        Constructor *getCalculatedValue() const { return calculatedValue; }
+
+    protected:
+        Context *context;
+        Constructor *calculatedValue;
+    };
+    
+}
 
 #endif //FJ_EVALTERMVISITOR_H

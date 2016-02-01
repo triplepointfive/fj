@@ -9,9 +9,7 @@
 #include <memory>
 
 namespace fj {
-    using Properties = std::map<std::string, std::string>;
     using Arguments = std::map<std::string, std::string>;
-    using Methods = std::map<std::string, std::string>;
 
     class ParsedContext;
 
@@ -159,13 +157,13 @@ namespace fj {
         }
         std::string getName() const { return name; };
         std::string getParentName() const { return parentName; };
-        const Properties getProperties() const {
+        const std::map<std::string, std::string> getProperties() const {
             return std::move(properties);
         };
 
     private:
         std::string name, parentName;
-        Properties properties;
+        std::map<std::string, std::string> properties;
         std::vector< std::shared_ptr< MethodDeclaration > > methods;
         std::shared_ptr< ConstructorBody > constructorBody;
     };

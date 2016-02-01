@@ -6,25 +6,29 @@
 
 #include "term.h"
 
-typedef std::map<PropertyName, ClassName> ArgumentsDeclaration;
+namespace fj {
 
-class Term;
-class Context;
+    typedef std::map<PropertyName, ClassName> ArgumentsDeclaration;
 
-class MethodBody {
-public:
-    MethodBody(const MethodName&, std::shared_ptr< Term >, ArgumentsDeclaration);
+    class Term;
+    class Context;
 
-    Constructor *invocate(Constructor *object,
-                          MethodArguments &arguments,
-                          Context *context);
+    class MethodBody {
+    public:
+        MethodBody(const MethodName&, std::shared_ptr< Term >, ArgumentsDeclaration);
 
-    MethodName getName() const { return name; }
+        Constructor *invocate(Constructor *object,
+                              MethodArguments &arguments,
+                              Context *context);
 
-protected:
-    std::shared_ptr< Term > body;
-    MethodName name;
-    ArgumentsDeclaration args;
-};
+        MethodName getName() const { return name; }
+
+    protected:
+        std::shared_ptr< Term > body;
+        MethodName name;
+        ArgumentsDeclaration args;
+    };
+
+}
 
 #endif //FJ_METHOD_BODY_H

@@ -1,16 +1,20 @@
 #include "utils.h"
 
-std::string intercalation(MethodArguments args, std::string insertion) {
-    std::string acc = "";
-    bool firstElement = true;
+namespace fj {
 
-    for (auto &pair : args) {
-        if (firstElement) {
-            firstElement = false;
-        } else {
-            acc += insertion;
+    std::string intercalation(MethodArguments args, std::string insertion) {
+        std::string acc = "";
+        bool firstElement = true;
+
+        for (auto &pair : args) {
+            if (firstElement) {
+                firstElement = false;
+            } else {
+                acc += insertion;
+            }
+            acc += pair.first.t + " = " + pair.second->show();
         }
-        acc += pair.first.t + " = " + pair.second->show();
+        return acc;
     }
-    return acc;
+
 }

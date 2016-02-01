@@ -1,31 +1,35 @@
 #ifndef FJ_TERM_VISITOR_H
 #define FJ_TERM_VISITOR_H
 
-#include "term.h"
+#include "ast/term.h"
 
-class Variable;
+    namespace fj {
 
-class Access;
+    class Variable;
 
-class Invocation;
+    class Access;
 
-class Constructor;
+    class Invocation;
 
-class Coercion;
+    class Constructor;
 
-class TermVisitor {
-public:
-    virtual ~TermVisitor() { }
+    class Coercion;
 
-    virtual void visitVariable(Variable *) = 0;
+    class TermVisitor {
+    public:
+        virtual ~TermVisitor() { }
 
-    virtual void visitAccess(Access *) = 0;
+        virtual void visitVariable(Variable *) = 0;
 
-    virtual void visitInvocation(Invocation *) = 0;
+        virtual void visitAccess(Access *) = 0;
 
-    virtual void visitConstructor(Constructor *) = 0;
+        virtual void visitInvocation(Invocation *) = 0;
 
-    virtual void visitCoercion(Coercion *) = 0;
-};
+        virtual void visitConstructor(Constructor *) = 0;
+
+        virtual void visitCoercion(Coercion *) = 0;
+    };
+
+}
 
 #endif //FJ_TERM_VISITOR_H

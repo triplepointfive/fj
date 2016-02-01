@@ -2,6 +2,8 @@
 
 #include "context.h"
 
+using namespace fj;
+
 TEST (Context, classHasProperty) {
     PropertyName fst("fst");
     PropertyName snd("snd");

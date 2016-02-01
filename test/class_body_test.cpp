@@ -3,6 +3,8 @@
 #include "eval_term_visitor.h"
 #include "context.h"
 
+using namespace fj;
+
 TEST (ClassBody, getMethod) {
     std::shared_ptr< ObjectClassBody > objectClass =
         std::make_shared< ObjectClassBody >();

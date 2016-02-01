@@ -4,26 +4,30 @@
 #include <string>
 #include <map>
 
-#include "term.h"
+#include "ast/term.h"
 #include "ast/class_body.h"
 
-class Context {
-public:
-    void addClass(std::shared_ptr< ObjectClassBody >);
+namespace fj {
 
-    void setVariables(map<PropertyName, Constructor *>);
+    class Context {
+    public:
+        void addClass(std::shared_ptr< ObjectClassBody >);
 
-    bool classHasProperty(ClassName className, PropertyName propertyName) const;
+        void setVariables(map<PropertyName, Constructor *>);
 
-    bool isASubtype(std::string, std::string) const;
+        bool classHasProperty(ClassName className, PropertyName propertyName) const;
 
-    Constructor *invocateMethod(Constructor *, MethodName, MethodArguments);
+        bool isASubtype(std::string, std::string) const;
 
-    Constructor *assignedValue(PropertyName) const;
+        Constructor *invocateMethod(Constructor *, MethodName, MethodArguments);
 
-private:
-    map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
-    map<PropertyName, Constructor *> assigned_variables;
-};
+        Constructor *assignedValue(PropertyName) const;
+
+    private:
+        map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
+        map<PropertyName, Constructor *> assigned_variables;
+    };
+
+}
 
 #endif //FJ_CONTEXT_H
