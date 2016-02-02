@@ -1,6 +1,20 @@
 #include "ast/builder.h"
 
 namespace fj {
+
+    template< typename ParsedTerm >
+    struct TermBuilder {
+        static void build(shared_ptr< Term > &,
+                          const shared_ptr< ParsedTerm >&);
+    };
+
+    template<> void TermBuilder< VariableTerm >::build(
+        shared_ptr< Term > &term, const shared_ptr< VariableTerm > &parsedTerm) {
+        term = std::make_shared< Variable >(
+            PropertyName(parsedTerm->getName())
+        );
+    }
+
     ContextBuilder::ContextBuilder() {
         classTable.addClass(std::make_shared< ObjectClassBody >());
     }
@@ -45,10 +59,19 @@ namespace fj {
             args[PropertyName(elem.first)] = ClassName(elem.second);
         }
         MethodName methodName(method->getName());
+
+        auto term = buildMethodBody(method->getBodyTerm());
+
         return std::make_shared< MethodBody >(
             methodName,
-            nullptr,
+            term,
             args
         );
+    }
+
+    shared_ptr<Term> ContextBuilder::buildMethodBody(
+        const shared_ptr<MethodTerm> &ptr) {
+
+        return std::shared_ptr<Term>();
     }
 }
