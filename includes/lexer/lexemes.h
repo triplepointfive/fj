@@ -96,12 +96,12 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct property_invocation_m : property_invocation {};
+    struct attribute_access_term : seq < this_keyword, dot, object_name > {};
     struct method_term : sor < type_casting, instantiation, method_invocation,
-        property_invocation_m, variable_term > {};
+        attribute_access_term, variable_term > {};
 
     // Required returned value from method. Matches the pattern "return ...".
-    struct return_stat : seq < pad < return_keyword, space, space >,
+    struct return_stat : seq < pad < return_keyword, space >,
             method_term > {};
 
     /* Constructors */
@@ -143,7 +143,7 @@ namespace fj {
             sur_with_brackets < method_arguments > > {};
 
     // Matches the content of {"..."}.
-    struct method_body : seq < return_stat, semicolon > {};
+    struct method_body : must < return_stat, semicolon > {};
 
     // Matches single method definition.
     struct method_def : seq < method_head, sur_with_braces < method_body > > {};

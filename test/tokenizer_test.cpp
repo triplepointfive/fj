@@ -411,7 +411,7 @@ TEST (AST, constructor_with_a_super_argument) {
     EXPECT_EQ("fst", args.front());
 }
 
-TEST (AST, method_returns_property) {
+TEST (AST, method_returns_anothers_object_property) {
     const std::string input = "return this.fst;";
     MethodState methodState;
 

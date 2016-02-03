@@ -15,6 +15,14 @@ namespace fj {
         );
     }
 
+    template<> void TermBuilder< PropertyTerm >::build(
+        shared_ptr< Term > &term, const shared_ptr< PropertyTerm > &parsedTerm) {
+        term = std::make_shared< Access >(
+            nullptr,
+            PropertyName(parsedTerm->getName())
+        );
+    }
+
     ContextBuilder::ContextBuilder() {
         classTable.addClass(std::make_shared< ObjectClassBody >());
     }

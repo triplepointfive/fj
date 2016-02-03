@@ -70,3 +70,8 @@ TEST (lexer_error, missed_super_invocation) {
     const std::string input = "class A extends Object { A() {} }";
     PARSER_ERROR("input variable:1:30: Call of super is a must")
 }
+
+TEST (lexer_error, missed_method_body) {
+    const std::string input = "class A extends Object { A() { super(); } Object A() {} }";
+    PARSER_ERROR("input variable:1:30: Call of super is a must")
+}

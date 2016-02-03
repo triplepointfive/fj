@@ -1,6 +1,8 @@
 #ifndef FJ_ERRORS_H
 #define FJ_ERRORS_H
 
+#include <iostream>
+
 #include "lexemes.h"
 
 namespace fj {

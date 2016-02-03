@@ -19,6 +19,7 @@ namespace fj {
 
     // Terms.
     template<> const string errors< super_invocation >::error_message = "Call of super is a must";
+    template<> const string errors< return_stat >::error_message = "Method body is missing";
 
     // Stubs.
     template<> const string errors< constructor_body >::error_message = "stub1";
