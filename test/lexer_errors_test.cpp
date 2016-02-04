@@ -73,5 +73,10 @@ TEST (lexer_error, missed_super_invocation) {
 
 TEST (lexer_error, missed_method_body) {
     const std::string input = "class A extends Object { A() { super(); } Object A() {} }";
-    PARSER_ERROR("input variable:1:30: Call of super is a must")
+    PARSER_ERROR("input variable:1:54: Method body is missing")
+}
+
+TEST (lexer_error, missed_returned_term) {
+    const std::string input = "class A extends Object { A() { super(); } Object A() { return; } }";
+    PARSER_ERROR("input variable:1:61: Expected a term")
 }

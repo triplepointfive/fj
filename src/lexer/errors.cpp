@@ -19,12 +19,15 @@ namespace fj {
 
     // Terms.
     template<> const string errors< super_invocation >::error_message = "Call of super is a must";
+    template<> const string errors< returned_statement >::error_message = "Expected a term";
     template<> const string errors< return_stat >::error_message = "Method body is missing";
 
     // Stubs.
     template<> const string errors< constructor_body >::error_message = "stub1";
     template<> const string errors< class_body >::error_message = "stub2";
     template<> const string errors< method_ret_and_name >::error_message = "invalid method defenition";
+    template<> const string errors< method_head >::error_message = "invalid method_head";
+    template<> const string errors< sur_with_braces< method_body > >::error_message = "invalid method_body";
     template<> const string errors< sur_with_brackets<fj::method_arguments> >::error_message = "invalid method argument defenition";
     template<> const string errors< properties_list >::error_message = "invalid properties list";
 

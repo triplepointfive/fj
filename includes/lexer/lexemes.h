@@ -13,7 +13,7 @@ namespace fj {
     struct class_keyword   : pegtl_string_t("class")   {};
     struct extends_keyword : pegtl_string_t("extends") {};
     struct super_keyword   : pegtl_string_t("super")   {};
-    struct return_keyword  : pegtl_string_t("return")  {};
+    struct return_keyword  : pad < pegtl_string_t("return"), space > {};
     struct new_keyword     : pegtl_string_t("new")     {};
     struct this_keyword    : pegtl_string_t("this")    {};
 
@@ -100,9 +100,10 @@ namespace fj {
     struct method_term : sor < type_casting, instantiation, method_invocation,
         attribute_access_term, variable_term > {};
 
+    // Just for better error message handling.
+    struct returned_statement : method_term {};
     // Required returned value from method. Matches the pattern "return ...".
-    struct return_stat : seq < pad < return_keyword, space >,
-            method_term > {};
+    struct return_stat : if_must < return_keyword, returned_statement > {};
 
     /* Constructors */
 
@@ -122,7 +123,6 @@ namespace fj {
     struct properties_list : star_must < assignment, semicolon > {};
 
     // Matches the whole content of constructor body.
-    // TODO: Throw local error if failed to match
     struct constructor_body : must < super_invocation, semicolon,
         properties_list > {};
 
@@ -139,14 +139,14 @@ namespace fj {
     struct method_ret_and_name : seq < met_class, space, met_name > {};
 
     // Matches the method head and its args list.
-    struct method_head : must < method_ret_and_name,
+    struct method_head : seq < method_ret_and_name,
             sur_with_brackets < method_arguments > > {};
 
     // Matches the content of {"..."}.
     struct method_body : must < return_stat, semicolon > {};
 
     // Matches single method definition.
-    struct method_def : seq < method_head, sur_with_braces < method_body > > {};
+    struct method_def : if_must < method_head, sur_with_braces < method_body > > {};
 
     /* Classes */
 
@@ -168,7 +168,7 @@ namespace fj {
         if_must < seq < class_name, space, object_name >, semicolon > {};
 
     // A list of base units inside class body: properties, methods etc.
-    struct class_term : sor < constructor_def, property_def > {};
+    struct class_term : sor < constructor_def, method_def, property_def > {};
 
     // Matches the content of {"..."}.
     struct class_body : list < class_term, star< space > > {};
