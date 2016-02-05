@@ -35,6 +35,16 @@ TEST (lexer_error, missed_parent_class_name) {
     PARSER_ERROR("input variable:1:15: Missed class name")
 }
 
+TEST (lexer_error, keywords_as_a_class_name) {
+    const std::string input = "class this extends Object { A() { super(); } Object A() { return var; } }";
+    PARSER_ERROR("input variable:1:5: Missed class name")
+}
+
+TEST (lexer_error, keywords_as_inherited_class_name) {
+    const std::string input = "class A extends super { A() { super(); } Object A() { return var; } }";
+    PARSER_ERROR("input variable:1:15: Missed class name")
+}
+
 // Braces
 
 TEST (lexer_error, missed_open_brace_with_constructor) {

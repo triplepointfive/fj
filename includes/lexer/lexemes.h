@@ -17,6 +17,14 @@ namespace fj {
     struct new_keyword     : pegtl_string_t("new")     {};
     struct this_keyword    : pegtl_string_t("this")    {};
 
+    struct keywords : sor<
+        class_keyword,
+        extends_keyword,
+        super_keyword,
+        return_keyword,
+        new_keyword,
+        this_keyword > {};
+
     /* Special characters with optional paddies */
 
     struct semicolon     : pegtl_char_t(';') {};
@@ -31,9 +39,9 @@ namespace fj {
     /* Identifiers */
 
     // TODO: Exclude keywords
-    struct class_name  : plus< identifier > {};
-    struct method_name : plus< identifier > {};
-    struct object_name : plus< identifier > {};
+    struct class_name  : seq< not_at < keywords >, plus< identifier > > {};
+    struct method_name : seq< not_at < keywords >, plus< identifier > > {};
+    struct object_name : seq< not_at < keywords >, plus< identifier > > {};
 
     /* Meta rules */
 
@@ -67,7 +75,8 @@ namespace fj {
     struct method_list_of_args : opt < list < method_term, comma > >{};
 
     // TODO: Make more strict
-    struct method_invocation_head : seq < object_name, dot, method_name > {};
+    // TODO: Extract to another rule
+    struct method_invocation_head : seq < sor < this_keyword, object_name >, dot, method_name > {};
 
     // Call of a method, this includes both object method called for,
     // method name and the list of arguments.

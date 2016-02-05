@@ -25,6 +25,9 @@ namespace fj {
     // Stubs.
     template<> const string errors< constructor_body >::error_message = "stub1";
     template<> const string errors< class_body >::error_message = "stub2";
+    template<> const string errors< pegtl::not_at<fj::keywords>  >::error_message = "stub2";
+    template<> const string errors< pegtl::plus<pegtl::ascii::identifier> >::error_message = "stub3";
+
     template<> const string errors< method_ret_and_name >::error_message = "invalid method defenition";
     template<> const string errors< method_head >::error_message = "invalid method_head";
     template<> const string errors< sur_with_braces< method_body > >::error_message = "invalid method_body";
