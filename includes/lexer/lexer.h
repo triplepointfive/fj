@@ -20,7 +20,7 @@ namespace fj {
     template< typename Rule >
     struct build_method_invocation : nothing< Rule > {};
 
-    template<> struct build_method_invocation< object_name > {
+    template<> struct build_method_invocation< variable_name > {
         static void apply(const input & in,
                           MethodInvocationState & methodInvocationState) {
             methodInvocationState.methodInvocation->setObjectName(in.string());

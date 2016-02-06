@@ -74,9 +74,11 @@ namespace fj {
     // Matches a list of terms used for invocation a method.
     struct method_list_of_args : opt < list < method_term, comma > >{};
 
+    // General variable name available in method's body.
+    struct variable_name : sor < this_keyword, object_name > {};
+
     // TODO: Make more strict
-    // TODO: Extract to another rule
-    struct method_invocation_head : seq < sor < this_keyword, object_name >, dot, method_name > {};
+    struct method_invocation_head : seq < variable_name, dot, method_name > {};
 
     // Call of a method, this includes both object method called for,
     // method name and the list of arguments.
