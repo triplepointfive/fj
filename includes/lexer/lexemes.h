@@ -51,12 +51,12 @@ namespace fj {
 
     // Matches the pattern like "(Rule)"
     template < typename Rule >
-    struct sur_with_brackets : seq < open_bracket, Rule, close_bracket > {};
+    struct sur_with_brackets : if_must < open_bracket, Rule, close_bracket > {};
 
     /* Method arguments */
 
     // Matches single method argument, like "Object x".
-    struct method_arg : seq < class_name, space, object_name > {};
+    struct method_arg : if_must < class_name, space, object_name > {};
 
     // Matches "Object x, ..." or just nothing for method with no arguments.
     struct method_arguments : opt < list < method_arg, comma > > {};
