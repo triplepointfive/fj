@@ -20,22 +20,32 @@ namespace fj {
         void setName(std::string name) { this->name = name; }
         std::string getName() const;
         virtual ~MethodTerm() {}
+
+        // TODO: Debug only
+        virtual std::string termType() = 0;
+        virtual std::string inspect() = 0;
     protected:
         std::string name;
     };
 
     class PropertyTerm : public MethodTerm {
     public:
+        std::string termType() { return "PropertyTerm"; };
+        std::string inspect() { return "." + name; };
         PropertyTerm(std::string propertyName) : MethodTerm(propertyName) {}
     };
 
     class VariableTerm : public MethodTerm {
     public:
+        std::string termType() { return "VariableTerm"; };
+        std::string inspect() { return name; };
         VariableTerm(std::string variableName) : MethodTerm(variableName) {}
     };
 
     class TypeCastingTerm : public MethodTerm {
     public:
+        std::string termType() { return "TypeCastingTerm"; };
+        std::string inspect() { return "(" + name + ") " + term->inspect(); };
         void setTerm(std::shared_ptr< MethodTerm > term) {
             this->term = term;
         }
@@ -61,6 +71,8 @@ namespace fj {
 
     class MethodInvocation : public ArgumentTerm {
     public:
+        std::string termType() { return "MethodInvocation"; };
+        std::string inspect() { return objectName + "." + name; };
         void setObjectName(const std::string &objectName) {
             this->objectName = objectName;
         }
@@ -69,7 +81,11 @@ namespace fj {
         std::string objectName;
     };
 
-    class Initiation : public ArgumentTerm {};
+    class Initiation : public ArgumentTerm {
+    public:
+        std::string termType() { return "Initiation"; };
+        std::string inspect() { return "new " + name; };
+    };
 
     class BaseMethod {
     public:
@@ -90,6 +106,7 @@ namespace fj {
 
     class ConstructorBody : public BaseMethod {
     public:
+        std::string termType() { return "ConstructorBody"; };
         ConstructorBody() {};
 
         void addProperty(const std::string &propertyName);
@@ -104,6 +121,7 @@ namespace fj {
 
     class MethodDeclaration : public BaseMethod {
     public:
+        std::string termType() { return "MethodDeclaration"; };
         // TODO: Remove this constructor
         MethodDeclaration(const std::string &name,
                           const std::string &return_class_name)

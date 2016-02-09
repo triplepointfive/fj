@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <typeinfo>
 #include "lexer/lexer.h"
 
 using namespace pegtl;
@@ -657,4 +658,17 @@ TEST (AST, method_returns_type_casting_with_property) {
 
     PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(term.get());
     EXPECT_EQ("snd", propertyTerm->getName());
+}
+
+TEST (AST, method_returns_variables_property) {
+    const std::string input = "var.x;";
+    MethodTermState methodState;
+
+    bool status = parse< fj::attribute_access_term, fj::build_method>(
+        input,
+        "input variable",
+        methodState
+    );
+
+    ASSERT_TRUE(status);
 }

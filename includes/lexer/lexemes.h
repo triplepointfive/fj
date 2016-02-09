@@ -65,17 +65,17 @@ namespace fj {
 
     struct method_term; // Forwarding declaration for cycle usage.
 
+    // General variable name available in method's body.
+    struct variable_name : sor < this_keyword, object_name > {};
+
     // Just a variable name, matching general restrictions.
-    struct variable_term : object_name {};
+    struct variable_term : variable_name {};
 
     // Left part of assignment, matches "this.fst".
     struct property_invocation : seq < this_keyword, dot, object_name> {};
 
     // Matches a list of terms used for invocation a method.
     struct method_list_of_args : opt < list < method_term, comma > >{};
-
-    // General variable name available in method's body.
-    struct variable_name : sor < this_keyword, object_name > {};
 
     // TODO: Make more strict
     struct method_invocation_head : seq < variable_name, dot, method_name > {};
@@ -107,7 +107,8 @@ namespace fj {
     struct assignment :
             seq <property_invocation, assign, assignment_prop_name > {};
 
-    struct attribute_access_term : seq < this_keyword, dot, object_name > {};
+    struct attribute_name : object_name {};
+    struct attribute_access_term : seq < variable_name, dot, attribute_name > {};
     struct method_term : sor < type_casting, instantiation, method_invocation,
         attribute_access_term, variable_term > {};
 

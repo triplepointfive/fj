@@ -55,7 +55,7 @@ namespace fj {
     };
 
     template< typename Rule > struct build_property_term : nothing< Rule > {};
-    template<> struct build_property_term< object_name > {
+    template<> struct build_property_term< attribute_name > {
         static void apply(const input & in, MethodTermState & methodTermState) {
             methodTermState.methodTerm =
                 std::make_shared < PropertyTerm >(in.string());
