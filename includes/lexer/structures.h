@@ -11,6 +11,16 @@
 namespace fj {
     using Arguments = std::map<std::string, std::string>;
 
+    // TODO: Move to somewhere.
+    class non_copyable {
+    protected:
+        non_copyable() = default;
+        ~non_copyable() = default;
+
+        non_copyable(non_copyable const &) = delete;
+        void operator=(non_copyable const &x) = delete;
+    };
+
     class ParsedContext;
 
     class MethodTerm {
@@ -87,7 +97,7 @@ namespace fj {
         std::string inspect() { return "new " + name; };
     };
 
-    class BaseMethod {
+    class BaseMethod : non_copyable {
     public:
         void setName(const std::string &name) { this->name = name; }
 
@@ -145,8 +155,7 @@ namespace fj {
         std::shared_ptr< MethodTerm > treeHead = nullptr;
     };
 
-    // TODO: Forbid to clone
-    class ClassDeclaration {
+    class ClassDeclaration : non_copyable {
     public:
         ClassDeclaration() {};
 

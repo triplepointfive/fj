@@ -202,6 +202,11 @@ namespace fj {
         change_state_and_action< method_def, MethodState, build_method > {};
     template<> struct control< method_body > :
         change_state_and_action< method_body, MethodTermState, build_method_body > {};
+
+    template<> struct control< method_arg > :
+        change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
+
+    // Method Terms
     template<> struct control< variable_term > :
         change_action< variable_term, build_variable_term > {};
     template<> struct control< attribute_access_term > :
@@ -212,8 +217,6 @@ namespace fj {
         change_state_and_action< instantiation, InitiationState, build_instantiation > {};
     template<> struct control< type_casting > :
         change_state_and_action< type_casting, TypeCastingState, build_casting > {};
-    template<> struct control< method_arg > :
-        change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
 }
 
 #endif //FJ_AST_STRUCT_H
