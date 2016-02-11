@@ -242,9 +242,18 @@ namespace fj {
         void success(TypeCastingState & typeCastingState);
     };
 
-    struct InitiationState {
+    struct ArguableTermState {
+        virtual void addArg(std::shared_ptr< MethodTerm >) = 0;
+        virtual ~ArguableTermState() {}
+    };
+
+    struct InitiationState : ArguableTermState {
         std::shared_ptr< Initiation > initiation =
             std::make_shared<Initiation>();
+
+        void addArg(std::shared_ptr< MethodTerm > term) {
+            initiation->addArg(term);
+        }
 
         void success(MethodTermState & methodTermState);
         void success(MethodState & methodState);
@@ -253,9 +262,13 @@ namespace fj {
         void success(TypeCastingState & typeCastingState);
     };
 
-    struct MethodInvocationState {
+    struct MethodInvocationState : ArguableTermState {
         std::shared_ptr< MethodInvocation > methodInvocation =
             std::make_shared< MethodInvocation >();
+
+        void addArg(std::shared_ptr< MethodTerm > term) {
+            methodInvocation->addArg(term);
+        }
 
         void success(MethodTermState & methodTermState);
         void success(MethodInvocationState & methodInvocationState);
@@ -263,9 +276,13 @@ namespace fj {
         void success(TypeCastingState & typeCastingState);
     };
 
-    struct TypeCastingState {
+    struct TypeCastingState : ArguableTermState {
         std::shared_ptr< TypeCastingTerm > typeCastingTerm =
             std::make_shared< TypeCastingTerm >();
+
+        void addArg(std::shared_ptr< MethodTerm > term) {
+            typeCastingTerm->setTerm(std::move(typeCastingTerm));
+        }
 
         void success(MethodTermState & methodTermState);
         void success(MethodState & methodState);

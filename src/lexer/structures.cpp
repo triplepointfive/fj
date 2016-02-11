@@ -1,3 +1,4 @@
+#include <lexer/lexemes.h>
 #include "lexer/structures.h"
 
 namespace fj {
@@ -44,7 +45,7 @@ namespace fj {
     }
 
     void MethodInvocationState::success(MethodInvocationState & methodInvocationState) {
-        methodInvocationState.methodInvocation->addArg(std::move(methodInvocation));
+        methodInvocationState.addArg(std::move(methodInvocation));
     }
 
     void MethodState::success(ClassState & classState) {
@@ -64,12 +65,12 @@ namespace fj {
     }
 
     void MethodTermState::success(InitiationState &initiationState) {
-        initiationState.initiation->addArg(std::move(methodTerm));
+        initiationState.addArg(std::move(methodTerm));
     }
 
     void MethodInvocationState::success(
         InitiationState &initiationState) {
-        initiationState.initiation->addArg(std::move(methodInvocation));
+        initiationState.addArg(std::move(methodInvocation));
     }
 
     void InitiationState::success(MethodState &methodState) {
@@ -80,15 +81,11 @@ namespace fj {
 
     void InitiationState::success(
         MethodInvocationState &methodInvocationState) {
-        methodInvocationState.methodInvocation->addArg(
-            std::move(initiation)
-        );
+        methodInvocationState.addArg(std::move(initiation));
     }
 
     void InitiationState::success(InitiationState &initiationState) {
-        initiationState.initiation->addArg(
-            std::move(initiation)
-        );
+        initiationState.addArg(std::move(initiation));
     }
 
     void InitiationState::success(MethodTermState &methodTermState) {
@@ -105,40 +102,27 @@ namespace fj {
         );
     }
 
-    void TypeCastingState::success(
-        MethodInvocationState &methodInvocationState) {
-        methodInvocationState.methodInvocation->addArg(
-            std::move(typeCastingTerm)
-        );
+    void TypeCastingState::success(MethodInvocationState &methodInvocationState) {
+        methodInvocationState.addArg(std::move(typeCastingTerm));
     }
 
     void TypeCastingState::success(InitiationState &initiationState) {
-        initiationState.initiation->addArg(
-            std::move(typeCastingTerm)
-        );
+        initiationState.addArg(std::move(typeCastingTerm));
     }
 
     void TypeCastingState::success(TypeCastingState &typeCastingState) {
-        typeCastingState.typeCastingTerm->setTerm(
-            std::move(typeCastingTerm)
-        );
+        typeCastingState.addArg(std::move(typeCastingTerm));
     }
 
     void MethodTermState::success(TypeCastingState &typeCastingState) {
-        typeCastingState.typeCastingTerm->setTerm(
-            std::move(methodTerm)
-        );
+        typeCastingState.addArg(std::move(methodTerm));
     }
 
     void InitiationState::success(TypeCastingState &typeCastingState) {
-        typeCastingState.typeCastingTerm->setTerm(
-            std::move(initiation)
-        );
+        typeCastingState.addArg(std::move(initiation));
     }
 
     void MethodInvocationState::success(TypeCastingState &typeCastingState) {
-        typeCastingState.typeCastingTerm->setTerm(
-            std::move(methodInvocation)
-        );
+        typeCastingState.addArg(std::move(methodInvocation));
     }
 }
