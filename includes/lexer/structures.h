@@ -229,20 +229,35 @@ namespace fj {
         void success(ClassState & classState);
     };
 
+    struct ArguableTermState;
+    struct MethodTermState;
     struct MethodInvocationState;
     struct InitiationState;
     struct TypeCastingState;
 
-    struct MethodTermState {
-        std::shared_ptr< MethodTerm > methodTerm = nullptr;
+    struct BaseMethodTermState {
+        virtual std::shared_ptr< MethodTerm > getTerm() = 0;
+
+        // TODO: Seems redundant
+        void success(MethodTermState & methodTermState);
 
         void success(MethodState & methodState);
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);
         void success(TypeCastingState & typeCastingState);
+
+        virtual ~BaseMethodTermState() {}
     };
 
-    struct ArguableTermState {
+    struct MethodTermState : BaseMethodTermState {
+        std::shared_ptr< MethodTerm > methodTerm = nullptr;
+
+        std::shared_ptr< MethodTerm > getTerm() override {
+            return methodTerm;
+        };
+    };
+
+    struct ArguableTermState : BaseMethodTermState {
         virtual void addArg(std::shared_ptr< MethodTerm >) = 0;
         virtual ~ArguableTermState() {}
     };
@@ -255,11 +270,9 @@ namespace fj {
             initiation->addArg(term);
         }
 
-        void success(MethodTermState & methodTermState);
-        void success(MethodState & methodState);
-        void success(MethodInvocationState & methodInvocationState);
-        void success(InitiationState & initiationState);
-        void success(TypeCastingState & typeCastingState);
+        std::shared_ptr< MethodTerm > getTerm() override {
+            return initiation;
+        };
     };
 
     struct MethodInvocationState : ArguableTermState {
@@ -270,10 +283,9 @@ namespace fj {
             methodInvocation->addArg(term);
         }
 
-        void success(MethodTermState & methodTermState);
-        void success(MethodInvocationState & methodInvocationState);
-        void success(InitiationState & initiationState);
-        void success(TypeCastingState & typeCastingState);
+        std::shared_ptr< MethodTerm > getTerm() override {
+            return methodInvocation;
+        };
     };
 
     struct TypeCastingState : ArguableTermState {
@@ -281,14 +293,12 @@ namespace fj {
             std::make_shared< TypeCastingTerm >();
 
         void addArg(std::shared_ptr< MethodTerm > term) {
-            typeCastingTerm->setTerm(std::move(typeCastingTerm));
+            typeCastingTerm->setTerm(term);
         }
 
-        void success(MethodTermState & methodTermState);
-        void success(MethodState & methodState);
-        void success(MethodInvocationState & methodInvocationState);
-        void success(InitiationState & initiationState);
-        void success(TypeCastingState & typeCastingState);
+        std::shared_ptr< MethodTerm > getTerm() override {
+            return typeCastingTerm;
+        };
     };
 
     struct PairState {
@@ -305,7 +315,6 @@ namespace fj {
         void success(ConstructorState & constructorState);
         void success(MethodState & methodState);
     };
-
 }
 
 #endif //FJ_STRUCTURES_H
