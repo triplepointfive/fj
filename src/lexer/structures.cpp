@@ -64,8 +64,4 @@ namespace fj {
     void ClassState::success(ParsedContext & context) {
         context.addClass(std::move(classDeclaration));
     }
-
-    void BaseMethodTermState::success(MethodTermState &methodTermState) {
-        methodTermState.methodTerm = std::move(getTerm());
-    }
 }

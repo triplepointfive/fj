@@ -238,9 +238,6 @@ namespace fj {
     struct BaseMethodTermState {
         virtual std::shared_ptr< MethodTerm > getTerm() = 0;
 
-        // TODO: Seems redundant
-        void success(MethodTermState & methodTermState);
-
         void success(MethodState & methodState);
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);

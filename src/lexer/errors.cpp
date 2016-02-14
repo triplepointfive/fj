@@ -43,5 +43,6 @@ namespace fj {
     template<> const string errors< sur_with_brackets<fj::method_arguments> >::error_message = "invalid method argument defenition";
     template<> const string errors< properties_list >::error_message = "invalid properties list";
 
+    template<> const string errors< method_body >::error_message = "invalid method body";
     template<> const string errors< pegtl::eof >::error_message = "unexpected character";
 }

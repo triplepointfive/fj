@@ -13,10 +13,6 @@
 namespace fj {
     using namespace pegtl;
 
-    // TODO: Wipe out?
-    template< typename Rule >
-    struct build_method_body : nothing< Rule > {};
-
     template< typename Rule >
     struct build_method_invocation : nothing< Rule > {};
 
@@ -56,9 +52,10 @@ namespace fj {
 
     template< typename Rule > struct build_property_term : nothing< Rule > {};
     template<> struct build_property_term< attribute_name > {
-        static void apply(const input & in, MethodTermState & methodTermState) {
-            methodTermState.methodTerm =
-                std::make_shared < PropertyTerm >(in.string());
+        static void apply(const input & in, MethodState & methodState) {
+            methodState.methodDeclaration->setBodyTerm(
+                std::make_shared < PropertyTerm >(in.string())
+            );
         }
 
         static void apply(const input & in, TypeCastingState & typeCastingState) {
@@ -82,9 +79,10 @@ namespace fj {
 
     template< typename Rule > struct build_variable_term : nothing< Rule > {};
     template<> struct build_variable_term< variable_term > {
-        static void apply(const input & in, MethodTermState & methodTermState) {
-            methodTermState.methodTerm =
-                std::make_shared < VariableTerm >(in.string());
+        static void apply(const input & in, MethodState & methodState) {
+            methodState.methodDeclaration->setBodyTerm(
+                std::make_shared < VariableTerm >(in.string())
+            );
         }
 
         static void apply(const input & in, TypeCastingState & typeCastingState) {
@@ -200,8 +198,6 @@ namespace fj {
         change_state_and_action< constructor_def, ConstructorState, build_constructor > {};
     template<> struct control< method_def > :
         change_state_and_action< method_def, MethodState, build_method > {};
-    template<> struct control< method_body > :
-        change_state_and_action< method_body, MethodTermState, build_method_body > {};
 
     template<> struct control< method_arg > :
         change_state_and_action< method_arg, MethodArgState, build_method_arg > {};
