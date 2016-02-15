@@ -45,6 +45,10 @@ namespace fj {
         typeCastingState.addArg(std::move(getTerm()));
     }
 
+    void BaseMethodTermState::success(AccessState &accessState) {
+        accessState.addArg(std::move(getTerm()));
+    }
+
     void BaseMethodTermState::success(InitiationState &initiationState) {
         initiationState.addArg(std::move(getTerm()));
     }

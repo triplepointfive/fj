@@ -108,9 +108,9 @@ namespace fj {
             seq <property_invocation, assign, assignment_prop_name > {};
 
     struct attribute_name : object_name {};
-    struct attribute_access_term : seq < variable_name, dot, attribute_name > {};
+    struct access_term : seq < variable_name, dot, attribute_name > {};
     struct method_term : sor < type_casting, instantiation, method_invocation,
-        attribute_access_term, variable_term > {};
+        access_term, variable_term > {};
 
     // Just for better error message handling.
     struct returned_statement : method_term {};

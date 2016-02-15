@@ -664,7 +664,7 @@ TEST (AST, method_returns_variables_property) {
     const std::string input = "var.x;";
     MethodTermState methodState;
 
-    bool status = parse< fj::attribute_access_term, fj::build_method>(
+    bool status = parse< fj::access_term, fj::build_method>(
         input,
         "input variable",
         methodState

@@ -38,18 +38,22 @@ namespace fj {
         std::string name;
     };
 
-    class PropertyTerm : public MethodTerm {
-    public:
-        std::string termType() { return "PropertyTerm"; };
-        std::string inspect() { return "." + name; };
-        PropertyTerm(std::string propertyName) : MethodTerm(propertyName) {}
-    };
-
     class VariableTerm : public MethodTerm {
     public:
         std::string termType() { return "VariableTerm"; };
         std::string inspect() { return name; };
         VariableTerm(std::string variableName) : MethodTerm(variableName) {}
+    };
+
+    class PropertyTerm : public MethodTerm {
+    public:
+        std::string termType() { return "PropertyTerm"; };
+        std::string inspect() { return "." + name; };
+        void setTerm(std::shared_ptr<MethodTerm> methodTerm) {
+            this->methodTerm = methodTerm;
+        }
+    private:
+        std::shared_ptr< MethodTerm > methodTerm { nullptr };
     };
 
     class TypeCastingTerm : public MethodTerm {
@@ -229,11 +233,11 @@ namespace fj {
         void success(ClassState & classState);
     };
 
-    struct ArguableTermState;
     struct MethodTermState;
     struct MethodInvocationState;
     struct InitiationState;
     struct TypeCastingState;
+    struct AccessState;
 
     struct BaseMethodTermState {
         virtual std::shared_ptr< MethodTerm > getTerm() = 0;
@@ -242,6 +246,7 @@ namespace fj {
         void success(MethodInvocationState & methodInvocationState);
         void success(InitiationState & initiationState);
         void success(TypeCastingState & typeCastingState);
+        void success(AccessState & accessState);
 
         virtual ~BaseMethodTermState() {}
     };
@@ -295,6 +300,19 @@ namespace fj {
 
         std::shared_ptr< MethodTerm > getTerm() override {
             return typeCastingTerm;
+        };
+    };
+
+    struct AccessState : ArguableTermState {
+        std::shared_ptr< PropertyTerm > accessTerm =
+            std::make_shared< PropertyTerm >();
+
+        void addArg(std::shared_ptr< MethodTerm > term) {
+            accessTerm->setTerm(term);
+        }
+
+        std::shared_ptr< MethodTerm > getTerm() override {
+            return accessTerm;
         };
     };
 

@@ -6,6 +6,7 @@
 
 #include <pegtl.hh>
 #include <pegtl/contrib/changes.hh>
+#include <ast/term.h>
 
 #include "lexer/structures.h"
 #include "lexer/errors.h"
@@ -52,28 +53,8 @@ namespace fj {
 
     template< typename Rule > struct build_property_term : nothing< Rule > {};
     template<> struct build_property_term< attribute_name > {
-        static void apply(const input & in, MethodState & methodState) {
-            methodState.methodDeclaration->setBodyTerm(
-                std::make_shared < PropertyTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, TypeCastingState & typeCastingState) {
-            typeCastingState.typeCastingTerm->setTerm(
-                std::make_shared < PropertyTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, MethodInvocationState & methodInvocationState) {
-            methodInvocationState.methodInvocation->addArg(
-                std::make_shared < PropertyTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, InitiationState & initiationState) {
-            initiationState.initiation->addArg(
-                std::make_shared < PropertyTerm >(in.string())
-            );
+        static void apply(const input & in, AccessState & accessState) {
+            accessState.accessTerm->setName(in.string());
         }
     };
 
@@ -205,8 +186,8 @@ namespace fj {
     // Method Terms
     template<> struct control< variable_term > :
         change_action< variable_term, build_variable_term > {};
-    template<> struct control< attribute_access_term > :
-        change_action< attribute_access_term, build_property_term > {};
+    template<> struct control< access_term > :
+        change_state_and_action< access_term, AccessState, build_property_term > {};
     template<> struct control< method_invocation > :
         change_state_and_action< method_invocation, MethodInvocationState, build_method_invocation > {};
     template<> struct control< instantiation > :
