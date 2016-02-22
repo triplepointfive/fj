@@ -53,11 +53,10 @@ namespace fj {
             elem.second->accept(visitor);
             calculatedArguments[elem.first] = visitor.getCalculatedValue();
         };
-        if (calculatedValue != nullptr) {
-            delete calculatedValue;
-        }
-        calculatedValue = new Constructor(constructor->getClassName(),
-                                          calculatedArguments);
+        calculatedValue = std::make_shared< Constructor>(
+            constructor->getClassName(),
+            calculatedArguments
+        );
     }
 
     void EvalTermVisitor::visitCoercion(Coercion *coercion) {

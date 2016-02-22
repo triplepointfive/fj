@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <memory>
 
 #include "base_types.h"
 #include "type.h"
@@ -15,6 +16,7 @@ namespace fj {
 
     class TermVisitor;
 
+    // TODO: Disable copying.
     class Term {
     public:
         virtual ~Term() { }
@@ -26,7 +28,9 @@ namespace fj {
         virtual bool isValue() const { return false; }
     };
 
-    typedef map<PropertyName, Term *> MethodArguments;
+    using TermPtr = std::shared_ptr< Term >;
+
+    using MethodArguments = map<PropertyName, TermPtr>;
 
     class Variable : public Term {
     public:
@@ -45,7 +49,7 @@ namespace fj {
 
     class Access : public Term {
     public:
-        Access(Term *object, PropertyName propertyName) {
+        Access(TermPtr object, PropertyName propertyName) {
             this->object = object;
             this->propertyName = propertyName;
         }
@@ -56,28 +60,26 @@ namespace fj {
 
         PropertyName getPropertyName() const { return propertyName; }
 
-        Term *getObject() const { return object; }
+        TermPtr getObject() const { return std::move(object); }
 
         void accept(TermVisitor &) override;
 
-        virtual ~Access() { delete object; }
-
     private:
-        Term *object;
+        TermPtr object;
         PropertyName propertyName;
     };
 
     class Invocation : public Term {
     public:
-        Invocation(Term *object, MethodName methodName, MethodArguments args) {
+        Invocation(TermPtr object, MethodName methodName, MethodArguments args) {
             this->object = object;
             this->methodName = methodName;
             this->args = args;
         }
 
-        Term *getObject() const { return object; }
+        TermPtr getObject() const { return std::move(object); }
 
-        MethodArguments getArgs() const { return args; }
+        MethodArguments getArgs() const { return std::move(args); }
 
         MethodName getMethodName() const { return methodName; }
 
@@ -85,10 +87,8 @@ namespace fj {
 
         void accept(TermVisitor &) override;
 
-        virtual ~Invocation();
-
     private:
-        Term *object;
+        TermPtr object;
         MethodName methodName;
         MethodArguments args;
     };
@@ -108,18 +108,12 @@ namespace fj {
 
         ClassName getClassName() const { return className; }
 
-        MethodArguments getArgs() const { return args; }
+        MethodArguments getArgs() const { return std::move(args); }
 
-        Term *getAttribute(PropertyName propertyName) {
+        TermPtr getAttribute(PropertyName propertyName) {
             // Accessing no-existing property, it is type checker's job.
             assert(args.count(propertyName) != 0);
-            return args.find(propertyName)->second;
-        }
-
-        virtual ~Constructor() {
-            for (auto &pair : args) {
-                delete pair.second;
-            }
+            return std::move(args.find(propertyName)->second);
         }
 
     private:
@@ -129,7 +123,7 @@ namespace fj {
 
     class Coercion : public Term {
     public:
-        Coercion(ClassName className, Term *object) {
+        Coercion(ClassName className, TermPtr object) {
             this->className = className;
             this->object = object;
         }
@@ -138,19 +132,15 @@ namespace fj {
             return "(" + className.t + ") " + object->show();
         }
 
-        Term *getObject() const { return object; }
+        TermPtr getObject() const { return std::move(object); }
 
         ClassName getClassName() const { return className; }
 
         void accept(TermVisitor &) override;
 
-        virtual ~Coercion() {
-            delete object;
-        }
-
     private:
         ClassName className;
-        Term *object;
+        TermPtr object;
     };
 
 }

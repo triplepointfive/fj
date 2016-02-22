@@ -37,11 +37,4 @@ namespace fj {
         visitor.visitCoercion(this);
     }
 
-    Invocation::~Invocation() {
-        delete object;
-        for (auto &pair : args) {
-            delete pair.second;
-        }
-    }
-
 }

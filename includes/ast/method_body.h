@@ -17,15 +17,16 @@ namespace fj {
     public:
         MethodBody(const MethodName&, std::shared_ptr< Term >, ArgumentsDeclaration);
 
-        Constructor *invocate(Constructor *object,
-                              MethodArguments &arguments,
-                              Context *context);
+        std::shared_ptr< Constructor > invocate(
+            std::shared_ptr< Constructor > object,
+            MethodArguments &arguments,
+            Context *context);
 
         MethodName getName() const { return name; }
 
     protected:
-        std::shared_ptr< Term > body;
         MethodName name;
+        std::shared_ptr< Term > body;
         ArgumentsDeclaration args;
     };
 

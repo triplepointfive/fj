@@ -45,12 +45,15 @@ namespace fj {
         VariableTerm(std::string variableName) : MethodTerm(variableName) {}
     };
 
-    class PropertyTerm : public MethodTerm {
+    class AccessTerm : public MethodTerm {
     public:
         std::string termType() { return "PropertyTerm"; };
         std::string inspect() { return "." + name; };
         void setTerm(std::shared_ptr<MethodTerm> methodTerm) {
             this->methodTerm = methodTerm;
+        }
+        std::shared_ptr< MethodTerm > getTerm() {
+            return methodTerm;
         }
     private:
         std::shared_ptr< MethodTerm > methodTerm { nullptr };
@@ -304,8 +307,8 @@ namespace fj {
     };
 
     struct AccessState : ArguableTermState {
-        std::shared_ptr< PropertyTerm > accessTerm =
-            std::make_shared< PropertyTerm >();
+        std::shared_ptr<AccessTerm> accessTerm =
+            std::make_shared<AccessTerm>();
 
         void addArg(std::shared_ptr< MethodTerm > term) {
             accessTerm->setTerm(term);

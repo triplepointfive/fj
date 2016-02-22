@@ -15,8 +15,8 @@ namespace fj {
         );
     }
 
-    template<> void TermBuilder< PropertyTerm >::build(
-        shared_ptr< Term > &term, const shared_ptr< PropertyTerm > &parsedTerm) {
+    template<> void TermBuilder<AccessTerm>::build(
+        shared_ptr< Term > &term, const shared_ptr<AccessTerm> &parsedTerm) {
         term = std::make_shared< Access >(
             nullptr,
             PropertyName(parsedTerm->getName())

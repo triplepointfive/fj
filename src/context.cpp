@@ -12,8 +12,9 @@ namespace fj {
         return true;
     }
 
-    Constructor *Context::invocateMethod(Constructor *object, MethodName methodName,
-                                         MethodArguments args) {
+    std::shared_ptr< Constructor > Context::invocateMethod(
+        std::shared_ptr< Constructor > object, MethodName methodName,
+        MethodArguments args) {
         assert((bool)classes.count(object->getClassName()));
         auto classBody = classes.find(object->getClassName())->second;
         auto methodBody = classBody->getMethod(methodName);
@@ -26,12 +27,13 @@ namespace fj {
         ));
     }
 
-    void Context::setVariables(map<PropertyName, Constructor *> vars) {
+    void Context::setVariables(
+        map<PropertyName, std::shared_ptr< Constructor >> vars) {
         this->assigned_variables = vars;
 
     }
 
-    Constructor *Context::assignedValue(PropertyName name) const {
+    std::shared_ptr< Constructor > Context::assignedValue(PropertyName name) const {
         assert((bool) assigned_variables.count(name));
         return assigned_variables.find(name)->second;
     }

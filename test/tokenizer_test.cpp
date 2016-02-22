@@ -428,7 +428,7 @@ TEST (AST, method_returns_anothers_object_property) {
     auto methodTerm = methodDeclaration->getBodyTerm().get();
     ASSERT_NE(nullptr, methodTerm);
 
-    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(methodTerm);
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 }
 
@@ -504,7 +504,7 @@ TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
     );
     EXPECT_EQ("var1", variableTerm->getName());
 
-    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(
         args.back().get()
     );
     EXPECT_EQ("fst", propertyTerm->getName());
@@ -545,7 +545,7 @@ TEST (AST, method_returns_another_method_invocation_with_another_invocation) {
     args = methodMethodTerm->getArgs();
     ASSERT_EQ(1, args.size());
 
-    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(
         args.back().get()
     );
     EXPECT_EQ("third", propertyTerm->getName());
@@ -601,7 +601,7 @@ TEST (AST, method_returns_initiated_object_with_few_args) {
     ASSERT_NE(nullptr, variableTerm);
     EXPECT_EQ("x", variableTerm->getName());
 
-    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(
         args.back().get()
     );
     EXPECT_EQ("y", propertyTerm->getName());
@@ -656,7 +656,7 @@ TEST (AST, method_returns_type_casting_with_property) {
     EXPECT_EQ("A", typeCasting->getName());
     ASSERT_NE(nullptr, term);
 
-    PropertyTerm * propertyTerm = dynamic_cast<PropertyTerm *>(term.get());
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(term.get());
     EXPECT_EQ("snd", propertyTerm->getName());
 }
 

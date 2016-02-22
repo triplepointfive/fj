@@ -12,16 +12,17 @@ namespace fj {
         body(body),
         args(declaration) {}
 
-    Constructor *MethodBody::invocate(Constructor *constructor,
-                                      MethodArguments &arguments,
-                                      Context *context) {
+    std::shared_ptr< Constructor > MethodBody::invocate(
+        std::shared_ptr< Constructor > constructor,
+        MethodArguments &arguments,
+        Context *context) {
         assert(arguments.size() == args.size());
         for (auto elem : args) {
             assert((bool)arguments.count(elem.first));
             // TODO: Validate type casting instead
     //        assert(arguments.find(elem.first)->second->getClassName() == elem.second);
         }
-        map<PropertyName, Constructor *> calculatedArgs;
+        map<PropertyName, std::shared_ptr< Constructor >> calculatedArgs;
         for (auto elem : arguments) {
             EvalTermVisitor evaluator(*context);
             elem.second->accept(evaluator);

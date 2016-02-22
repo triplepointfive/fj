@@ -21,11 +21,13 @@ namespace fj {
 
         void visitCoercion(Coercion *) override;
 
-        Constructor *getCalculatedValue() const { return calculatedValue; }
+        std::shared_ptr< Constructor > getCalculatedValue() const {
+            return calculatedValue;
+        }
 
     protected:
         Context *context;
-        Constructor *calculatedValue;
+        std::shared_ptr< Constructor > calculatedValue;
     };
     
 }

@@ -13,19 +13,20 @@ namespace fj {
     public:
         void addClass(std::shared_ptr< ObjectClassBody >);
 
-        void setVariables(map<PropertyName, Constructor *>);
+        void setVariables(map<PropertyName, std::shared_ptr< Constructor >>);
 
         bool classHasProperty(ClassName className, PropertyName propertyName) const;
 
         bool isASubtype(std::string, std::string) const;
 
-        Constructor *invocateMethod(Constructor *, MethodName, MethodArguments);
+        std::shared_ptr< Constructor > invocateMethod(
+            std::shared_ptr< Constructor > , MethodName, MethodArguments);
 
-        Constructor *assignedValue(PropertyName) const;
+        std::shared_ptr< Constructor > assignedValue(PropertyName) const;
 
     private:
         map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
-        map<PropertyName, Constructor *> assigned_variables;
+        map< PropertyName, std::shared_ptr< Constructor > > assigned_variables;
     };
 
 }

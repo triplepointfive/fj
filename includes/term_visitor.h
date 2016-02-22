@@ -1,10 +1,11 @@
 #ifndef FJ_TERM_VISITOR_H
 #define FJ_TERM_VISITOR_H
 
+#include <memory>
+
 #include "ast/term.h"
 
-    namespace fj {
-
+namespace fj {
     class Variable;
 
     class Access;
