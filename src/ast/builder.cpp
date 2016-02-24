@@ -2,25 +2,36 @@
 
 namespace fj {
 
-    template< typename ParsedTerm >
-    struct TermBuilder {
-        static void build(shared_ptr< Term > &,
-                          const shared_ptr< ParsedTerm >&);
-    };
+    void TermBuilder::build(TermPtr &, const shared_ptr< MethodTerm > &) {
+        throw "Build is called for base type!";
+    }
 
-    template<> void TermBuilder< VariableTerm >::build(
-        shared_ptr< Term > &term, const shared_ptr< VariableTerm > &parsedTerm) {
+    void TermBuilder::build(TermPtr &term,
+                            const shared_ptr< VariableTerm > &parsedTerm) {
         term = std::make_shared< Variable >(
             PropertyName(parsedTerm->getName())
         );
     }
 
-    template<> void TermBuilder<AccessTerm>::build(
-        shared_ptr< Term > &term, const shared_ptr<AccessTerm> &parsedTerm) {
+    void TermBuilder::build(TermPtr  &term,
+                            const shared_ptr< AccessTerm > &parsedTerm) {
+        TermPtr accessor;
+        build(accessor, parsedTerm->getTerm());
+
         term = std::make_shared< Access >(
-            nullptr,
+            accessor,
             PropertyName(parsedTerm->getName())
         );
+    }
+
+    void TermBuilder::build(TermPtr &term,
+                            const shared_ptr< TypeCastingTerm > &parsedTerm) {
+
+    }
+
+    void TermBuilder::build(TermPtr &term,
+                            const shared_ptr< Initiation > &parsedTerm) {
+
     }
 
     ContextBuilder::ContextBuilder() {

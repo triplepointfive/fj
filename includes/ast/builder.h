@@ -6,6 +6,15 @@
 namespace fj {
     using std::shared_ptr;
 
+    class TermBuilder {
+    public:
+        static void build(TermPtr &, const shared_ptr< MethodTerm > &);
+        static void build(TermPtr &, const shared_ptr< VariableTerm > &);
+        static void build(TermPtr &, const shared_ptr< AccessTerm > &);
+        static void build(TermPtr &, const shared_ptr< TypeCastingTerm > &);
+        static void build(TermPtr &, const shared_ptr< Initiation > &);
+    };
+
     class ContextBuilder {
     public:
         ContextBuilder();

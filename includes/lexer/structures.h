@@ -53,7 +53,7 @@ namespace fj {
             this->methodTerm = methodTerm;
         }
         std::shared_ptr< MethodTerm > getTerm() {
-            return methodTerm;
+            return std::move(methodTerm);
         }
     private:
         std::shared_ptr< MethodTerm > methodTerm { nullptr };
