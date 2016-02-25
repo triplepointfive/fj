@@ -3,16 +3,22 @@
 
 #include "context.h"
 
+#include "lexer/lexer_term_visitor.h"
+
 namespace fj {
     using std::shared_ptr;
 
-    class TermBuilder {
+    class LexerTermBuilder : LexerTermVisitor {
     public:
-        static void build(TermPtr &, const shared_ptr< MethodTerm > &);
-        static void build(TermPtr &, const shared_ptr< VariableTerm > &);
-        static void build(TermPtr &, const shared_ptr< AccessTerm > &);
-        static void build(TermPtr &, const shared_ptr< TypeCastingTerm > &);
-        static void build(TermPtr &, const shared_ptr< Initiation > &);
+        void visitVariableTerm(const VariableTerm *) override;
+        void visitAccessTerm(const AccessTerm *) override;
+        void visitMethodInvocation(const MethodInvocation *) override;
+        void visitInitiation(const Initiation *) override;
+        void visitTypeCastingTerm(const TypeCastingTerm *) override;
+        TermPtr getTerm() { return std::move(term); };
+
+    private:
+        TermPtr term = { nullptr };
     };
 
     class ContextBuilder {

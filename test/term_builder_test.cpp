@@ -4,14 +4,37 @@
 using namespace fj;
 
 TEST (term_builder, variable_term) {
-    TermPtr term = { nullptr };
-    std::shared_ptr< VariableTerm > variableTerm
-        = std::make_shared< VariableTerm >("total");
+    VariableTerm variableTerm("total");
 
-    TermBuilder::build(term, variableTerm);
+    LexerTermBuilder builder;
+    builder.visitVariableTerm(&variableTerm);
+    TermPtr term = builder.getTerm();
 
     ASSERT_NE(nullptr, term);
     Variable * variable = dynamic_cast<Variable *>(term.get());
     ASSERT_NE(nullptr, variable);
     ASSERT_EQ("total", variable->getName().t);
+}
+
+TEST (term_builder, variable_property_term) {
+    std::shared_ptr< VariableTerm > variableTerm
+        = std::make_shared< VariableTerm >("queue");
+
+    AccessTerm accessTerm;
+    accessTerm.setName("last");
+    accessTerm.setTerm(variableTerm);
+
+    LexerTermBuilder builder;
+    builder.visitAccessTerm(&accessTerm);
+    TermPtr term = builder.getTerm();
+
+    ASSERT_NE(nullptr, term);
+    Access *property = dynamic_cast<Access *>(term.get());
+    ASSERT_NE(nullptr, property);
+    ASSERT_EQ("last", property->getPropertyName().t);
+
+    ASSERT_NE(nullptr, property->getObject());
+    Variable * variable = dynamic_cast<Variable *>(property->getObject().get());
+    ASSERT_NE(nullptr, variable);
+    ASSERT_EQ("queue", variable->getName().t);
 }

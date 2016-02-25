@@ -1,39 +1,9 @@
 #include "ast/builder.h"
+#include <type_traits>
+
+using std::is_same;
 
 namespace fj {
-
-    void TermBuilder::build(TermPtr &, const shared_ptr< MethodTerm > &) {
-        throw "Build is called for base type!";
-    }
-
-    void TermBuilder::build(TermPtr &term,
-                            const shared_ptr< VariableTerm > &parsedTerm) {
-        term = std::make_shared< Variable >(
-            PropertyName(parsedTerm->getName())
-        );
-    }
-
-    void TermBuilder::build(TermPtr  &term,
-                            const shared_ptr< AccessTerm > &parsedTerm) {
-        TermPtr accessor;
-        build(accessor, parsedTerm->getTerm());
-
-        term = std::make_shared< Access >(
-            accessor,
-            PropertyName(parsedTerm->getName())
-        );
-    }
-
-    void TermBuilder::build(TermPtr &term,
-                            const shared_ptr< TypeCastingTerm > &parsedTerm) {
-
-    }
-
-    void TermBuilder::build(TermPtr &term,
-                            const shared_ptr< Initiation > &parsedTerm) {
-
-    }
-
     ContextBuilder::ContextBuilder() {
         classTable.addClass(std::make_shared< ObjectClassBody >());
     }
@@ -92,5 +62,34 @@ namespace fj {
         const shared_ptr<MethodTerm> &ptr) {
 
         return std::shared_ptr<Term>();
+    }
+
+    void LexerTermBuilder::visitTypeCastingTerm(const TypeCastingTerm *term) {
+
+    }
+
+    void LexerTermBuilder::visitInitiation(const Initiation *initiation) {
+
+    }
+
+    void LexerTermBuilder::visitMethodInvocation(
+        const MethodInvocation *invocation) {
+
+    }
+
+    void LexerTermBuilder::visitAccessTerm(const AccessTerm *term) {
+        term->getTerm()->accept(this);
+
+        this->term = std::make_shared< Access >(
+            this->term,
+            PropertyName(term->getName())
+        );
+
+    }
+
+    void LexerTermBuilder::visitVariableTerm(const VariableTerm *term) {
+        this->term = std::make_shared< Variable >(
+            PropertyName(term->getName())
+        );
     }
 }

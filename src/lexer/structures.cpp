@@ -1,5 +1,6 @@
-#include <lexer/lexemes.h>
 #include "lexer/structures.h"
+#include "lexer/lexemes.h"
+#include "lexer/lexer_term_visitor.h"
 
 namespace fj {
     std::string MethodTerm::getName() const {
@@ -67,5 +68,25 @@ namespace fj {
 
     void ClassState::success(ParsedContext & context) {
         context.addClass(std::move(classDeclaration));
+    }
+
+    void VariableTerm::accept(LexerTermVisitor* visitor) const {
+        visitor->visitVariableTerm(this);
+    }
+
+    void AccessTerm::accept(LexerTermVisitor* visitor) const {
+        visitor->visitAccessTerm(this);
+    }
+
+    void TypeCastingTerm::accept(LexerTermVisitor* visitor) const {
+        visitor->visitTypeCastingTerm(this);
+    }
+
+    void MethodInvocation::accept(LexerTermVisitor* visitor) const {
+        visitor->visitMethodInvocation(this);
+    }
+
+    void Initiation::accept(LexerTermVisitor* visitor) const {
+        visitor->visitInitiation(this);
     }
 }

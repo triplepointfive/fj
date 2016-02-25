@@ -9,6 +9,8 @@
 #include <memory>
 
 namespace fj {
+    class LexerTermVisitor;
+
     using Arguments = std::map<std::string, std::string>;
 
     // TODO: Move to somewhere.
@@ -30,6 +32,7 @@ namespace fj {
         void setName(std::string name) { this->name = name; }
         std::string getName() const;
         virtual ~MethodTerm() {}
+        virtual void accept(LexerTermVisitor* visitor) const = 0;
 
         // TODO: Debug only
         virtual std::string termType() = 0;
@@ -40,9 +43,10 @@ namespace fj {
 
     class VariableTerm : public MethodTerm {
     public:
+        VariableTerm(std::string variableName) : MethodTerm(variableName) {}
         std::string termType() { return "VariableTerm"; };
         std::string inspect() { return name; };
-        VariableTerm(std::string variableName) : MethodTerm(variableName) {}
+        void accept(LexerTermVisitor* visitor) const override;
     };
 
     class AccessTerm : public MethodTerm {
@@ -52,9 +56,10 @@ namespace fj {
         void setTerm(std::shared_ptr<MethodTerm> methodTerm) {
             this->methodTerm = methodTerm;
         }
-        std::shared_ptr< MethodTerm > getTerm() {
+        std::shared_ptr< MethodTerm > getTerm() const {
             return std::move(methodTerm);
         }
+        void accept(LexerTermVisitor* visitor) const override;
     private:
         std::shared_ptr< MethodTerm > methodTerm { nullptr };
     };
@@ -70,6 +75,7 @@ namespace fj {
         std::shared_ptr< MethodTerm > getTerm() const {
             return std::move(term);
         }
+        void accept(LexerTermVisitor* visitor) const override;
     private:
         std::shared_ptr< MethodTerm > term{ nullptr };
     };
@@ -81,7 +87,6 @@ namespace fj {
         std::vector<std::shared_ptr< MethodTerm > > getArgs() const {
             return terms;
         }
-
     private:
         std::vector<std::shared_ptr< MethodTerm > > terms;
     };
@@ -94,6 +99,7 @@ namespace fj {
             this->objectName = objectName;
         }
         std::string getObjectName() const { return objectName; }
+        void accept(LexerTermVisitor* visitor) const override;
     private:
         std::string objectName;
     };
@@ -102,6 +108,7 @@ namespace fj {
     public:
         std::string termType() { return "Initiation"; };
         std::string inspect() { return "new " + name; };
+        void accept(LexerTermVisitor* visitor) const override;
     };
 
     class BaseMethod : non_copyable {
