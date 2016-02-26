@@ -65,7 +65,12 @@ namespace fj {
     }
 
     void LexerTermBuilder::visitTypeCastingTerm(const TypeCastingTerm *term) {
+        term->getTerm()->accept(this);
 
+        this->term = std::make_shared< Coercion >(
+            ClassName(term->getName()),
+            this->term
+        );
     }
 
     void LexerTermBuilder::visitInitiation(const Initiation *initiation) {

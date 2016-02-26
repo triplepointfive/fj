@@ -38,3 +38,26 @@ TEST (term_builder, variable_property_term) {
     ASSERT_NE(nullptr, variable);
     ASSERT_EQ("queue", variable->getName().t);
 }
+
+TEST (term_builder, variable_coercion_term) {
+    std::shared_ptr< VariableTerm > variableTerm
+        = std::make_shared< VariableTerm >("queue");
+
+    TypeCastingTerm typeCastingTerm;
+    typeCastingTerm.setName("Pair");
+    typeCastingTerm.setTerm(variableTerm);
+
+    LexerTermBuilder builder;
+    builder.visitTypeCastingTerm(&typeCastingTerm);
+    TermPtr term = builder.getTerm();
+
+    ASSERT_NE(nullptr, term);
+    Coercion *coercion = dynamic_cast<Coercion *>(term.get());
+    ASSERT_NE(nullptr, coercion);
+    ASSERT_EQ("Pair", coercion->getClassName().t);
+
+    ASSERT_NE(nullptr, coercion->getObject());
+    Variable * variable = dynamic_cast<Variable *>(coercion->getObject().get());
+    ASSERT_NE(nullptr, variable);
+    ASSERT_EQ("queue", variable->getName().t);
+}
