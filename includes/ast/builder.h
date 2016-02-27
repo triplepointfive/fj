@@ -18,6 +18,8 @@ namespace fj {
         TermPtr getTerm() { return std::move(term); };
 
     private:
+        std::vector< TermPtr > buildArgsList(
+            const std::vector<std::shared_ptr< MethodTerm > > &);
         TermPtr term = { nullptr };
     };
 

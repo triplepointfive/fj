@@ -79,7 +79,15 @@ namespace fj {
 
     void LexerTermBuilder::visitMethodInvocation(
         const MethodInvocation *invocation) {
+        invocation->getTerm()->accept(this);
 
+        MethodArguments args;
+
+        this->term = std::make_shared< Invocation >(
+            this->term,
+            MethodName(invocation->getName()),
+            args
+        );
     }
 
     void LexerTermBuilder::visitAccessTerm(const AccessTerm *term) {
@@ -96,5 +104,19 @@ namespace fj {
         this->term = std::make_shared< Variable >(
             PropertyName(term->getName())
         );
+    }
+
+    std::vector<TermPtr> LexerTermBuilder::buildArgsList(
+        const std::vector<shared_ptr<MethodTerm>> &list) {
+        std::vector<TermPtr> args;
+        args.reserve(list.size());
+
+        for ( auto argTerm : list ) {
+            argTerm->accept(this);
+            // TODO: Verify order.
+            args.push_back(this->term);
+        }
+
+        return std::move(args);
     }
 }
