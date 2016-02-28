@@ -17,17 +17,22 @@ namespace fj {
         MethodArguments &arguments,
         Context *context) {
         assert(arguments.size() == args.size());
-        for (auto elem : args) {
-            assert((bool)arguments.count(elem.first));
+        /* for (auto elem : args) { */
+            /* assert((bool)arguments.count(elem.first)); */
             // TODO: Validate type casting instead
     //        assert(arguments.find(elem.first)->second->getClassName() == elem.second);
-        }
-        map<PropertyName, std::shared_ptr< Constructor >> calculatedArgs;
-        for (auto elem : arguments) {
+        /* } */
+        std::map<PropertyName, std::shared_ptr< Constructor >> calculatedArgs;
+
+        std::vector< TermPtr >::size_type i = 0;
+        for(auto argDeclaration : args) {
+            auto elem = arguments[i];
+            i++;
             EvalTermVisitor evaluator(*context);
-            elem.second->accept(evaluator);
-            calculatedArgs[elem.first] = evaluator.getCalculatedValue();
+            elem->accept(evaluator);
+            calculatedArgs[argDeclaration.first] = evaluator.getCalculatedValue();
         }
+
         context->setVariables(calculatedArgs);
         EvalTermVisitor evaluator(*context);
         constructor->accept(evaluator);

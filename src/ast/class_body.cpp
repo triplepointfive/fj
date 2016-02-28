@@ -16,6 +16,23 @@ namespace fj {
         return properties;
     }
 
+
+    TermPtr ClassBody::getProperty(std::shared_ptr< Constructor > object,
+        PropertyName propertyName) const {
+        assert(className == object->getClassName());
+        assert(properties.size() == object->getArgs().size());
+        assert(properties.count(propertyName) != 0);
+
+        auto i = 0;
+        for (auto &elem : properties) {
+            if (propertyName == elem.first) {
+                return object->getArgs()[i];
+            } else {
+                i++;
+            }
+        }
+    }
+
     std::shared_ptr< MethodBody > ClassBody::getMethod(
         MethodName methodName) const {
         auto i = methods.find(methodName);

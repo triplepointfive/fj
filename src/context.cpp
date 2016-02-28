@@ -1,6 +1,8 @@
 #include "context.h"
 
 namespace fj {
+    using std::map;
+
     bool Context::classHasProperty(ClassName className,
                                    PropertyName propertyName) const {
         assert((bool)classes.count(className));
@@ -10,6 +12,13 @@ namespace fj {
 
     bool Context::isASubtype(std::string, std::string) const {
         return true;
+    }
+
+    TermPtr Context::getAttribute(std::shared_ptr< Constructor > object,
+        PropertyName propertyName) {
+        assert((bool)classes.count(object->getClassName()));
+        auto classBody = classes.find(object->getClassName())->second;
+        return classBody->getProperty(object, propertyName);
     }
 
     std::shared_ptr< Constructor > Context::invocateMethod(

@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include <iostream>
-#include <map>
 #include <vector>
 #include <memory>
 
@@ -12,7 +11,6 @@
 
 namespace fj {
     using std::string;
-    using std::map;
 
     class TermVisitor;
 
@@ -30,7 +28,7 @@ namespace fj {
 
     using TermPtr = std::shared_ptr< Term >;
 
-    using MethodArguments = map<PropertyName, TermPtr>;
+    using MethodArguments = std::vector< TermPtr >;
 
     class Variable : public Term {
     public:
@@ -109,12 +107,6 @@ namespace fj {
         ClassName getClassName() const { return className; }
 
         MethodArguments getArgs() const { return std::move(args); }
-
-        TermPtr getAttribute(PropertyName propertyName) {
-            // Accessing no-existing property, it is type checker's job.
-            assert(args.count(propertyName) != 0);
-            return std::move(args.find(propertyName)->second);
-        }
 
     private:
         ClassName className;

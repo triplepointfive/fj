@@ -12,7 +12,7 @@ namespace fj {
             } else {
                 acc += insertion;
             }
-            acc += pair.first.t + " = " + pair.second->show();
+            acc += pair->show();
         }
         return acc;
     }

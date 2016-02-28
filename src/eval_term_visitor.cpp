@@ -24,7 +24,7 @@ namespace fj {
         // This should be found by type checker.
         assert(context->classHasProperty(calculatedValue->getClassName(),
                                          access->getPropertyName()));
-        calculatedValue->getAttribute(access->getPropertyName())->accept(*this);
+        context->getAttribute(calculatedValue, access->getPropertyName())->accept(*this);
     }
 
     void EvalTermVisitor::visitInvocation(Invocation *invocation) {
@@ -36,8 +36,8 @@ namespace fj {
         MethodArguments calculatedArguments;
         for (auto elem : invocation->getArgs()) {
             EvalTermVisitor visitor(*this);
-            elem.second->accept(visitor);
-            calculatedArguments[elem.first] = visitor.getCalculatedValue();
+            elem->accept(visitor);
+            calculatedArguments.push_back(visitor.getCalculatedValue());
         };
         // E-InvkNew
         calculatedValue = context->invocateMethod(calculatedValue,
@@ -50,8 +50,8 @@ namespace fj {
         MethodArguments calculatedArguments;
         for (auto elem : constructor->getArgs()) {
             EvalTermVisitor visitor(*this);
-            elem.second->accept(visitor);
-            calculatedArguments[elem.first] = visitor.getCalculatedValue();
+            elem->accept(visitor);
+            calculatedArguments.push_back(visitor.getCalculatedValue());
         };
         calculatedValue = std::make_shared< Constructor>(
             constructor->getClassName(),

@@ -38,8 +38,8 @@ TEST (Pair, setfst) {
     auto newFstVar = std::make_shared< Variable >(newFstName);
     auto thisVar = std::make_shared< Variable >(PropertyName("this"));
     auto sndAccess = std::make_shared< Access >(thisVar, snd);
-    newPairClassArgs[fst] = newFstVar;
-    newPairClassArgs[snd] = sndAccess;
+    newPairClassArgs.push_back(newFstVar);
+    newPairClassArgs.push_back(sndAccess);
 
     auto setFstTerm = std::make_shared< Constructor >(
         pairClassName, newPairClassArgs);
@@ -62,14 +62,16 @@ TEST (Pair, setfst) {
     ctx.addClass(pairClass);
 
     MethodArguments args;
-    args[fst] = std::make_shared< Constructor >(aClassName, MethodArguments());
-    args[snd] = std::make_shared< Constructor >(bClassName, MethodArguments());
+    args.push_back(std::make_shared< Constructor >(aClassName, MethodArguments()));
+    args.push_back(std::make_shared< Constructor >(bClassName, MethodArguments()));
 
     auto basePair = std::make_shared< Constructor >(pairClassName, args);
     MethodArguments newArgs;
-    newArgs[newFstName] = std::make_shared< Constructor >(bClassName, MethodArguments());
+    newArgs.push_back(std::make_shared< Constructor >(bClassName, MethodArguments()));
     auto newPair = ctx.invocateMethod(basePair, setFst, newArgs);
 
     EXPECT_EQ(newPair->getClassName(), pairClassName);
-    EXPECT_TRUE(newPair->getAttribute(fst)->isValue());
+
+    auto attribute = ctx.getAttribute(newPair, fst);
+    EXPECT_TRUE(attribute->isValue());
 }
