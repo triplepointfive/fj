@@ -74,7 +74,11 @@ namespace fj {
     }
 
     void LexerTermBuilder::visitInitiation(const Initiation *initiation) {
-
+        auto terms = buildArgsList(initiation->getArgs());
+        this->term = std::make_shared< Constructor >(
+            ClassName(initiation->getName()),
+            terms
+        );
     }
 
     void LexerTermBuilder::visitMethodInvocation(
@@ -97,7 +101,6 @@ namespace fj {
             this->term,
             PropertyName(term->getName())
         );
-
     }
 
     void LexerTermBuilder::visitVariableTerm(const VariableTerm *term) {
@@ -106,7 +109,7 @@ namespace fj {
         );
     }
 
-    std::vector<TermPtr> LexerTermBuilder::buildArgsList(
+    MethodArguments LexerTermBuilder::buildArgsList(
         const std::vector<shared_ptr<MethodTerm>> &list) {
         std::vector<TermPtr> args;
         args.reserve(list.size());

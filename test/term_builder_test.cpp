@@ -61,3 +61,50 @@ TEST (term_builder, variable_coercion_term) {
     ASSERT_NE(nullptr, variable);
     ASSERT_EQ("queue", variable->getName().t);
 }
+
+TEST (term_builder, empty_initiation) {
+    Initiation initiation;
+    initiation.setName("Object");
+
+    LexerTermBuilder builder;
+    builder.visitInitiation(&initiation);
+    TermPtr term = builder.getTerm();
+
+    ASSERT_NE(nullptr, term);
+    Constructor *constructor = dynamic_cast<Constructor *>(term.get());
+    ASSERT_NE(nullptr, constructor);
+    ASSERT_EQ("Object", constructor->getClassName().t);
+    ASSERT_EQ(0, constructor->getArgs().size());
+}
+
+TEST (term_builder, initiation_with_few_args) {
+    std::shared_ptr< VariableTerm > variableTerm1
+        = std::make_shared< VariableTerm >("fst");
+    std::shared_ptr< VariableTerm > variableTerm2
+        = std::make_shared< VariableTerm >("snd");
+
+    Initiation initiation;
+    initiation.setName("Pair");
+    initiation.addArg(variableTerm1);
+    initiation.addArg(variableTerm2);
+
+    LexerTermBuilder builder;
+    builder.visitInitiation(&initiation);
+    TermPtr term = builder.getTerm();
+
+    ASSERT_NE(nullptr, term);
+    Constructor *constructor = dynamic_cast<Constructor *>(term.get());
+    ASSERT_NE(nullptr, constructor);
+    EXPECT_EQ("Pair", constructor->getClassName().t);
+
+    MethodArguments args = constructor->getArgs();
+    ASSERT_EQ(2, args.size());
+
+    Variable * variable1 = dynamic_cast<Variable *>(args.front().get());
+    ASSERT_NE(nullptr, variable1);
+    ASSERT_EQ("fst", variable1->getName().t);
+
+    Variable * variable2 = dynamic_cast<Variable *>(args.back().get());
+    ASSERT_NE(nullptr, variable2);
+    ASSERT_EQ("snd", variable2->getName().t);
+}
