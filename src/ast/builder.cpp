@@ -1,5 +1,6 @@
 #include "ast/builder.h"
 #include <type_traits>
+#include <iostream>
 
 using std::is_same;
 
@@ -83,9 +84,8 @@ namespace fj {
 
     void LexerTermBuilder::visitMethodInvocation(
         const MethodInvocation *invocation) {
+        MethodArguments args = buildArgsList(invocation->getArgs());
         invocation->getTerm()->accept(this);
-
-        MethodArguments args;
 
         this->term = std::make_shared< Invocation >(
             this->term,

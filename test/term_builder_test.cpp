@@ -108,3 +108,36 @@ TEST (term_builder, initiation_with_few_args) {
     ASSERT_NE(nullptr, variable2);
     ASSERT_EQ("snd", variable2->getName().t);
 }
+
+TEST (term_builder, method_invocation_with_arg) {
+    std::shared_ptr< VariableTerm > arg
+        = std::make_shared< VariableTerm >("fst");
+
+    std::shared_ptr< VariableTerm > invocatedObject
+        = std::make_shared< VariableTerm >("this");
+
+    MethodInvocation methodInvocation;
+    methodInvocation.setName("replace");
+    methodInvocation.addArg(arg);
+    methodInvocation.setTerm(invocatedObject);
+
+    LexerTermBuilder builder;
+    builder.visitMethodInvocation(&methodInvocation);
+    TermPtr term = builder.getTerm();
+
+    ASSERT_NE(nullptr, term);
+    Invocation *invocation = dynamic_cast<Invocation *>(term.get());
+    ASSERT_NE(nullptr, invocation);
+    EXPECT_EQ("replace", invocation->getMethodName().t);
+
+    Variable * object = dynamic_cast<Variable *>(invocation->getObject().get());
+    ASSERT_NE(nullptr, object);
+    ASSERT_EQ("this", object->getName().t);
+
+    MethodArguments args = invocation->getArgs();
+    ASSERT_EQ(1, args.size());
+
+    Variable * variable = dynamic_cast<Variable *>(args.front().get());
+    ASSERT_NE(nullptr, variable);
+    ASSERT_EQ("fst", variable->getName().t);
+}

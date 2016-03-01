@@ -103,6 +103,9 @@ namespace fj {
         std::string getObjectName() const { return objectName; }
 
         // TODO: Implement setup.
+        void setTerm(std::shared_ptr< MethodTerm > term) {
+            this->methodTerm = term;
+        }
         std::shared_ptr< MethodTerm > getTerm() const {
             return std::move(methodTerm);
         }
