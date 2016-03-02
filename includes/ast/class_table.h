@@ -1,3 +1,6 @@
+#ifndef FJ_CLASS_TABLE_H
+#define FJ_CLASS_TABLE_H
+
 #include <memory>
 #include <map>
 
@@ -20,3 +23,4 @@ namespace fj {
     };
 }
 
+#endif //FJ_CLASS_TABLE_H

@@ -26,11 +26,10 @@ namespace fj {
         auto i = 0;
         for (auto &elem : properties) {
             if (propertyName == elem.first) {
-                return object->getArgs()[i];
-            } else {
                 i++;
             }
         }
+        return object->getArgs()[i];
     }
 
     std::shared_ptr< MethodBody > ClassBody::getMethod(

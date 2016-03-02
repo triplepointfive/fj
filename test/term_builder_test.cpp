@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "ast/builder.h"
+#include "ast/lexer_term_builder.h"
 
 using namespace fj;
 

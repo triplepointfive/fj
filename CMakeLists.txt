@@ -15,6 +15,7 @@ add_library(fj_lib
         src/context.cpp
         src/ast/method_body.cpp
         src/ast/class_body.cpp
+        src/ast/lexer_term_builder.cpp
         includes/ast/builder.h
         includes/ast/class_table.h
         includes/ast/structures.h
@@ -24,6 +25,7 @@ add_library(fj_lib
         includes/context.h
         includes/ast/method_body.h
         includes/ast/class_body.h
+        includes/ast/lexer_term_builder.h
         includes/base_types.h
         includes/lexer/lexer.h
         includes/lexer/lexemes.h
