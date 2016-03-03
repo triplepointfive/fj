@@ -14,6 +14,12 @@ namespace fj {
         return true;
     }
 
+    std::map<ClassName, std::shared_ptr< ObjectClassBody >>
+        Context::getClasses() const {
+        return std::move(classes);
+    }
+
+
     TermPtr Context::getAttribute(std::shared_ptr< Constructor > object,
         PropertyName propertyName) {
         assert((bool)classes.count(object->getClassName()));

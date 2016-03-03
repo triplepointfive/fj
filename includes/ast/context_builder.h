@@ -4,6 +4,7 @@
 #include "lexer/lexer.h"
 
 #include "context.h"
+#include "class_table.h"
 
 namespace fj {
     using std::shared_ptr;

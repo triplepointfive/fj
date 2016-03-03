@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "ast/structures.h"
-#include "ast/builder.h"
+#include "ast/context_builder.h"
 #include "ast/lexer_term_builder.h"
 
 using std::is_same;

@@ -23,8 +23,6 @@ namespace fj {
         void operator=(non_copyable const &x) = delete;
     };
 
-    class ParsedContext;
-
     class MethodTerm {
     public:
         MethodTerm(const std::string &name) : name(name) { }
@@ -195,9 +193,10 @@ namespace fj {
             methods.push_back(methodDeclaration);
         }
 
-        void setConstructorBody(std::shared_ptr< ConstructorBody > constructorBody) {
-            // TODO: Fail if already presence - means constructor is defined twice.
-            this->constructorBody = constructorBody;
+        void setConstructorBody(std::shared_ptr< ConstructorBody > constructor) {
+            // TODO: Fail if already presence -
+            // means constructor is defined twice.
+            this->constructorBody = constructor;
         }
 
         std::shared_ptr< ConstructorBody > getConstructorBody() const {

@@ -27,6 +27,8 @@ namespace fj {
         TermPtr getAttribute(std::shared_ptr< Constructor >,
             PropertyName propertyName);
 
+        std::map<ClassName, std::shared_ptr< ObjectClassBody >> getClasses() const;
+
     private:
         std::map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
         std::map< PropertyName, std::shared_ptr< Constructor > > assigned_variables;
