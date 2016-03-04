@@ -13,7 +13,7 @@ namespace fj {
     }
 
     Properties ClassBody::getProperties() const {
-        return properties;
+        return std::move(properties);
     }
 
 
