@@ -18,6 +18,8 @@ addons:
       - clang
       - libboost-dev
       - libgtest-dev
+      - libreadline6
+      - libreadline6-dev
 
 before_script:
   - mkdir build

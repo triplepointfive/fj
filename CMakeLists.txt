@@ -45,6 +45,8 @@ add_executable(fj_test
 include_directories(PEGTL)
 include_directories(src)
 include_directories(includes)
+
+target_link_libraries(fj readline)
 target_link_libraries(fj_test gtest gtest_main pthread)
 target_link_libraries(fj_test fj_lib)
 
