@@ -19,35 +19,31 @@ using namespace std;
 
 int com_help PARAMS((char *));
 
-typedef struct {
+struct Command {
   char *name;
   rl_icpfunc_t *func;
   char *doc;
-} COMMAND;
-
-COMMAND commands[] = {
-  { "help", com_help, "Display this text" },
-  { (char *)NULL, (rl_icpfunc_t *)NULL, (char *)NULL }
 };
 
-char *dupstr (char *s) {
-  char *r;
+Command commands[] = {
+  { "help", com_help, "Display this text" },
+  { nullptr, nullptr, nullptr }
+};
 
-  r = (char *)malloc (strlen (s));
+char *dupstr(char *s) {
+  char *r = (char *)malloc (strlen (s));
   strcpy (r, s);
   return (r);
 }
 
-/* Forward declarations. */
-/* char *stripwhite (); */
-COMMAND *find_command (char *name) {
+Command *find_command(char *name) {
   int i;
 
   for (i = 0; commands[i].name; i++)
     if (strcmp (name, commands[i].name) == 0)
       return (&commands[i]);
 
-  return ((COMMAND *)NULL);
+  return nullptr;
 }
 
 char *command_generator PARAMS((const char *, int));
@@ -56,8 +52,7 @@ char **fileman_completion PARAMS((const char *, int, int));
 /* Tell the GNU Readline library how to complete.  We want to try to complete
    on command names if this is the first word in the line, or on filenames
    if not. */
-void initialize_readline()
-{
+void initialize_readline() {
   /* Allow conditional parsing of the ~/.inputrc file. */
   rl_readline_name = "FileMan";
 
@@ -70,12 +65,8 @@ void initialize_readline()
    the word to complete.  We can use the entire contents of rl_line_buffer
    in case we want to do some simple parsing.  Return the array of matches,
    or NULL if there aren't any. */
-char **
-fileman_completion (const char *text, int start, int end)
-{
-  char **matches;
-
-  matches = (char **)NULL;
+char ** fileman_completion (const char *text, int start, int end) {
+  char **matches = nullptr;
 
   /* If this word is at the start of the line, then it is a command
      to complete.  Otherwise it is the name of a file in the current
@@ -89,102 +80,86 @@ fileman_completion (const char *text, int start, int end)
 /* Generator function for command completion.  STATE lets us know whether
    to start from scratch; without any state (i.e. STATE == 0), then we
    start at the top of the list. */
-char *
-command_generator (const char *text, int state)
-{
-  static int list_index, len;
-  char *name;
+char *command_generator(const char *text, int state) {
+    static int list_index, len;
+    char *name;
 
-  /* If this is a new word to complete, initialize now.  This includes
-     saving the length of TEXT for efficiency, and initializing the index
-     variable to 0. */
-  if (!state)
-    {
-      list_index = 0;
-      len = strlen (text);
+    /* If this is a new word to complete, initialize now.  This includes
+       saving the length of TEXT for efficiency, and initializing the index
+       variable to 0. */
+    if (!state) {
+        list_index = 0;
+        len = strlen (text);
     }
 
-  /* Return the next name which partially matches from the command list. */
-  while (name = commands[list_index].name)
-    {
-      list_index++;
+    /* Return the next name which partially matches from the command list. */
+    while (name = commands[list_index].name) {
+        list_index++;
 
-      if (strncmp (name, text, len) == 0)
-        return (dupstr(name));
+        if (strncmp (name, text, len) == 0)
+          return (dupstr(name));
     }
 
-  /* If no names matched, then return NULL. */
-  return ((char *)NULL);
+    /* If no names matched, then return NULL. */
+    return nullptr;
 }
 
+int com_help(char *arg) {
+    int i;
+    int printed = 0;
 
-
-
-int com_help (char *arg) {
-  int i;
-  int printed = 0;
-
-  for (i = 0; commands[i].name; i++)
-    {
-      if (!*arg || (strcmp (arg, commands[i].name) == 0))
-        {
-          printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
-          printed++;
+    for (i = 0; commands[i].name; i++) {
+        if (!*arg || (strcmp (arg, commands[i].name) == 0)) {
+            printf ("%s\t\t%s.\n", commands[i].name, commands[i].doc);
+            printed++;
         }
     }
 
-  if (!printed)
-    {
-      printf ("No commands match `%s'.  Possibilties are:\n", arg);
+    if (!printed) {
+        printf ("No commands match `%s'.  Possibilties are:\n", arg);
 
-      for (i = 0; commands[i].name; i++)
-        {
-          /* Print in six columns. */
-          if (printed == 6)
-            {
-              printed = 0;
-              printf ("\n");
+        for (i = 0; commands[i].name; i++) {
+            /* Print in six columns. */
+            if (printed == 6) {
+                printed = 0;
+                printf ("\n");
             }
 
-          printf ("%s\t", commands[i].name);
-          printed++;
+            printf ("%s\t", commands[i].name);
+            printed++;
         }
 
-      if (printed)
-        printf ("\n");
+        if (printed)
+            printf ("\n");
     }
-  return (0);
+    return 0;
 }
 
 
 /* Strip whitespace from the start and end of STRING.  Return a pointer
    into STRING. */
-char *
-stripwhite (char *string)
-{
-  register char *s, *t;
+char *stripwhite(char *string) {
+    char *s, *t;
 
-  for (s = string; whitespace (*s); s++)
-    ;
+    for (s = string; whitespace (*s); s++)
+      ;
 
-  if (*s == 0)
-    return (s);
+    if (*s == 0)
+        return (s);
 
-  t = s + strlen (s) - 1;
-  while (t > s && whitespace (*t))
-    t--;
-  *++t = '\0';
+    t = s + strlen (s) - 1;
+    while (t > s && whitespace (*t))
+        t--;
+    *++t = '\0';
 
-  return s;
+    return s;
 }
 
 
 /* Execute a command line. */
-int
-execute_line (char *line)
-{
+int execute_line(char *line) {
   register int i;
-  COMMAND *command;
+  Command *command;
   char *word;
 
   /* Isolate the command word. */
@@ -240,6 +215,7 @@ void interactive() {
 
     free(line);
   }
+  printf("Leaving fji.");
 }
 
 int main() {
