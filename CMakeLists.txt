@@ -31,7 +31,10 @@ add_library(fj_lib
         includes/lexer/lexemes.h
         includes/lexer/lexer.h
         includes/lexer/structures.h)
-add_executable(fj src/main.cpp)
+add_executable(fj
+        src/interactive/mode.cpp
+        includes/interactive/mode.h
+        src/main.cpp)
 target_link_libraries(fj fj_lib)
 
 add_executable(fj_test
