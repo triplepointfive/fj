@@ -18,46 +18,46 @@ using namespace std;
 namespace fj {
     using std::string;
 
-    InteractiveMode* InteractiveMode::instance = nullptr;
+    std::shared_ptr< InteractiveMode > InteractiveMode::instance = nullptr;
+
+    int HelpCommand::execute(string arg) {
+        int printed = 0;
+
+        for (auto command : mode->getCommands()) {
+            if (arg == "" || command->getName() == arg) {
+                std::cout << command->getName() << "\t\t"
+                    << command->getDoc() << "." << std::endl;
+                printed++;
+            }
+        }
+
+        if (!printed) {
+            std::cout << "No commands match `" << arg
+                << "'.  Possibilties are:\n";
+
+            for ( auto command : mode->getCommands() ) {
+                /* Print in six columns. */
+                if (printed == 6) {
+                    printed = 0;
+                    std::cout << "\n";
+                }
+
+                std::cout << command->getName() << "\t";
+                printed++;
+            }
+
+            if (printed) {
+                std::cout << std::endl;
+            }
+        }
+        return 0;
+    }
 
     char *dupstr(char *s) {
       char *r = (char *)malloc (strlen (s));
       strcpy (r, s);
       return (r);
     }
-
-    int InteractiveMode::com_help(string arg) {
-        int printed = 0;
-
-        for (auto command : commands) {
-            if (arg == "" || command.name == arg) {
-                std::cout << command.name << "\t\t" << command.doc << "."
-                    << std::endl;
-                printed++;
-            }
-        }
-
-        if (!printed) {
-            std::cout << "No commands match `" << arg << "'.  Possibilties are:"
-                << std::endl;
-
-            for ( auto command : commands ) {
-                /* Print in six columns. */
-                if (printed == 6) {
-                    printed = 0;
-                    printf ("\n");
-                }
-
-                std::cout << command.name << "\t";
-                printed++;
-            }
-
-            if (printed)
-                printf ("\n");
-        }
-        return 0;
-    }
-
 
     /* Generator function for command completion.  STATE lets us know whether
        to start from scratch; without any state (i.e. STATE == 0), then we
@@ -114,83 +114,70 @@ namespace fj {
       return (matches);
     }
 
+    /* Strip whitespace from the start and end of STRING.  Return a pointer
+       into STRING. */
+    char *stripwhite(char *string) {
+        char *s, *t;
 
-/* Strip whitespace from the start and end of STRING.  Return a pointer
-   into STRING. */
-char *stripwhite(char *string) {
-    char *s, *t;
+        for (s = string; whitespace (*s); s++)
+          ;
 
-    for (s = string; whitespace (*s); s++)
-      ;
+        if (*s == 0)
+            return (s);
 
-    if (*s == 0)
-        return (s);
+        t = s + strlen (s) - 1;
+        while (t > s && whitespace (*t))
+            t--;
+        *++t = '\0';
 
-    t = s + strlen (s) - 1;
-    while (t > s && whitespace (*t))
-        t--;
-    *++t = '\0';
-
-    return s;
-}
-
-
-/* Execute a command line. */
-int InteractiveMode::execute_line(char *line) {
-  register int i;
-  Command *command;
-  char *word;
-
-  /* Isolate the command word. */
-  i = 0;
-  while (line[i] && whitespace (line[i]))
-    i++;
-  word = line + i;
-
-  while (line[i] && !whitespace (line[i]))
-    i++;
-
-  if (line[i])
-    line[i++] = '\0';
-
-  for (auto com : commands) {
-      if (word == com.name) {
-          command = &com;
-          break;
-      }
-  }
-
-  if (!command)
-    {
-      fprintf (stderr, "%s: No such command for FileMan.\n", word);
-      return (-1);
+        return s;
     }
 
-  /* Get argument to command, if any. */
-  while (whitespace (line[i]))
-    i++;
+    /* Execute a command line. */
+    int InteractiveMode::execute_line(char *line) {
+      register int i;
+      char *word;
 
-  word = line + i;
+      /* Isolate the command word. */
+      i = 0;
+      while (line[i] && whitespace (line[i]))
+        i++;
+      word = line + i;
 
-  /* Call the function. */
-  return ((*(command->func)) (word));
-}
+      while (line[i] && !whitespace (line[i]))
+        i++;
 
-  int InteractiveMode::run() {
-    instance = new InteractiveMode();
-    int code = instance->run();
-    delete instance;
-    instance = nullptr;
-    return code;
-  }
+      if (line[i])
+        line[i++] = '\0';
 
-  InteractiveMode::InteractiveMode() {
-    Command command;
-    command.name = "help";
-    command.doc = "Display this text";
 
-    commands.push_back(command);
-  }
+      for (auto command : commands) {
+          if (word == command->getName()) {
+              /* Get argument to command, if any. */
+              while (whitespace (line[i]))
+                i++;
+
+              word = line + i;
+
+              /* Call the function. */
+              return command->execute(std::string(word));
+          }
+      }
+
+      fprintf (stderr, "%s: No such command for FileMan.\n", word);
+      return -1;
+    }
+
+    int InteractiveMode::run() {
+        auto mode = std::make_shared< InteractiveMode >();
+        mode->addCommand(std::make_shared< HelpCommand >(mode));
+        int code = mode->iterate();
+        instance = nullptr;
+        return code;
+    }
+
+    InteractiveMode::InteractiveMode() {
+    }
 
    int InteractiveMode::iterate() {
     char prompt [250];
