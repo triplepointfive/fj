@@ -1,3 +1,8 @@
+#ifndef FJ_INTERACTIVE_MODE_H
+#define FJ_INTERACTIVE_MODE_H
+
+#include <iostream>
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -10,15 +15,13 @@ namespace fj {
 
     class InteractiveMode {
     public:
-        InteractiveMode();
-
         static int run();
         static std::shared_ptr< InteractiveMode > instance;
         static char *command_generator(const char *text, int state);
         static char **fileman_completion(const char *, int, int);
 
         std::vector< std::shared_ptr< InteractiveCommand > > getCommands() {
-            return std::move(commands);
+            return commands;
         }
         void addCommand(std::shared_ptr< InteractiveCommand > command) {
             commands.push_back(command);
@@ -32,33 +35,6 @@ namespace fj {
         int execute_line(char *line);
         std::vector< std::shared_ptr< InteractiveCommand > > commands;
     };
-
-    class InteractiveCommand {
-    public:
-        InteractiveCommand(std::shared_ptr< InteractiveMode > mode,
-                std::string name, std::string doc)
-            : mode(mode)
-            , name(name)
-            , doc(doc)
-            {}
-
-        virtual ~InteractiveCommand() = default;
-
-        virtual int execute(std::string) = 0;
-        const std::string &getName() const { return name; };
-        const std::string &getDoc()  const { return doc;  };
-    protected:
-        std::shared_ptr< InteractiveMode > mode{ nullptr };
-        std::string name;
-        std::string doc;
-    };
-
-    class HelpCommand : public InteractiveCommand {
-    public:
-        HelpCommand(std::shared_ptr< InteractiveMode > mode)
-            : InteractiveCommand(mode, "help", "Display this text")
-            {}
-
-        int execute(std::string arg) override;
-    };
 }
+
+#endif //FJ_INTERACTIVE_MODE_H

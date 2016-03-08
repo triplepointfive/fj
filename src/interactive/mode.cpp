@@ -11,6 +11,7 @@
 
 #include "term.h"
 
+#include "interactive/help_command.h"
 #include "interactive/mode.h"
 
 using namespace std;
@@ -20,67 +21,36 @@ namespace fj {
 
     std::shared_ptr< InteractiveMode > InteractiveMode::instance = nullptr;
 
-    int HelpCommand::execute(string arg) {
-        int printed = 0;
-
-        for (auto command : mode->getCommands()) {
-            if (arg == "" || command->getName() == arg) {
-                std::cout << command->getName() << "\t\t"
-                    << command->getDoc() << "." << std::endl;
-                printed++;
-            }
-        }
-
-        if (!printed) {
-            std::cout << "No commands match `" << arg
-                << "'.  Possibilties are:\n";
-
-            for ( auto command : mode->getCommands() ) {
-                /* Print in six columns. */
-                if (printed == 6) {
-                    printed = 0;
-                    std::cout << "\n";
-                }
-
-                std::cout << command->getName() << "\t";
-                printed++;
-            }
-
-            if (printed) {
-                std::cout << std::endl;
-            }
-        }
-        return 0;
-    }
-
     char *dupstr(char *s) {
-      char *r = (char *)malloc (strlen (s));
-      strcpy (r, s);
-      return (r);
+        char *r = (char *)malloc (strlen (s));
+        strcpy (r, s);
+        return (r);
     }
 
     /* Generator function for command completion.  STATE lets us know whether
        to start from scratch; without any state (i.e. STATE == 0), then we
        start at the top of the list. */
     char *InteractiveMode::command_generator(const char *text, int state) {
-        static int list_index, len;
-        std::string name;
+        static std::vector< std::shared_ptr < InteractiveCommand > >
+            ::size_type i;
 
-        /* If this is a new word to complete, initialize now.  This includes
-           saving the length of TEXT for efficiency, and initializing the index
-           variable to 0. */
-        if (!state) {
-            list_index = 0;
-            len = strlen (text);
+        if (state == 0) {
+            i = 0;
         }
 
         /* Return the next name which partially matches from the command list. */
-        /* while (name = commands[list_index].name) { */
-            /* list_index++; */
-
-            /* if (strncmp (name, text, len) == 0) */
-              /* return (dupstr(name)); */
-        /* } */
+        const std::string name(text);
+        while(i != instance->getCommands().size()) {
+            auto command = instance->getCommands()[i];
+            i++;
+            if (command->getName().find(name) == 0) {
+                auto comName = command->getName();
+                char * writable = new char[comName.size() + 1];
+                std::copy(comName.begin(), comName.end(), writable);
+                writable[comName.size()] = '\0';
+                return writable;
+            }
+        }
 
         /* If no names matched, then return NULL. */
         return nullptr;
@@ -90,11 +60,11 @@ namespace fj {
        on command names if this is the first word in the line, or on filenames
        if not. */
     void InteractiveMode::initialize_readline() {
-      /* Allow conditional parsing of the ~/.inputrc file. */
-      rl_readline_name = "FileMan";
+        /* Allow conditional parsing of the ~/.inputrc file. */
+        rl_readline_name = "FileMan";
 
-      /* Tell the completer that we want a crack first. */
-      rl_attempted_completion_function = fileman_completion;
+        /* Tell the completer that we want a crack first. */
+        rl_attempted_completion_function = fileman_completion;
     }
 
     /* Attempt to complete on the contents of TEXT.  START and END bound the
@@ -102,16 +72,17 @@ namespace fj {
        the word to complete.  We can use the entire contents of rl_line_buffer
        in case we want to do some simple parsing.  Return the array of matches,
        or NULL if there aren't any. */
-    char ** InteractiveMode::fileman_completion (const char *text, int start, int) {
-      char **matches = nullptr;
+    char **InteractiveMode::fileman_completion(const char *text,
+            int start, int) {
+        char **matches = nullptr;
 
-      /* If this word is at the start of the line, then it is a command
-         to complete.  Otherwise it is the name of a file in the current
-         directory. */
-      if (start == 0)
-        matches = rl_completion_matches (text, command_generator);
+        /* If this word is at the start of the line, then it is a command
+           to complete.  Otherwise it is the name of a file in the current
+           directory. */
+        if (start == 0)
+            matches = rl_completion_matches(text, command_generator);
 
-      return (matches);
+        return (matches);
     }
 
     /* Strip whitespace from the start and end of STRING.  Return a pointer
@@ -135,75 +106,72 @@ namespace fj {
 
     /* Execute a command line. */
     int InteractiveMode::execute_line(char *line) {
-      register int i;
-      char *word;
+        register int i;
+        char *word;
 
-      /* Isolate the command word. */
-      i = 0;
-      while (line[i] && whitespace (line[i]))
-        i++;
-      word = line + i;
+        /* Isolate the command word. */
+        i = 0;
+        while (line[i] && whitespace (line[i]))
+            i++;
+        word = line + i;
 
-      while (line[i] && !whitespace (line[i]))
-        i++;
+        while (line[i] && !whitespace (line[i]))
+            i++;
 
-      if (line[i])
-        line[i++] = '\0';
+        if (line[i])
+            line[i++] = '\0';
 
+        for (auto command : commands) {
+            if (word == command->getName()) {
+                /* Get argument to command, if any. */
+                while (whitespace (line[i]))
+                    i++;
 
-      for (auto command : commands) {
-          if (word == command->getName()) {
-              /* Get argument to command, if any. */
-              while (whitespace (line[i]))
-                i++;
+                word = line + i;
 
-              word = line + i;
+                /* Call the function. */
+                return command->execute(std::string(word));
+            }
+        }
 
-              /* Call the function. */
-              return command->execute(std::string(word));
-          }
-      }
-
-      fprintf (stderr, "%s: No such command for FileMan.\n", word);
-      return -1;
+        fprintf (stderr, "%s: No such command for FileMan.\n", word);
+        return -1;
     }
 
     int InteractiveMode::run() {
-        auto mode = std::make_shared< InteractiveMode >();
-        mode->addCommand(std::make_shared< HelpCommand >(mode));
-        int code = mode->iterate();
+        instance = std::make_shared< InteractiveMode >();
+        instance->addCommand(std::make_shared< HelpCommand >(instance));
+        instance->addCommand(std::make_shared< HelpCommand >(instance, "?"));
+        int code = instance->iterate();
         instance = nullptr;
         return code;
     }
 
-    InteractiveMode::InteractiveMode() {
-    }
-
    int InteractiveMode::iterate() {
-    char prompt [250];
-    unsigned int commandNumber = 1;
+      char prompt [250];
+      unsigned int commandNumber = 1;
 
-    char *line, *s;
+      char *line, *s;
 
-    initialize_readline();
-    while(1) {
-      sprintf(prompt, "%.3d > ", commandNumber);
-      line = readline(prompt);
-      commandNumber++;
-      if (!line)
-        break;
+      initialize_readline();
+      while(1) {
+          sprintf(prompt, "%.3d > ", commandNumber);
+          line = readline(prompt);
+          commandNumber++;
+          if (!line)
+              break;
 
-      s = stripwhite(line);
+          s = stripwhite(line);
 
-      if (*s) {
-        add_history(s);
-        execute_line(s);
+          if (*s) {
+              add_history(s);
+              execute_line(s);
+          }
+
+          free(line);
       }
 
-      free(line);
-    }
-
-    printf("Leaving fji.");
-    return 0;
+      printf("Leaving fji.");
+      return 0;
   }
 }
