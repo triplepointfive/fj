@@ -1,0 +1,49 @@
+#include <iostream>
+
+#include "interactive/import_command.h"
+#include "interactive/mode.h"
+
+#include "lexer/lexer.h"
+#include "ast/context_builder.h"
+
+namespace fj {
+    int ImportCommand::execute(std::string arg) {
+        if (arg == "") {
+            std::cout << "Syntax: import FILENAME" << std::endl;
+            return -1;
+        }
+        if (!std::ifstream(arg).good()) {
+            std::cout << "import: Failed to find or read file `"
+                << arg << "'" << std::endl;
+            return -1;
+        }
+        return import(arg);
+    }
+
+    int ImportCommand::import(std::string fileName) {
+        std::ifstream stream(fileName);
+        try {
+            ParsedContext parsedContext;
+            const std::string input((std::istreambuf_iterator< char >(stream) ),
+                       (std::istreambuf_iterator< char >()));
+            bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
+                input,
+                fileName,
+                parsedContext
+            );
+
+            if (!status) {
+                std::cout << "import: Hit unknown parse error" << std::endl;
+                return -2;
+            }
+
+            Context context;
+            ContextBuilder().buildAST(parsedContext, context);
+            mode->setContext(std::make_shared< Context >(context));
+        }
+        catch (const pegtl::parse_error& e) {
+            std::cout << "import: " << e.what() << std::endl;
+        }
+        return 0;
+    }
+}

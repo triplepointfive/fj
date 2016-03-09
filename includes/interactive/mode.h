@@ -12,13 +12,14 @@
 
 namespace fj {
     class InteractiveCommand;
+    class Context;
 
     class InteractiveMode {
     public:
         static int run();
         static std::shared_ptr< InteractiveMode > instance;
         static char *command_generator(const char *text, int state);
-        static char **fileman_completion(const char *, int, int);
+        static char **fj_completion(const char *, int, int);
 
         std::vector< std::shared_ptr< InteractiveCommand > > getCommands() {
             return commands;
@@ -26,6 +27,10 @@ namespace fj {
         void addCommand(std::shared_ptr< InteractiveCommand > command) {
             commands.push_back(command);
         }
+        void setContext(std::shared_ptr< Context > context) {
+            this->context = context;
+        }
+
     private:
         int iterate();
         void initialize_readline();
@@ -34,6 +39,7 @@ namespace fj {
 
         int execute_line(char *line);
         std::vector< std::shared_ptr< InteractiveCommand > > commands;
+        std::shared_ptr< Context > context{ nullptr };
     };
 }
 

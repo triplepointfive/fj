@@ -11,6 +11,7 @@
 
 #include "term.h"
 
+#include "interactive/import_command.h"
 #include "interactive/help_command.h"
 #include "interactive/mode.h"
 
@@ -61,10 +62,10 @@ namespace fj {
        if not. */
     void InteractiveMode::initialize_readline() {
         /* Allow conditional parsing of the ~/.inputrc file. */
-        rl_readline_name = "FileMan";
+        rl_readline_name = "fj";
 
         /* Tell the completer that we want a crack first. */
-        rl_attempted_completion_function = fileman_completion;
+        rl_attempted_completion_function = fj_completion;
     }
 
     /* Attempt to complete on the contents of TEXT.  START and END bound the
@@ -72,8 +73,7 @@ namespace fj {
        the word to complete.  We can use the entire contents of rl_line_buffer
        in case we want to do some simple parsing.  Return the array of matches,
        or NULL if there aren't any. */
-    char **InteractiveMode::fileman_completion(const char *text,
-            int start, int) {
+    char **InteractiveMode::fj_completion(const char *text, int start, int) {
         char **matches = nullptr;
 
         /* If this word is at the start of the line, then it is a command
@@ -106,16 +106,13 @@ namespace fj {
 
     /* Execute a command line. */
     int InteractiveMode::execute_line(char *line) {
-        register int i;
-        char *word;
-
         /* Isolate the command word. */
-        i = 0;
-        while (line[i] && whitespace (line[i]))
+        int i = 0;
+        while (line[i] && whitespace(line[i]))
             i++;
-        word = line + i;
+        char *word = line + i;
 
-        while (line[i] && !whitespace (line[i]))
+        while (line[i] && !whitespace(line[i]))
             i++;
 
         if (line[i])
@@ -134,14 +131,17 @@ namespace fj {
             }
         }
 
-        fprintf (stderr, "%s: No such command for FileMan.\n", word);
+        fprintf (stderr, "%s: No such command for fj.\n", word);
         return -1;
     }
 
     int InteractiveMode::run() {
         instance = std::make_shared< InteractiveMode >();
+
         instance->addCommand(std::make_shared< HelpCommand >(instance));
         instance->addCommand(std::make_shared< HelpCommand >(instance, "?"));
+        instance->addCommand(std::make_shared< ImportCommand >(instance));
+
         int code = instance->iterate();
         instance = nullptr;
         return code;
