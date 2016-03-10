@@ -4,7 +4,16 @@
 
 using namespace fj;
 
-TEST (Context, classHasProperty) {
+TEST (Context, includes_object_class) {
+    Context context;
+
+    ASSERT_EQ(1, context.getClasses().size());
+
+    auto objectClass = context.getClasses()[ClassName("Object")];
+    ASSERT_NE(nullptr, objectClass);
+}
+
+TEST (Context, class_has_property) {
     PropertyName fst("fst");
     PropertyName snd("snd");
 

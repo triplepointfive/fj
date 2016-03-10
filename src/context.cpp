@@ -3,6 +3,10 @@
 namespace fj {
     using std::map;
 
+    Context::Context() {
+        addClass(std::make_shared< ObjectClassBody >());
+    }
+
     bool Context::classHasProperty(ClassName className,
                                    PropertyName propertyName) const {
         assert((bool)classes.count(className));
@@ -45,10 +49,10 @@ namespace fj {
     void Context::setVariables(
         map<PropertyName, std::shared_ptr< Constructor >> vars) {
         this->assigned_variables = vars;
-
     }
 
-    std::shared_ptr< Constructor > Context::assignedValue(PropertyName name) const {
+    std::shared_ptr< Constructor > Context::assignedValue(
+            PropertyName name) const {
         assert((bool) assigned_variables.count(name));
         return assigned_variables.find(name)->second;
     }

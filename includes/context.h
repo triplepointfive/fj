@@ -11,6 +11,7 @@ namespace fj {
 
     class Context {
     public:
+        Context();
         void addClass(std::shared_ptr< ObjectClassBody >);
 
         void setVariables(std::map<PropertyName, std::shared_ptr< Constructor >>);

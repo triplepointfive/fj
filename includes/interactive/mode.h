@@ -16,9 +16,11 @@ namespace fj {
 
     class InteractiveMode {
     public:
+        InteractiveMode();
         static int run();
         static std::shared_ptr< InteractiveMode > instance;
         static char *command_generator(const char *text, int state);
+        static char *info_generator(const char *text, int state);
         static char **fj_completion(const char *, int, int);
 
         std::vector< std::shared_ptr< InteractiveCommand > > getCommands() {
@@ -26,6 +28,9 @@ namespace fj {
         }
         void addCommand(std::shared_ptr< InteractiveCommand > command) {
             commands.push_back(command);
+        }
+        std::shared_ptr< Context > getContext() {
+            return this->context;
         }
         void setContext(std::shared_ptr< Context > context) {
             this->context = context;

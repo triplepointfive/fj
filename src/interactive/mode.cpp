@@ -8,9 +8,12 @@
 #include <sys/errno.h>
 
 #include <strings.h>
+#include <sstream>
 
 #include "term.h"
+#include "context.h"
 
+#include "interactive/info_command.h"
 #include "interactive/import_command.h"
 #include "interactive/help_command.h"
 #include "interactive/mode.h"
@@ -41,7 +44,7 @@ namespace fj {
 
         /* Return the next name which partially matches from the command list. */
         const std::string name(text);
-        while(i != instance->getCommands().size()) {
+        while (i != instance->getCommands().size()) {
             auto command = instance->getCommands()[i];
             i++;
             if (command->getName().find(name) == 0) {
@@ -54,6 +57,32 @@ namespace fj {
         }
 
         /* If no names matched, then return NULL. */
+        return nullptr;
+    }
+
+    char *InteractiveMode::info_generator(const char *text, int state) {
+        static std::map<ClassName, std::shared_ptr< ObjectClassBody >>
+            ::iterator i;
+
+        std::map<ClassName, std::shared_ptr< ObjectClassBody >> classes
+            = instance->getContext()->getClasses();
+        if (state == 0) {
+            i = classes.begin();
+        }
+
+        const std::string name(text);
+        while (i != classes.end()) {
+            auto name = i->first;
+            i++;
+            if (name.t.find(name) == 0) {
+                auto comName = name.t;
+                char * writable = new char[comName.size() + 1];
+                std::copy(comName.begin(), comName.end(), writable);
+                writable[comName.size()] = '\0';
+                return writable;
+            }
+        }
+
         return nullptr;
     }
 
@@ -74,15 +103,22 @@ namespace fj {
        in case we want to do some simple parsing.  Return the array of matches,
        or NULL if there aren't any. */
     char **InteractiveMode::fj_completion(const char *text, int start, int) {
-        char **matches = nullptr;
-
         /* If this word is at the start of the line, then it is a command
            to complete.  Otherwise it is the name of a file in the current
            directory. */
-        if (start == 0)
-            matches = rl_completion_matches(text, command_generator);
+        if (start == 0) {
+            return rl_completion_matches(text, command_generator);
+        } else {
+            std::stringstream stream(rl_line_buffer);
+            std::string commandName;
+            stream >> commandName;
+            // TODO: Convert commands list into a mapping.
+            if ( commandName == "info" ) {
+                return rl_completion_matches(text, info_generator);
+            }
+        }
 
-        return (matches);
+        return nullptr;
     }
 
     /* Strip whitespace from the start and end of STRING.  Return a pointer
@@ -135,12 +171,17 @@ namespace fj {
         return -1;
     }
 
+    InteractiveMode::InteractiveMode() {
+        setContext(std::make_shared< Context >());
+    }
+
     int InteractiveMode::run() {
         instance = std::make_shared< InteractiveMode >();
 
         instance->addCommand(std::make_shared< HelpCommand >(instance));
         instance->addCommand(std::make_shared< HelpCommand >(instance, "?"));
         instance->addCommand(std::make_shared< ImportCommand >(instance));
+        instance->addCommand(std::make_shared< InfoCommand >(instance));
 
         int code = instance->iterate();
         instance = nullptr;

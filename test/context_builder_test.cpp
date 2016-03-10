@@ -22,7 +22,7 @@ TEST (context_builder, build_class_with_two_properties) {
     ContextBuilder builder;
     builder.buildAST(parsedContext, context);
 
-    ASSERT_EQ(1, context.getClasses().size());
+    ASSERT_EQ(2, context.getClasses().size());
 
     auto builtClass = context.getClasses()[ClassName("Pair")];
     Properties properties = builtClass->getProperties();
@@ -57,7 +57,7 @@ TEST (context_builder, build_class_with_a_method) {
     ContextBuilder builder;
     builder.buildAST(parsedContext, context);
 
-    ASSERT_EQ(1, context.getClasses().size());
+    ASSERT_EQ(2, context.getClasses().size());
     auto builtClass = context.getClasses()[ClassName("Pair")];
 
     auto methodBody = builtClass->getMethod(MethodName("getFst"));
