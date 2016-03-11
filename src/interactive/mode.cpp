@@ -63,22 +63,21 @@ namespace fj {
     char *InteractiveMode::info_generator(const char *text, int state) {
         static std::map<ClassName, std::shared_ptr< ObjectClassBody >>
             ::iterator i;
+        static std::map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
 
-        std::map<ClassName, std::shared_ptr< ObjectClassBody >> classes
-            = instance->getContext()->getClasses();
         if (state == 0) {
+            classes = instance->getContext()->getClasses();
             i = classes.begin();
         }
 
-        const std::string name(text);
+        const std::string inputText(text);
         while (i != classes.end()) {
-            auto name = i->first;
+            auto commandName = i->first.t;
             i++;
-            if (name.t.find(name) == 0) {
-                auto comName = name.t;
-                char * writable = new char[comName.size() + 1];
-                std::copy(comName.begin(), comName.end(), writable);
-                writable[comName.size()] = '\0';
+            if (commandName.find(inputText) == 0) {
+                char * writable = new char[commandName.size() + 1];
+                std::copy(commandName.begin(), commandName.end(), writable);
+                writable[commandName.size()] = '\0';
                 return writable;
             }
         }

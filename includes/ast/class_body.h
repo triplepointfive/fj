@@ -20,6 +20,9 @@ namespace  fj {
         virtual TermPtr getProperty(std::shared_ptr< Constructor >, PropertyName) const {
             return nullptr;
         }
+        virtual std::shared_ptr< ObjectClassBody > getParentClass() const {
+            return std::make_shared< ObjectClassBody >();
+        }
         virtual ClassName getClassName() const { return ClassName("Object"); }
         virtual ~ObjectClassBody() {}
     };
@@ -33,6 +36,9 @@ namespace  fj {
         std::shared_ptr< MethodBody > getMethod(MethodName) const override;
         ClassName getClassName() const override;
         TermPtr getProperty(std::shared_ptr< Constructor >, PropertyName) const override;
+        std::shared_ptr< ObjectClassBody > getParentClass() const override {
+            return std::move(parentClass);
+        }
 
     protected:
         ClassName className;

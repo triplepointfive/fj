@@ -15,7 +15,9 @@ namespace fj {
     void ContextBuilder::buildAST(const ParsedContext &parsedContext,
         Context &context) {
         for (auto elem : parsedContext.getClasses()) {
-            context.addClass(buildClass(elem));
+            auto newClass = buildClass(elem);
+            classTable.addClass(newClass);
+            context.addClass(newClass);
         }
     }
 

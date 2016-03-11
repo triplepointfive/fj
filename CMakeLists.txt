@@ -10,6 +10,7 @@ add_library(fj_lib
         src/eval_term_visitor.cpp
         src/utils.cpp
         src/ast/class_body.cpp
+        src/ast/class_table.cpp
         src/ast/context_builder.cpp
         src/ast/method_body.cpp
         src/ast/term.cpp

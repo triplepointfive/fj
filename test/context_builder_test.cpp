@@ -63,3 +63,29 @@ TEST (context_builder, build_class_with_a_method) {
     auto methodBody = builtClass->getMethod(MethodName("getFst"));
     ASSERT_NE(nullptr, methodBody);
 }
+
+TEST (context_builder, build_class_with_parent_class) {
+    auto newClass1 = std::make_shared< ClassDeclaration >();
+    newClass1->setName("A");
+    newClass1->setParentName("Object");
+    newClass1->setConstructorBody(std::make_shared< ConstructorBody >());
+
+    auto newClass2 = std::make_shared< ClassDeclaration >();
+    newClass2->setName("B");
+    newClass2->setParentName("A");
+    newClass2->setConstructorBody(std::make_shared< ConstructorBody >());
+
+    ParsedContext parsedContext;
+    parsedContext.addClass(newClass1);
+    parsedContext.addClass(newClass2);
+
+    Context context;
+    ContextBuilder builder;
+    builder.buildAST(parsedContext, context);
+
+    ASSERT_EQ(3, context.getClasses().size());
+    auto builtClass = context.getClasses()[ClassName("B")];
+
+    EXPECT_EQ("B", builtClass->getClassName().t);
+    EXPECT_EQ("A", builtClass->getParentClass()->getClassName().t);
+}

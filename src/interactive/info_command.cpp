@@ -21,7 +21,20 @@ namespace fj {
     }
 
     int InfoCommand::printClass(std::shared_ptr< ObjectClassBody > classBody) {
-        std::cout << classBody->getClassName().t << std::endl;
+        std::cout << classBody->getClassName().t << " : "
+            << classBody->getParentClass()->getClassName().t << " (";
+
+        bool first = true;
+        for (auto property : classBody->getProperties()) {
+            if (first) {
+                first = !first;
+            } else {
+                std::cout << ", ";
+            }
+            std::cout << property.second.t << " " << property.first.t;
+        }
+
+        std::cout << ")" << std::endl;
         return 0;
     }
 }

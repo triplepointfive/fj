@@ -11,13 +11,8 @@ namespace fj {
     class ClassTable {
     public:
         std::shared_ptr< ObjectClassBody > getClass(
-            const ClassName & className) const {
-            return std::move(classes.find(className)->second);
-        }
-
-        void addClass(std::shared_ptr< ObjectClassBody > classBody) {
-            classes[classBody->getClassName()] = classBody;
-        }
+            const ClassName & className) const;
+        void addClass(std::shared_ptr< ObjectClassBody > classBody);
     private:
         std::map< ClassName, std::shared_ptr< ObjectClassBody > > classes;
     };
