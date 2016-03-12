@@ -3,27 +3,44 @@
 
 #include <pegtl.hh>
 
-#define pegtl_char_t(x) pad < one < x >, space, space >
+#define pegtl_char_t(x) pad < one < x > >
 
 namespace fj {
     using namespace pegtl;
 
+    /* Parse meta */
+
+    struct comment : disable< two< '/' >, until< eolf > > {};
+
+    struct sep : sor< space, comment > {};
+    struct seps : star< sep > {};
+
+    template< typename R >
+    struct pad : pegtl::pad< R, sep > {};
+
     /* Keywords */
 
-    struct class_keyword   : pegtl_string_t("class")   {};
-    struct extends_keyword : pegtl_string_t("extends") {};
-    struct super_keyword   : pegtl_string_t("super")   {};
-    struct return_keyword  : pad < pegtl_string_t("return"), space > {};
-    struct new_keyword     : pegtl_string_t("new")     {};
-    struct this_keyword    : pegtl_string_t("this")    {};
+    struct str_class   : pegtl_string_t("class")   {};
+    struct str_extends : pegtl_string_t("extends") {};
+    struct str_super   : pegtl_string_t("super")   {};
+    struct str_return  : pegtl_string_t("return")  {};
+    struct str_new     : pegtl_string_t("new")     {};
+    struct str_this    : pegtl_string_t("this")    {};
 
-    struct keywords : sor<
-        class_keyword,
-        extends_keyword,
-        super_keyword,
-        return_keyword,
-        new_keyword,
-        this_keyword > {};
+    struct str_keyword : sor< str_class, str_extends, str_super,
+        str_return, str_new, str_this > {};
+
+    template< typename Key >
+    struct key : pegtl::seq< Key, pegtl::not_at< pegtl::identifier_other > > {};
+
+    struct class_keyword   : key< str_class >   {};
+    struct extends_keyword : key< str_extends > {};
+    struct super_keyword   : key< str_super >   {};
+    struct return_keyword  : key< str_return >  {};
+    struct new_keyword     : key< str_new >     {};
+    struct this_keyword    : key< str_this >    {};
+
+    struct keyword : key< str_keyword > {};
 
     /* Special characters with optional paddies */
 
@@ -38,10 +55,9 @@ namespace fj {
 
     /* Identifiers */
 
-    // TODO: Exclude keywords
-    struct class_name  : seq< not_at < keywords >, plus< identifier > > {};
-    struct method_name : seq< not_at < keywords >, plus< identifier > > {};
-    struct object_name : seq< not_at < keywords >, plus< identifier > > {};
+    struct class_name  : seq< not_at < keyword >, plus< identifier > > {};
+    struct method_name : seq< not_at < keyword >, plus< identifier > > {};
+    struct object_name : seq< not_at < keyword >, plus< identifier > > {};
 
     /* Meta rules */
 
@@ -56,7 +72,7 @@ namespace fj {
     /* Method arguments */
 
     // Matches single method argument, like "Object x".
-    struct method_arg : if_must < class_name, space, object_name > {};
+    struct method_arg : if_must < class_name, seps, object_name > {};
 
     // Matches "Object x, ..." or just nothing for method with no arguments.
     struct method_arguments : opt < list < method_arg, comma > > {};
@@ -88,7 +104,7 @@ namespace fj {
 
     struct instantiation_class : class_name {};
     // TODO: Make more strict
-    struct instantiation_head : seq < new_keyword, space, instantiation_class > {};
+    struct instantiation_head : seq < new_keyword, seps, instantiation_class > {};
 
     // Creation of new object, includes "new" keyword and a list of arguments.
     struct instantiation :
@@ -105,7 +121,7 @@ namespace fj {
     // Matches assignment of property like "this.fst = fst".
     // TODO: Validate the same identifier is used on both sides of assignment.
     struct assignment :
-            seq <property_invocation, assign, assignment_prop_name > {};
+        seq <property_invocation, assign, assignment_prop_name > {};
 
     struct attribute_name : object_name {};
     struct access_term : seq < variable_name, dot, attribute_name > {};
@@ -115,7 +131,7 @@ namespace fj {
     // Just for better error message handling.
     struct returned_statement : method_term {};
     // Required returned value from method. Matches the pattern "return ...".
-    struct return_stat : if_must < return_keyword, returned_statement > {};
+    struct return_stat : if_must < return_keyword, seps, returned_statement > {};
 
     /* Constructors */
 
@@ -145,10 +161,10 @@ namespace fj {
     /* Methods */
 
     struct met_class : class_name {};
-    struct met_name : method_name {};
+    struct met_name  : method_name {};
 
     // Matches common method declaration, with return type and name.
-    struct method_ret_and_name : seq < met_class, space, met_name > {};
+    struct method_ret_and_name : seq < met_class, seps, met_name > {};
 
     // Matches the method head and its args list.
     struct method_head : seq < method_ret_and_name,
@@ -168,8 +184,8 @@ namespace fj {
     // Matches the class name after the extends keyword.
     struct inherited_class_name : class_name {};
 
-    struct declared_class_name_padded : pad < declared_class_name, space > {};
-    struct inherited_class_name_padded : pad < inherited_class_name, space > {};
+    struct declared_class_name_padded : pad < declared_class_name > {};
+    struct inherited_class_name_padded : pad < inherited_class_name > {};
 
     // Matches "class A extends B"
     struct class_header : if_must < class_keyword, declared_class_name_padded,
@@ -177,13 +193,13 @@ namespace fj {
 
     // Matches new property inside class body.
     struct property_def :
-        if_must < seq < class_name, space, object_name >, semicolon > {};
+        if_must < seq < class_name, seps, object_name >, semicolon > {};
 
     // A list of base units inside class body: properties, methods etc.
     struct class_term : sor < constructor_def, method_def, property_def > {};
 
     // Matches the content of {"..."}.
-    struct class_body : list < class_term, star< space > > {};
+    struct class_body : list < class_term, seps > {};
 
     // Matches the whole class body.
     struct class_def : seq< class_header, sur_with_braces< class_body > > {};

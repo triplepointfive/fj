@@ -3,7 +3,6 @@
 #include "interactive/info_command.h"
 #include "interactive/mode.h"
 
-#include "lexer/lexer.h"
 #include "ast/context_builder.h"
 
 namespace fj {
