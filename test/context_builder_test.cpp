@@ -34,7 +34,8 @@ TEST (context_builder, build_class_with_two_properties) {
 TEST (context_builder, build_class_with_a_method) {
     auto constructor = std::make_shared< ConstructorBody >();
 
-    auto variableTerm = std::make_shared< VariableTerm >("queue");
+    auto variableTerm = std::make_shared< VariableTerm >();
+    variableTerm->setName("queue");
     auto methodTerm = std::make_shared< AccessTerm >();
     methodTerm->setName("last");
     methodTerm->setTerm(variableTerm);

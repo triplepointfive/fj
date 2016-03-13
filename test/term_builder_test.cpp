@@ -4,7 +4,8 @@
 using namespace fj;
 
 TEST (term_builder, variable_term) {
-    VariableTerm variableTerm("total");
+    VariableTerm variableTerm;
+    variableTerm.setName("total");
 
     LexerTermBuilder builder;
     builder.visitVariableTerm(&variableTerm);
@@ -18,7 +19,8 @@ TEST (term_builder, variable_term) {
 
 TEST (term_builder, variable_property_term) {
     std::shared_ptr< VariableTerm > variableTerm
-        = std::make_shared< VariableTerm >("queue");
+        = std::make_shared< VariableTerm >();
+    variableTerm->setName("queue");
 
     AccessTerm accessTerm;
     accessTerm.setName("last");
@@ -41,7 +43,8 @@ TEST (term_builder, variable_property_term) {
 
 TEST (term_builder, variable_coercion_term) {
     std::shared_ptr< VariableTerm > variableTerm
-        = std::make_shared< VariableTerm >("queue");
+        = std::make_shared< VariableTerm >();
+    variableTerm->setName("queue");
 
     TypeCastingTerm typeCastingTerm;
     typeCastingTerm.setName("Pair");
@@ -79,9 +82,11 @@ TEST (term_builder, empty_initiation) {
 
 TEST (term_builder, initiation_with_few_args) {
     std::shared_ptr< VariableTerm > variableTerm1
-        = std::make_shared< VariableTerm >("fst");
+        = std::make_shared< VariableTerm >();
+    variableTerm1->setName("fst");
     std::shared_ptr< VariableTerm > variableTerm2
-        = std::make_shared< VariableTerm >("snd");
+        = std::make_shared< VariableTerm >();
+    variableTerm2->setName("snd");
 
     Initiation initiation;
     initiation.setName("Pair");
@@ -111,10 +116,12 @@ TEST (term_builder, initiation_with_few_args) {
 
 TEST (term_builder, method_invocation_with_arg) {
     std::shared_ptr< VariableTerm > arg
-        = std::make_shared< VariableTerm >("fst");
+        = std::make_shared< VariableTerm >();
+    arg->setName("fst");
 
     std::shared_ptr< VariableTerm > invocatedObject
-        = std::make_shared< VariableTerm >("this");
+        = std::make_shared< VariableTerm >();
+    invocatedObject->setName("this");
 
     MethodInvocation methodInvocation;
     methodInvocation.setName("replace");

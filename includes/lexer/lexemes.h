@@ -93,14 +93,6 @@ namespace fj {
     // Matches a list of terms used for invocation a method.
     struct method_list_of_args : opt < list < method_term, comma > >{};
 
-    // TODO: Make more strict
-    struct method_invocation_head : seq < variable_name, dot, method_name > {};
-
-    // Call of a method, this includes both object method called for,
-    // method name and the list of arguments.
-    struct method_invocation :
-            seq < method_invocation_head,
-                    sur_with_brackets < method_list_of_args > > {};
 
     struct instantiation_class : class_name {};
     // TODO: Make more strict
@@ -124,9 +116,14 @@ namespace fj {
         seq <property_invocation, assign, assignment_prop_name > {};
 
     struct attribute_name : object_name {};
-    struct access_term : seq < variable_name, dot, attribute_name > {};
-    struct method_term : sor < type_casting, instantiation, method_invocation,
-        access_term, variable_term > {};
+    // TODO: STRICT!
+    struct method_term_access;
+    // Call of a method, this includes both object method called for,
+    // method name and the list of arguments.
+    struct access_term : seq< dot, attribute_name, method_term_access > {};
+    struct method_invocation : seq< dot, method_name, sur_with_brackets < method_list_of_args >, method_term_access > {};
+    struct method_term_access : sor< method_invocation, access_term, success > {};
+    struct method_term : seq < sor < type_casting, instantiation, variable_term >, method_term_access > {};
 
     // Just for better error message handling.
     struct returned_statement : method_term {};

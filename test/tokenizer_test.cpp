@@ -470,8 +470,12 @@ TEST (AST, method_returns_another_method_invocation) {
 
     MethodInvocation * methodInvocation =
         dynamic_cast<MethodInvocation *>(methodTerm);
+
+    VariableTerm *term = dynamic_cast<VariableTerm *>(
+        methodInvocation->getTerm().get()
+    );
     EXPECT_EQ("someMethod", methodInvocation->getName());
-    EXPECT_EQ("this", methodInvocation->getObjectName());
+    EXPECT_EQ("this", term->getName());
     EXPECT_EQ(0, methodInvocation->getArgs().size());
 }
 
@@ -658,17 +662,4 @@ TEST (AST, method_returns_type_casting_with_property) {
 
     AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(term.get());
     EXPECT_EQ("snd", propertyTerm->getName());
-}
-
-TEST (AST, method_returns_variables_property) {
-    const std::string input = "var.x;";
-    MethodTermState methodState;
-
-    bool status = parse< fj::access_term, fj::build_method>(
-        input,
-        "input variable",
-        methodState
-    );
-
-    ASSERT_TRUE(status);
 }

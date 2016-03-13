@@ -17,13 +17,6 @@ namespace fj {
     template< typename Rule >
     struct build_method_invocation : nothing< Rule > {};
 
-    template<> struct build_method_invocation< variable_name > {
-        static void apply(const input & in,
-                          MethodInvocationState & methodInvocationState) {
-            methodInvocationState.methodInvocation->setObjectName(in.string());
-        }
-    };
-
     template<> struct build_method_invocation< method_name > {
         static void apply(const input & in,
                           MethodInvocationState & methodInvocationState) {
@@ -60,28 +53,8 @@ namespace fj {
 
     template< typename Rule > struct build_variable_term : nothing< Rule > {};
     template<> struct build_variable_term< variable_term > {
-        static void apply(const input & in, MethodState & methodState) {
-            methodState.methodDeclaration->setBodyTerm(
-                std::make_shared < VariableTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, TypeCastingState & typeCastingState) {
-            typeCastingState.typeCastingTerm->setTerm(
-                std::make_shared < VariableTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, MethodInvocationState & methodInvocationState) {
-            methodInvocationState.methodInvocation->addArg(
-                std::make_shared < VariableTerm >(in.string())
-            );
-        }
-
-        static void apply(const input & in, InitiationState & initiationState) {
-            initiationState.initiation->addArg(
-                std::make_shared < VariableTerm >(in.string())
-            );
+        static void apply(const input & in, VariableTermState &variableTermState) {
+            variableTermState.variableTerm->setName(in.string());
         }
     };
 
@@ -185,7 +158,7 @@ namespace fj {
 
     // Method Terms
     template<> struct control< variable_term > :
-        change_action< variable_term, build_variable_term > {};
+        change_state_and_action< variable_term, VariableTermState, build_variable_term > {};
     template<> struct control< access_term > :
         change_state_and_action< access_term, AccessState, build_property_term > {};
     template<> struct control< method_invocation > :
@@ -194,6 +167,9 @@ namespace fj {
         change_state_and_action< instantiation, InitiationState, build_instantiation > {};
     template<> struct control< type_casting > :
         change_state_and_action< type_casting, TypeCastingState, build_casting > {};
+
+    template<> struct control< method_list_of_args > :
+        change_state_and_action< method_list_of_args, ListOfArgsState, nothing > {};
 }
 
 #endif //FJ_AST_STRUCT_H

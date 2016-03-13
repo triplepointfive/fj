@@ -41,7 +41,6 @@ namespace fj {
 
     class VariableTerm : public MethodTerm {
     public:
-        VariableTerm(std::string variableName) : MethodTerm(variableName) {}
         std::string termType() { return "VariableTerm"; };
         std::string inspect() { return name; };
         void accept(LexerTermVisitor* visitor) const override;
@@ -258,24 +257,32 @@ namespace fj {
     struct InitiationState;
     struct TypeCastingState;
     struct AccessState;
+    struct ListOfArgsState;
 
     struct BaseMethodTermState {
         virtual std::shared_ptr< MethodTerm > getTerm() = 0;
 
-        void success(MethodState & methodState);
-        void success(MethodInvocationState & methodInvocationState);
-        void success(InitiationState & initiationState);
-        void success(TypeCastingState & typeCastingState);
-        void success(AccessState & accessState);
+        virtual void success(MethodState & methodState);
+        virtual void success(MethodInvocationState & methodInvocationState);
+        virtual void success(InitiationState & initiationState);
+        virtual void success(TypeCastingState & typeCastingState);
+        virtual void success(AccessState & accessState);
+        virtual void success(ListOfArgsState & listOfArgsState);
 
         virtual ~BaseMethodTermState() {}
     };
 
-    struct MethodTermState : BaseMethodTermState {
-        std::shared_ptr< MethodTerm > methodTerm = nullptr;
+    struct VariableTermState : BaseMethodTermState {
+        std::shared_ptr< VariableTerm > variableTerm =
+            std::make_shared< VariableTerm >();
+
+        void addArg(std::shared_ptr< MethodTerm >) {
+            // Shouldn't get called.
+            throw "xxx";
+        }
 
         std::shared_ptr< MethodTerm > getTerm() override {
-            return methodTerm;
+            return variableTerm;
         };
     };
 
@@ -308,6 +315,13 @@ namespace fj {
         std::shared_ptr< MethodTerm > getTerm() override {
             return methodInvocation;
         };
+
+        void success(MethodState & methodState) override;
+        void success(MethodInvocationState & methodInvocationState) override;
+        void success(InitiationState & initiationState) override;
+        void success(TypeCastingState & typeCastingState) override;
+        void success(AccessState & accessState) override;
+        void success(ListOfArgsState & listOfArgsState) override;
     };
 
     struct TypeCastingState : ArguableTermState {
@@ -334,6 +348,12 @@ namespace fj {
         std::shared_ptr< MethodTerm > getTerm() override {
             return accessTerm;
         };
+    };
+
+    struct ListOfArgsState {
+        std::vector< std::shared_ptr< MethodTerm > > args;
+        void success(MethodInvocationState & methodInvocationState);
+        void success(InitiationState & initiationState);
     };
 
     struct PairState {

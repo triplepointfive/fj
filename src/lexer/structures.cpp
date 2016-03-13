@@ -31,7 +31,6 @@ namespace fj {
         methodState.methodDeclaration->addArg(name, returnedClassName);
     }
 
-
     void BaseMethodTermState::success(MethodState & methodState) {
         methodState.methodDeclaration->setBodyTerm(
             std::move(getTerm())
@@ -39,7 +38,7 @@ namespace fj {
     }
 
     void BaseMethodTermState::success(MethodInvocationState & methodInvocationState) {
-        methodInvocationState.addArg(std::move(getTerm()));
+        methodInvocationState.methodInvocation->setTerm(std::move(getTerm()));
     }
 
     void BaseMethodTermState::success(TypeCastingState &typeCastingState) {
@@ -88,5 +87,54 @@ namespace fj {
 
     void Initiation::accept(LexerTermVisitor* visitor) const {
         visitor->visitInitiation(this);
+    }
+
+    void ListOfArgsState::success(MethodInvocationState &methodInvocationState) {
+        // TODO: Move vector itself?
+        for (auto arg : args) {
+            methodInvocationState.addArg(std::move(arg));
+        }
+    }
+
+    void ListOfArgsState::success(InitiationState &initiationState) {
+        // TODO: Move vector itself?
+        for (auto arg : args) {
+            initiationState.addArg(std::move(arg));
+        }
+    }
+
+    void BaseMethodTermState::success(ListOfArgsState &listOfArgsState) {
+        listOfArgsState.args.push_back(std::move(getTerm()));
+    }
+
+    void MethodInvocationState::success(MethodState &methodState) {
+        // If body already has a term it should belong to the
+        // method invocation itself.
+        if (methodState.methodDeclaration->getBodyTerm() != nullptr) {
+            methodInvocation->setTerm(std::move(
+                methodState.methodDeclaration->getBodyTerm()
+            ));
+        }
+        BaseMethodTermState::success(methodState);
+    }
+
+    void MethodInvocationState::success(MethodInvocationState & methodInvocationState) {
+        methodInvocationState.methodInvocation->setTerm(std::move(getTerm()));
+    }
+
+    void MethodInvocationState::success(TypeCastingState &typeCastingState) {
+        typeCastingState.addArg(std::move(getTerm()));
+    }
+
+    void MethodInvocationState::success(AccessState &accessState) {
+        accessState.addArg(std::move(getTerm()));
+    }
+
+    void MethodInvocationState::success(InitiationState &initiationState) {
+        initiationState.addArg(std::move(getTerm()));
+    }
+
+    void MethodInvocationState::success(ListOfArgsState &listOfArgsState) {
+        listOfArgsState.args.push_back(std::move(getTerm()));
     }
 }
