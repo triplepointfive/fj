@@ -348,6 +348,13 @@ namespace fj {
         std::shared_ptr< MethodTerm > getTerm() override {
             return accessTerm;
         };
+
+        void success(MethodState & methodState) override;
+        void success(MethodInvocationState & methodInvocationState) override;
+        void success(InitiationState & initiationState) override;
+        void success(TypeCastingState & typeCastingState) override;
+        void success(AccessState & accessState) override;
+        void success(ListOfArgsState & listOfArgsState) override;
     };
 
     struct ListOfArgsState {

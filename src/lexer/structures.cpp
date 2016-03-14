@@ -135,6 +135,35 @@ namespace fj {
     }
 
     void MethodInvocationState::success(ListOfArgsState &listOfArgsState) {
+        // TODO: Review
         listOfArgsState.args.push_back(std::move(getTerm()));
+    }
+
+    void AccessState::success(MethodState &methodState) {
+        BaseMethodTermState::success(methodState);
+    }
+
+    void AccessState::success(MethodInvocationState &methodInvocationState) {
+        BaseMethodTermState::success(methodInvocationState);
+    }
+
+    void AccessState::success(InitiationState &initiationState) {
+        BaseMethodTermState::success(initiationState);
+    }
+
+    void AccessState::success(TypeCastingState &typeCastingState) {
+        BaseMethodTermState::success(typeCastingState);
+    }
+
+    void AccessState::success(AccessState &accessState) {
+        BaseMethodTermState::success(accessState);
+    }
+
+    void AccessState::success(ListOfArgsState &listOfArgsState) {
+        assert(nullptr == accessTerm->getTerm());
+        assert(listOfArgsState.args.size());
+        accessTerm->setTerm(std::move(listOfArgsState.args.back()));
+        listOfArgsState.args.pop_back();
+        listOfArgsState.args.push_back(accessTerm);
     }
 }

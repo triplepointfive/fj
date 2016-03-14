@@ -498,7 +498,12 @@ TEST (AST, method_returns_another_method_invocation_with_2_input_args) {
             dynamic_cast<MethodInvocation *>(methodTerm);
     ASSERT_NE(nullptr, methodInvocation);
     EXPECT_EQ("someMethod", methodInvocation->getName());
-    EXPECT_EQ("this", methodInvocation->getObjectName());
+
+    ASSERT_NE(nullptr, methodInvocation->getTerm());
+    VariableTerm *term = dynamic_cast<VariableTerm *>(
+        methodInvocation->getTerm().get()
+    );
+    EXPECT_EQ("this", term->getName());
 
     auto args = methodInvocation->getArgs();
     ASSERT_EQ(2, args.size());
