@@ -91,13 +91,7 @@ namespace fj {
     class MethodInvocation : public ArgumentTerm {
     public:
         std::string termType() { return "MethodInvocation"; };
-        std::string inspect() { return objectName + "." + name; };
-
-        // TODO: Wipe them out.
-        void setObjectName(const std::string &objectName) {
-            this->objectName = objectName;
-        }
-        std::string getObjectName() const { return objectName; }
+        std::string inspect() { return getTerm()->inspect() + "." + name; };
 
         // TODO: Implement setup.
         void setTerm(std::shared_ptr< MethodTerm > term) {
@@ -108,7 +102,6 @@ namespace fj {
         }
         void accept(LexerTermVisitor* visitor) const override;
     private:
-        std::string objectName;
         std::shared_ptr< MethodTerm > methodTerm;
     };
 

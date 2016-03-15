@@ -104,8 +104,7 @@ namespace fj {
 
     struct type_casting_class : class_name {};
     // Cast type of object to one its parent classes.
-    struct type_casting : seq < sur_with_brackets < type_casting_class >,
-        method_term > {};
+    struct type_casting : seq < open_bracket, type_casting_class, close_bracket, method_term > {};
 
     // Used just to extract property name.
     struct assignment_prop_name : object_name {};
@@ -115,6 +114,8 @@ namespace fj {
     struct assignment :
         seq <property_invocation, assign, assignment_prop_name > {};
 
+    struct bracked_term : seq< sur_with_brackets< method_term > > {};
+
     struct attribute_name : object_name {};
     // TODO: STRICT!
     struct method_term_access;
@@ -123,7 +124,7 @@ namespace fj {
     struct access_term : seq< dot, attribute_name, method_term_access > {};
     struct method_invocation : seq< dot, method_name, sur_with_brackets < method_list_of_args >, method_term_access > {};
     struct method_term_access : sor< method_invocation, access_term, success > {};
-    struct method_term : seq < sor < type_casting, instantiation, variable_term >, method_term_access > {};
+    struct method_term : seq < sor < type_casting, bracked_term, instantiation, variable_term >, method_term_access > {};
 
     // Just for better error message handling.
     struct returned_statement : method_term {};

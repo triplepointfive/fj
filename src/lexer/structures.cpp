@@ -135,7 +135,10 @@ namespace fj {
     }
 
     void MethodInvocationState::success(ListOfArgsState &listOfArgsState) {
-        // TODO: Review
+        assert(nullptr == methodInvocation->getTerm());
+        assert(listOfArgsState.args.size());
+        methodInvocation->setTerm(std::move(listOfArgsState.args.back()));
+        listOfArgsState.args.pop_back();
         listOfArgsState.args.push_back(std::move(getTerm()));
     }
 
@@ -164,6 +167,6 @@ namespace fj {
         assert(listOfArgsState.args.size());
         accessTerm->setTerm(std::move(listOfArgsState.args.back()));
         listOfArgsState.args.pop_back();
-        listOfArgsState.args.push_back(accessTerm);
+        listOfArgsState.args.push_back(std::move(getTerm()));
     }
 }

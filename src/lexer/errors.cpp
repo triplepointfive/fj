@@ -21,6 +21,7 @@ namespace fj {
     template<> const string errors< space >::error_message = "Terms must be separated";
 
     // Terms.
+    template<> const string errors< method_term >::error_message = "Excepted a valid term here";
     template<> const string errors< super_invocation >::error_message = "Call of super is a must";
     template<> const string errors< returned_statement >::error_message = "Expected a term";
     template<> const string errors< return_stat >::error_message = "Method body is missing";
@@ -36,7 +37,7 @@ namespace fj {
     template<> const string errors< super_args >::error_message = "stub6";
     template<> const string errors< method_list_of_args >::error_message = "stub7";
     template<> const string errors< type_casting_class >::error_message = "stub8";
-    template<> const string errors< seps >::error_message = "stub8";
+    template<> const string errors< seps >::error_message = "stub9";
 
     template<> const string errors< method_ret_and_name >::error_message = "invalid method defenition";
     template<> const string errors< method_head >::error_message = "invalid method_head";
