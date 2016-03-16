@@ -31,6 +31,9 @@ namespace fj {
         std::string getName() const;
         virtual ~MethodTerm() {}
         virtual void accept(LexerTermVisitor* visitor) const = 0;
+        virtual void setTerm(std::shared_ptr< MethodTerm >) {
+            throw "Should never get there";
+        }
 
         // TODO: Debug only
         virtual std::string termType() = 0;
@@ -49,9 +52,20 @@ namespace fj {
     class AccessTerm : public MethodTerm {
     public:
         std::string termType() { return "PropertyTerm"; };
-        std::string inspect() { return "." + name; };
+        std::string inspect() {
+            if (nullptr != methodTerm) {
+                return methodTerm->inspect() + "." + name;
+            } else {
+                return "{nullptr}." + name;
+            }
+        };
         void setTerm(std::shared_ptr<MethodTerm> methodTerm) {
-            this->methodTerm = methodTerm;
+            // Move it deeper in the tree if self has term.
+            if (nullptr != this->methodTerm) {
+                this->methodTerm->setTerm(methodTerm);
+            } else {
+                this->methodTerm = methodTerm;
+            }
         }
         std::shared_ptr< MethodTerm > getTerm() const {
             return std::move(methodTerm);

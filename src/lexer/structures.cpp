@@ -143,6 +143,11 @@ namespace fj {
     }
 
     void AccessState::success(MethodState &methodState) {
+        // If body already has a term it should belong to the
+        // method invocation itself.
+        if (methodState.methodDeclaration->getBodyTerm() != nullptr) {
+            accessTerm->setTerm(methodState.methodDeclaration->getBodyTerm());
+        }
         BaseMethodTermState::success(methodState);
     }
 
@@ -159,7 +164,10 @@ namespace fj {
     }
 
     void AccessState::success(AccessState &accessState) {
-        BaseMethodTermState::success(accessState);
+        assert(nullptr == accessTerm->getTerm());
+        assert(nullptr != accessState.accessTerm);
+        accessTerm->setTerm(std::move(accessState.accessTerm));
+        accessState.accessTerm = accessTerm;
     }
 
     void AccessState::success(ListOfArgsState &listOfArgsState) {
