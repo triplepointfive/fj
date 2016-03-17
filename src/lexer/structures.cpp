@@ -177,4 +177,13 @@ namespace fj {
         listOfArgsState.args.pop_back();
         listOfArgsState.args.push_back(std::move(getTerm()));
     }
+
+    void AccessTerm::setTerm(std::shared_ptr<MethodTerm> methodTerm) {
+        // Move it deeper in the tree if self has term.
+        if (nullptr != this->methodTerm) {
+            this->methodTerm->setTerm(methodTerm);
+        } else {
+            this->methodTerm = methodTerm;
+        }
+    }
 }

@@ -52,6 +52,8 @@ add_executable(fj_test
         test/tokenizer_test.cpp
         test/lexer_errors_test.cpp
         test/context_builder_test.cpp
+        test/lexer/access_term_test.cpp
+        test/lexer/invocation_term_test.cpp
         test/term_builder_test.cpp)
 include_directories(PEGTL)
 include_directories(src)

@@ -15,7 +15,6 @@ namespace fj {
             throw pegtl::parse_error(error_message, in);
         }
     };
-
 }
 
 #endif //FJ_ERRORS_H

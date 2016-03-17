@@ -31,6 +31,8 @@ namespace fj {
         std::string getName() const;
         virtual ~MethodTerm() {}
         virtual void accept(LexerTermVisitor* visitor) const = 0;
+
+        // TODO: Rethink of it.
         virtual void setTerm(std::shared_ptr< MethodTerm >) {
             throw "Should never get there";
         }
@@ -59,14 +61,7 @@ namespace fj {
                 return "{nullptr}." + name;
             }
         };
-        void setTerm(std::shared_ptr<MethodTerm> methodTerm) {
-            // Move it deeper in the tree if self has term.
-            if (nullptr != this->methodTerm) {
-                this->methodTerm->setTerm(methodTerm);
-            } else {
-                this->methodTerm = methodTerm;
-            }
-        }
+        void setTerm(std::shared_ptr<MethodTerm> methodTerm) override;
         std::shared_ptr< MethodTerm > getTerm() const {
             return std::move(methodTerm);
         }
