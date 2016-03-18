@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "lexer/lexer.h"
+#include "lexer/parser_rules.h"
 
 using namespace pegtl;
 using namespace fj;

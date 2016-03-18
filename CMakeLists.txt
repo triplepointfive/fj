@@ -17,6 +17,8 @@ add_library(fj_lib
         src/ast/lexer_term_builder.cpp
         src/lexer/errors.cpp
         src/lexer/structures.cpp
+        src/lexer/lexer.cpp
+        src/lexer/parsing_structures.cpp
         includes/base_types.h
         includes/context.h
         includes/eval_term_visitor.h
@@ -30,6 +32,8 @@ add_library(fj_lib
         includes/ast/structures.h
         includes/lexer/errors.h
         includes/lexer/lexemes.h
+        includes/lexer/parsing_structures.h
+        includes/lexer/parser_rules.h
         includes/lexer/lexer.h
         includes/lexer/structures.h)
 add_executable(fj

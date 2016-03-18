@@ -1,7 +1,7 @@
 #ifndef FJ_CONTEXT_BUILDER_H
 #define FJ_CONTEXT_BUILDER_H
 
-#include "lexer/lexer.h"
+#include "lexer/structures.h"
 
 #include "context.h"
 #include "class_table.h"

@@ -2,7 +2,7 @@
 #define FJ_LEXER_TERM_BUILDER_H
 
 #include "lexer/lexer_term_visitor.h"
-#include "lexer/lexer.h"
+#include "lexer/structures.h"
 #include "ast/structures.h"
 
 namespace fj {

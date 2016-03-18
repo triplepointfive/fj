@@ -26,11 +26,7 @@ namespace fj {
             ParsedContext parsedContext;
             const std::string input((std::istreambuf_iterator< char >(stream) ),
                        (std::istreambuf_iterator< char >()));
-            bool status = pegtl::parse< fj::grammar, pegtl::nothing, fj::control >(
-                input,
-                fileName,
-                parsedContext
-            );
+            bool status = parseContent(parsedContext, input, fileName);
 
             if (!status) {
                 std::cout << "import: Hit unknown parse error" << std::endl;
