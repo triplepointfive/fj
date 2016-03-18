@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 2.8)
 option(test "Build all tests." OFF)
 project(fj)
 
+find_package(Boost 1.60.0)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic -Wextra -g -Wnon-virtual-dtor")
 
 add_library(fj_lib
@@ -62,6 +64,10 @@ add_executable(fj_test
 include_directories(PEGTL)
 include_directories(src)
 include_directories(includes)
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 target_link_libraries(fj readline)
 target_link_libraries(fj_test gtest gtest_main pthread)

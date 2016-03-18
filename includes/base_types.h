@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <boost/strong_typedef.hpp>
+#include <boost/serialization/strong_typedef.hpp>
 
 BOOST_STRONG_TYPEDEF(std::string, ClassName)
 

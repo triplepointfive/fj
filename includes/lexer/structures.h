@@ -46,16 +46,16 @@ namespace fj {
 
     class VariableTerm : public MethodTerm {
     public:
-        std::string termType() { return "VariableTerm"; };
-        std::string inspect() { return name; };
+        std::string termType() override { return "VariableTerm"; };
+        std::string inspect() override { return name; };
         void accept(LexerTermVisitor* visitor) const override;
     };
 
     class TypeCastingTerm : public MethodTerm {
     public:
-        std::string termType() { return "TypeCastingTerm"; };
-        std::string inspect() { return "(" + name + ") " + term->inspect(); };
-        void setTerm(std::shared_ptr< MethodTerm > term) {
+        std::string termType() override { return "TypeCastingTerm"; };
+        std::string inspect() override { return "(" + name + ") " + term->inspect(); };
+        void setTerm(std::shared_ptr< MethodTerm > term) override {
             this->term = term;
         }
 
@@ -84,8 +84,8 @@ namespace fj {
 
     class AccessTerm : public AccessorTerm {
     public:
-        std::string termType() { return "PropertyTerm"; };
-        std::string inspect() {
+        std::string termType() override { return "PropertyTerm"; };
+        std::string inspect() override {
             if (nullptr != getTerm()) {
                 return getTerm()->inspect() + "." + name;
             } else {
@@ -97,8 +97,8 @@ namespace fj {
 
     class MethodInvocation : public AccessorTerm {
     public:
-        std::string termType() { return "MethodInvocation"; };
-        std::string inspect() {
+        std::string termType() override { return "MethodInvocation"; };
+        std::string inspect() override {
             if (nullptr != getTerm()) {
                 return getTerm()->inspect() + "." + getName();
             } else {
@@ -107,7 +107,7 @@ namespace fj {
         };
         void accept(LexerTermVisitor* visitor) const override;
 
-        void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
+        void addArg(std::shared_ptr< MethodTerm > term) override { terms.push_back(term); }
 
         std::vector<std::shared_ptr< MethodTerm > > getArgs() const {
             return terms;
@@ -118,8 +118,8 @@ namespace fj {
 
     class Initiation : public MethodTerm {
     public:
-        std::string termType() { return "Initiation"; };
-        std::string inspect() { return "new " + name; };
+        std::string termType() override { return "Initiation"; };
+        std::string inspect() override { return "new " + name; };
         void accept(LexerTermVisitor* visitor) const override;
 
         void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
