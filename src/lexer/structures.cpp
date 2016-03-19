@@ -23,10 +23,6 @@ namespace fj {
         visitor->visitVariableTerm(this);
     }
 
-    void AccessTerm::accept(LexerTermVisitor* visitor) const {
-        visitor->visitAccessTerm(this);
-    }
-
     void TypeCastingTerm::accept(LexerTermVisitor* visitor) const {
         visitor->visitTypeCastingTerm(this);
     }
@@ -37,6 +33,10 @@ namespace fj {
 
     void Initiation::accept(LexerTermVisitor* visitor) const {
         visitor->visitInitiation(this);
+    }
+
+    void AccessTerm::accept(LexerTermVisitor* visitor) const {
+        visitor->visitAccessTerm(this);
     }
 
     void AccessTerm::setTerm(std::shared_ptr<MethodTerm> methodTerm) {
