@@ -39,7 +39,7 @@ namespace fj {
         visitor->visitAccessTerm(this);
     }
 
-    void AccessTerm::setTerm(std::shared_ptr<MethodTerm> methodTerm) {
+    void AccessorTerm::setTerm(std::shared_ptr<MethodTerm> methodTerm) {
         // Move it deeper in the tree if self has term.
         if (nullptr != this->methodTerm) {
             this->methodTerm->setTerm(methodTerm);

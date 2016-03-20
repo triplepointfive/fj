@@ -67,7 +67,7 @@ TEST (AccessTerm, property_of_type_casting) {
     EXPECT_EQ("A", typeCastingTerm->getName());
 }
 
-TEST (AccessTerm, DISABLED_property_of_method_invocation) {
+TEST (AccessTerm, property_of_method_invocation) {
     TEST_PARSE("return var1.properties().fst;")
 
     auto methodDeclaration = methodState.methodDeclaration;
@@ -82,6 +82,12 @@ TEST (AccessTerm, DISABLED_property_of_method_invocation) {
         = dynamic_cast< MethodInvocation * >(propertyTerm->getTerm().get());
     ASSERT_NE(nullptr, methodInvocationTerm);
     EXPECT_EQ("properties", methodInvocationTerm->getName());
+
+    ASSERT_NE(nullptr, methodInvocationTerm->getTerm());
+    VariableTerm * variableTerm
+        = dynamic_cast< VariableTerm * >(methodInvocationTerm->getTerm().get());
+    ASSERT_NE(nullptr, variableTerm);
+    EXPECT_EQ("var1", variableTerm->getName());
 }
 
 TEST (AccessTerm, property_of_property_of_variable) {

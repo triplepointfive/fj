@@ -51,25 +51,6 @@ namespace fj {
         void accept(LexerTermVisitor* visitor) const override;
     };
 
-    class AccessTerm : public MethodTerm {
-    public:
-        std::string termType() { return "PropertyTerm"; };
-        std::string inspect() {
-            if (nullptr != methodTerm) {
-                return methodTerm->inspect() + "." + name;
-            } else {
-                return "{nullptr}." + name;
-            }
-        };
-        void setTerm(std::shared_ptr<MethodTerm> methodTerm) override;
-        std::shared_ptr< MethodTerm > getTerm() const {
-            return std::move(methodTerm);
-        }
-        void accept(LexerTermVisitor* visitor) const override;
-    private:
-        std::shared_ptr< MethodTerm > methodTerm { nullptr };
-    };
-
     class TypeCastingTerm : public MethodTerm {
     public:
         std::string termType() { return "TypeCastingTerm"; };
@@ -86,8 +67,46 @@ namespace fj {
         std::shared_ptr< MethodTerm > term{ nullptr };
     };
 
-    class ArgumentTerm : public MethodTerm {
+    class AccessorTerm : public MethodTerm {
     public:
+        void setTerm(std::shared_ptr<MethodTerm> methodTerm) override;
+
+        std::shared_ptr< MethodTerm > getTerm() const {
+            return std::move(methodTerm);
+        }
+
+        virtual void addArg(std::shared_ptr< MethodTerm >) {
+            throw "Fial";
+        }
+    protected:
+        std::shared_ptr< MethodTerm > methodTerm;
+    };
+
+    class AccessTerm : public AccessorTerm {
+    public:
+        std::string termType() { return "PropertyTerm"; };
+        std::string inspect() {
+            if (nullptr != getTerm()) {
+                return getTerm()->inspect() + "." + name;
+            } else {
+                return "{nullptr}." + name;
+            }
+        };
+        void accept(LexerTermVisitor* visitor) const override;
+    };
+
+    class MethodInvocation : public AccessorTerm {
+    public:
+        std::string termType() { return "MethodInvocation"; };
+        std::string inspect() {
+            if (nullptr != getTerm()) {
+                return getTerm()->inspect() + "." + getName();
+            } else {
+                return "{nullptr}." + getName();
+            }
+        };
+        void accept(LexerTermVisitor* visitor) const override;
+
         void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
 
         std::vector<std::shared_ptr< MethodTerm > > getArgs() const {
@@ -97,28 +116,19 @@ namespace fj {
         std::vector<std::shared_ptr< MethodTerm > > terms;
     };
 
-    class MethodInvocation : public ArgumentTerm {
-    public:
-        std::string termType() { return "MethodInvocation"; };
-        std::string inspect() { return getTerm()->inspect() + "." + name; };
-
-        // TODO: Implement setup.
-        void setTerm(std::shared_ptr< MethodTerm > term) {
-            this->methodTerm = term;
-        }
-        std::shared_ptr< MethodTerm > getTerm() const {
-            return std::move(methodTerm);
-        }
-        void accept(LexerTermVisitor* visitor) const override;
-    private:
-        std::shared_ptr< MethodTerm > methodTerm;
-    };
-
-    class Initiation : public ArgumentTerm {
+    class Initiation : public MethodTerm {
     public:
         std::string termType() { return "Initiation"; };
         std::string inspect() { return "new " + name; };
         void accept(LexerTermVisitor* visitor) const override;
+
+        void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
+
+        std::vector<std::shared_ptr< MethodTerm > > getArgs() const {
+            return terms;
+        }
+    private:
+        std::vector<std::shared_ptr< MethodTerm > > terms;
     };
 
     class BaseMethod : non_copyable {

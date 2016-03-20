@@ -77,7 +77,7 @@ namespace fj {
     };
 
     struct MethodInvocationState : ArguableTermState {
-        std::shared_ptr< MethodInvocation > methodInvocation =
+        std::shared_ptr< AccessorTerm > methodInvocation =
             std::make_shared< MethodInvocation >();
 
         void addArg(std::shared_ptr< MethodTerm > term) {
@@ -110,7 +110,7 @@ namespace fj {
     };
 
     struct AccessState : ArguableTermState {
-        std::shared_ptr<AccessTerm> accessTerm =
+        std::shared_ptr<AccessorTerm> accessTerm =
             std::make_shared<AccessTerm>();
 
         void addArg(std::shared_ptr< MethodTerm > term) {
