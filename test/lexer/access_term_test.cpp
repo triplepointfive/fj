@@ -15,15 +15,16 @@ using namespace fj;
     ); \
     \
     ASSERT_TRUE(status); \
+    \
+    auto methodTerm = methodState.methodDeclaration->getBodyTerm().get(); \
+    ASSERT_NE(nullptr, methodTerm); \
+    \
+    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm); \
+    ASSERT_NE(nullptr, propertyTerm);
 
 TEST (AccessTerm, property_of_variable) {
     TEST_PARSE("return this.fst;")
 
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 
     ASSERT_NE(nullptr, propertyTerm->getTerm());
@@ -36,11 +37,6 @@ TEST (AccessTerm, property_of_variable) {
 TEST (AccessTerm, property_of_initiation) {
     TEST_PARSE("return (new A()).fst;")
 
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 
     ASSERT_NE(nullptr, propertyTerm->getTerm());
@@ -53,11 +49,6 @@ TEST (AccessTerm, property_of_initiation) {
 TEST (AccessTerm, property_of_type_casting) {
     TEST_PARSE("return ((A) var1).fst;")
 
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 
     ASSERT_NE(nullptr, propertyTerm->getTerm());
@@ -70,11 +61,6 @@ TEST (AccessTerm, property_of_type_casting) {
 TEST (AccessTerm, property_of_method_invocation) {
     TEST_PARSE("return var1.properties().fst;")
 
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
 
     ASSERT_NE(nullptr, propertyTerm->getTerm());
@@ -93,10 +79,6 @@ TEST (AccessTerm, property_of_method_invocation) {
 TEST (AccessTerm, property_of_property_of_variable) {
     TEST_PARSE("return this.snd.fst;")
 
-    auto methodTerm = methodState.methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(methodTerm);
     EXPECT_EQ("fst", propertyTerm->getName());
     ASSERT_NE(nullptr, propertyTerm->getTerm());
 

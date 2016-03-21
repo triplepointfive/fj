@@ -4,78 +4,66 @@
 using namespace pegtl;
 using namespace fj;
 
-TEST (MethodInvocation, method_returns_another_method_invocation) {
-    const std::string input = "return this.someMethod();";
-    MethodState methodState;
-
-    bool status = parse< fj::method_body, fj::build_method, fj::control>(
-        input,
-        "input variable",
-        methodState
-    );
-
-    ASSERT_TRUE(status);
-
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    MethodInvocation * methodInvocation =
-        dynamic_cast<MethodInvocation *>(methodTerm);
-
-    VariableTerm *term = dynamic_cast<VariableTerm *>(
-        methodInvocation->getTerm().get()
-    );
-    EXPECT_EQ("someMethod", methodInvocation->getName());
-    EXPECT_EQ("this", term->getName());
-    EXPECT_EQ(0, methodInvocation->getArgs().size());
-}
-
-TEST (AST, method_returns_method_invocation_for_initiation) {
-    const std::string input = "return (new A()).someMethod();";
-    MethodState methodState;
-
-    bool status = parse< fj::method_body, fj::build_method, fj::control>(
-        input,
-        "input variable",
-        methodState
-    );
-
-    ASSERT_TRUE(status);
-
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-
-    MethodInvocation * methodInvocation =
-        dynamic_cast<MethodInvocation *>(methodTerm);
-
-    Initiation *term = dynamic_cast<Initiation *>(
-        methodInvocation->getTerm().get()
-    );
-    EXPECT_EQ("someMethod", methodInvocation->getName());
-    EXPECT_EQ("A", term->getName());
-    EXPECT_EQ(0, methodInvocation->getArgs().size());
-}
-
-TEST (MethodInvocation, method_returns_another_method_invocation_with_2_input_args) {
-    const std::string input = "return this.someMethod(var1, this.fst);";
-    MethodState methodState;
-
-    bool status = parse< fj::method_body, fj::build_method, fj::control>(
-        input,
-        "input variable",
-        methodState
-    );
-
-    ASSERT_TRUE(status);
-
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-    MethodInvocation * methodInvocation =
-            dynamic_cast<MethodInvocation *>(methodTerm);
+#define TEST_PARSE(input_text) \
+    const std::string input = input_text; \
+    MethodState methodState; \
+    \
+    bool status = parse< fj::method_body, nothing, fj::control>( \
+        input, \
+        "input variable", \
+        methodState \
+    ); \
+    \
+    ASSERT_TRUE(status); \
+    \
+    auto methodTerm = methodState.methodDeclaration->getBodyTerm().get(); \
+    ASSERT_NE(nullptr, methodTerm); \
+    \
+    MethodInvocation * methodInvocation = \
+        dynamic_cast<MethodInvocation *>(methodTerm); \
     ASSERT_NE(nullptr, methodInvocation);
+
+TEST (MethodInvocation, of_variable) {
+    TEST_PARSE("return this.someMethod();")
+
+    EXPECT_EQ(0, methodInvocation->getArgs().size());
+    EXPECT_EQ("someMethod", methodInvocation->getName());
+
+    VariableTerm *variableTerm = dynamic_cast<VariableTerm *>(
+        methodInvocation->getTerm().get()
+    );
+    ASSERT_NE(nullptr, variableTerm);
+    EXPECT_EQ("this", variableTerm->getName());
+}
+
+TEST (MethodInvocation, of_initiation) {
+    TEST_PARSE("return (new A()).someMethod();")
+
+    EXPECT_EQ(0, methodInvocation->getArgs().size());
+    EXPECT_EQ("someMethod", methodInvocation->getName());
+
+    Initiation *initiationTerm = dynamic_cast<Initiation *>(
+        methodInvocation->getTerm().get()
+    );
+    ASSERT_NE(nullptr, initiationTerm);
+    EXPECT_EQ("A", initiationTerm->getName());
+}
+
+TEST (MethodInvocation, of_type_casting) {
+    TEST_PARSE("return ((A) some).someMethod();")
+
+    EXPECT_EQ("someMethod", methodInvocation->getName());
+    EXPECT_EQ(0, methodInvocation->getArgs().size());
+
+    TypeCastingTerm * typeCastingTerm
+        = dynamic_cast< TypeCastingTerm * >(methodInvocation->getTerm().get());
+    ASSERT_NE(nullptr, typeCastingTerm);
+    EXPECT_EQ("A", typeCastingTerm->getName());
+}
+
+TEST (MethodInvocation, with_variable_and_property_args) {
+    TEST_PARSE("return this.someMethod(var1, this.fst);")
+
     EXPECT_EQ("someMethod", methodInvocation->getName());
 
     ASSERT_NE(nullptr, methodInvocation->getTerm());
@@ -98,25 +86,9 @@ TEST (MethodInvocation, method_returns_another_method_invocation_with_2_input_ar
     EXPECT_EQ("fst", propertyTerm->getName());
 }
 
-TEST (MethodInvocation, method_returns_another_method_invocation_with_another_invocation) {
-    const std::string input = "return this.someMethod(\n"
-        "var1.anotherMethod(this.third));";
-    MethodState methodState;
+TEST (MethodInvocation, with_method_invocation_arg) {
+    TEST_PARSE("return this.someMethod(var1.anotherMethod(this.third));")
 
-    bool status = parse< fj::method_body, fj::build_method, fj::control>(
-        input,
-        "input variable",
-        methodState
-    );
-
-    ASSERT_TRUE(status);
-
-    auto methodDeclaration = methodState.methodDeclaration;
-    auto methodTerm = methodDeclaration->getBodyTerm().get();
-    ASSERT_NE(nullptr, methodTerm);
-    MethodInvocation * methodInvocation =
-        dynamic_cast<MethodInvocation *>(methodTerm);
-    ASSERT_NE(nullptr, methodInvocation);
     EXPECT_EQ("someMethod", methodInvocation->getName());
 
     ASSERT_NE(nullptr, methodInvocation->getTerm());
