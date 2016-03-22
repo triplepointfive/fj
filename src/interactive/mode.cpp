@@ -90,7 +90,7 @@ namespace fj {
        if not. */
     void InteractiveMode::initialize_readline() {
         /* Allow conditional parsing of the ~/.inputrc file. */
-        rl_readline_name = "fj";
+        rl_readline_name = (char*) "fj";
 
         /* Tell the completer that we want a crack first. */
         rl_attempted_completion_function = fj_completion;
@@ -125,14 +125,14 @@ namespace fj {
     char *stripwhite(char *string) {
         char *s, *t;
 
-        for (s = string; whitespace (*s); s++)
+        for (s = string; isspace (*s); s++)
           ;
 
         if (*s == 0)
             return (s);
 
         t = s + strlen (s) - 1;
-        while (t > s && whitespace (*t))
+        while (t > s && isspace (*t))
             t--;
         *++t = '\0';
 
@@ -143,11 +143,11 @@ namespace fj {
     int InteractiveMode::execute_line(char *line) {
         /* Isolate the command word. */
         int i = 0;
-        while (line[i] && whitespace(line[i]))
+        while (line[i] && isspace(line[i]))
             i++;
         char *word = line + i;
 
-        while (line[i] && !whitespace(line[i]))
+        while (line[i] && !isspace(line[i]))
             i++;
 
         if (line[i])
@@ -156,7 +156,7 @@ namespace fj {
         for (auto command : commands) {
             if (word == command->getName()) {
                 /* Get argument to command, if any. */
-                while (whitespace (line[i]))
+                while (isspace (line[i]))
                     i++;
 
                 word = line + i;

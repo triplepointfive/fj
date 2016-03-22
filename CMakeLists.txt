@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 option(test "Build all tests." OFF)
 project(fj)
 
+find_package(Boost 1.60.0)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -pedantic -Wextra -g -Wnon-virtual-dtor")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
 
 add_library(fj_lib
         src/context.cpp
@@ -59,13 +62,21 @@ add_executable(fj_test
         test/lexer/access_term_test.cpp
         test/lexer/invocation_term_test.cpp
         test/term_builder_test.cpp)
+
+target_compile_options(fj_test PUBLIC -fprofile-arcs -ftest-coverage)
+
 include_directories(PEGTL)
 include_directories(src)
 include_directories(includes)
 
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 target_link_libraries(fj readline)
 target_link_libraries(fj_test gtest gtest_main pthread)
+
 target_link_libraries(fj_test fj_lib)
 
 enable_testing()
-add_test(A fj_test)
+add_test(Tests fj_test)

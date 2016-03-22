@@ -67,7 +67,7 @@ namespace fj {
         std::shared_ptr< Initiation > initiation =
             std::make_shared<Initiation>();
 
-        void addArg(std::shared_ptr< MethodTerm > term) {
+        void addArg(std::shared_ptr< MethodTerm > term) override {
             initiation->addArg(term);
         }
 
@@ -80,7 +80,7 @@ namespace fj {
         std::shared_ptr< AccessorTerm > methodInvocation =
             std::make_shared< MethodInvocation >();
 
-        void addArg(std::shared_ptr< MethodTerm > term) {
+        void addArg(std::shared_ptr< MethodTerm > term) override {
             methodInvocation->addArg(term);
         }
 
@@ -100,7 +100,7 @@ namespace fj {
         std::shared_ptr< TypeCastingTerm > typeCastingTerm =
             std::make_shared< TypeCastingTerm >();
 
-        void addArg(std::shared_ptr< MethodTerm > term) {
+        void addArg(std::shared_ptr< MethodTerm > term) override {
             typeCastingTerm->setTerm(term);
         }
 
@@ -113,7 +113,7 @@ namespace fj {
         std::shared_ptr<AccessorTerm> accessTerm =
             std::make_shared<AccessTerm>();
 
-        void addArg(std::shared_ptr< MethodTerm > term) {
+        void addArg(std::shared_ptr< MethodTerm > term) override {
             accessTerm->setTerm(term);
         }
 
