@@ -50,7 +50,10 @@ namespace fj {
     }
 
     void MethodInvocationState::success(AccessState &accessState) {
-        accessState.addArg(std::move(getTerm()));
+        assert(nullptr != accessState.getTerm());
+        assert(nullptr == methodInvocation->getTerm());
+        methodInvocation->setTerm(std::move(accessState.getTerm()));
+        accessState.accessTerm = std::move(methodInvocation);
     }
 
     void MethodInvocationState::success(InitiationState &initiationState) {

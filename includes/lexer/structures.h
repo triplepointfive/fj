@@ -100,9 +100,9 @@ namespace fj {
         std::string termType() { return "MethodInvocation"; };
         std::string inspect() {
             if (nullptr != getTerm()) {
-                return getTerm()->inspect() + "." + getName();
+                return getTerm()->inspect() + "." + getName() + "()";
             } else {
-                return "{nullptr}." + getName();
+                return "{nullptr}." + getName() + "()";
             }
         };
         void accept(LexerTermVisitor* visitor) const override;
