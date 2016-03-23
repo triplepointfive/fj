@@ -214,11 +214,8 @@ TEST (AST, a_list_of_method_arguments) {
     Arguments args = methodDeclaration->getArgs();
     ASSERT_EQ(2, args.size());
 
-    EXPECT_EQ("b", args.rbegin()->first);
-    EXPECT_EQ("Object", args.rbegin()->second);
-
-    EXPECT_EQ("a", args.rend()->first);
-    EXPECT_EQ("Object", args.rend()->second);
+    EXPECT_EQ("Object", args["b"]);
+    EXPECT_EQ("Object", args["a"]);
 }
 
 TEST (AST, constructor_header_with_no_arguments) {
