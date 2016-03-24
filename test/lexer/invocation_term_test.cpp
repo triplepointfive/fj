@@ -73,6 +73,19 @@ TEST (MethodInvocation, of_property_of_variable) {
     EXPECT_EQ("first", accessTerm->getName());
 }
 
+TEST (MethodInvocation, of_method_invocation_of_variable) {
+    TEST_PARSE("return this.first().next();")
+
+    EXPECT_EQ("next", methodInvocation->getName());
+    EXPECT_EQ(0, methodInvocation->getArgs().size());
+
+    MethodInvocation * methodInvocationTerm
+        = dynamic_cast< MethodInvocation * >(methodInvocation->getTerm().get());
+    ASSERT_NE(nullptr, methodInvocationTerm);
+    EXPECT_EQ("first", methodInvocationTerm->getName());
+    EXPECT_EQ(0, methodInvocationTerm->getArgs().size());
+}
+
 TEST (MethodInvocation, with_variable_and_property_args) {
     TEST_PARSE("return this.someMethod(var1, this.fst);")
 

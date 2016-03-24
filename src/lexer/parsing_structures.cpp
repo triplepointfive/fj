@@ -42,7 +42,10 @@ namespace fj {
     }
 
     void MethodInvocationState::success(MethodInvocationState & methodInvocationState) {
-        methodInvocationState.methodInvocation->setTerm(std::move(getTerm()));
+        assert(nullptr == methodInvocation->getTerm());
+        assert(nullptr != methodInvocationState.methodInvocation);
+        methodInvocation->setTerm(std::move(methodInvocationState.methodInvocation));
+        methodInvocationState.methodInvocation = methodInvocation;
     }
 
     void MethodInvocationState::success(TypeCastingState &typeCastingState) {
