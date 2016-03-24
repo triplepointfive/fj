@@ -468,6 +468,8 @@ TEST (AST, method_returns_initiated_object_with_few_args) {
 
     Initiation * initiation =
         dynamic_cast<Initiation *>(methodTerm);
+    ASSERT_NE(nullptr, initiation);
+
     auto args = initiation->getArgs();
     EXPECT_EQ("Point", initiation->getName());
     EXPECT_EQ(2, args.size());
@@ -481,6 +483,7 @@ TEST (AST, method_returns_initiated_object_with_few_args) {
     AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(
         args.back().get()
     );
+    ASSERT_NE(nullptr, propertyTerm);
     EXPECT_EQ("y", propertyTerm->getName());
 }
 
@@ -529,10 +532,13 @@ TEST (AST, method_returns_type_casting_with_property) {
 
     TypeCastingTerm *typeCasting =
         dynamic_cast<TypeCastingTerm *>(methodTerm);
-    auto term = typeCasting->getTerm();
+    ASSERT_NE(nullptr, typeCasting);
     EXPECT_EQ("A", typeCasting->getName());
+
+    auto term = typeCasting->getTerm();
     ASSERT_NE(nullptr, term);
 
     AccessTerm * propertyTerm = dynamic_cast<AccessTerm *>(term.get());
+    ASSERT_NE(nullptr, propertyTerm);
     EXPECT_EQ("snd", propertyTerm->getName());
 }

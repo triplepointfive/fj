@@ -13,7 +13,7 @@ namespace fj {
             args.push_back(this->term);
         }
 
-        return std::move(args);
+        return args;
     }
 
     void LexerTermBuilder::visitTypeCastingTerm(const TypeCastingTerm *term) {

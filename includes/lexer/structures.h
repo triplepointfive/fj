@@ -8,20 +8,12 @@
 #include <assert.h>
 #include <memory>
 
+#include <boost/utility.hpp>
+
 namespace fj {
     class LexerTermVisitor;
 
     using Arguments = std::map<std::string, std::string>;
-
-    // TODO: Move to somewhere.
-    class non_copyable {
-    protected:
-        non_copyable() = default;
-        ~non_copyable() = default;
-
-        non_copyable(non_copyable const &) = delete;
-        void operator=(non_copyable const &x) = delete;
-    };
 
     class MethodTerm {
     public:
@@ -124,6 +116,10 @@ namespace fj {
 
         void addArg(std::shared_ptr< MethodTerm > term) { terms.push_back(term); }
 
+        void setArgs(std::vector<std::shared_ptr< MethodTerm > > args) {
+          this->terms = args;
+        }
+
         std::vector<std::shared_ptr< MethodTerm > > getArgs() const {
             return terms;
         }
@@ -131,7 +127,7 @@ namespace fj {
         std::vector<std::shared_ptr< MethodTerm > > terms;
     };
 
-    class BaseMethod : non_copyable {
+    class BaseMethod : boost::noncopyable {
     public:
         void setName(const std::string &name) { this->name = name; }
 
@@ -189,7 +185,7 @@ namespace fj {
         std::shared_ptr< MethodTerm > treeHead = nullptr;
     };
 
-    class ClassDeclaration : non_copyable {
+    class ClassDeclaration : boost::noncopyable {
     public:
         ClassDeclaration() {};
 

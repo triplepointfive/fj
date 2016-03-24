@@ -48,6 +48,7 @@ namespace fj {
         std::shared_ptr< VariableTerm > variableTerm =
             std::make_shared< VariableTerm >();
 
+        // TODO: Refactor.
         void addArg(std::shared_ptr< MethodTerm >) {
             // Shouldn't get called.
             throw "xxx";
@@ -76,6 +77,18 @@ namespace fj {
         };
     };
 
+    struct MethodTermAccessState {
+        std::shared_ptr<AccessorTerm> accessorTerm{ nullptr };
+
+        void success(MethodTermAccessState & methodTermAccessState) {  };
+        void success(ListOfArgsState & methodInvocationState) { };
+        void success(MethodInvocationState & methodInvocationState)  {  };
+        void success(InitiationState & initiationState)   {  };
+        void success(TypeCastingState & typeCastingState) {  };
+        void success(AccessState & accessState) {  };
+        void success(MethodState & methodState) {  };
+    };
+
     struct MethodInvocationState : ArguableTermState {
         std::shared_ptr< AccessorTerm > methodInvocation =
             std::make_shared< MethodInvocation >();
@@ -94,6 +107,7 @@ namespace fj {
         void success(TypeCastingState & typeCastingState) override;
         void success(AccessState & accessState) override;
         void success(ListOfArgsState & listOfArgsState) override;
+        void success(MethodTermAccessState & methodTermAccessState) {  };
     };
 
     struct TypeCastingState : ArguableTermState {
@@ -126,6 +140,7 @@ namespace fj {
         void success(InitiationState & initiationState) override;
         void success(TypeCastingState & typeCastingState) override;
         void success(AccessState & accessState) override;
+        void success(MethodTermAccessState & methodTermAccessState) {  };
         void success(ListOfArgsState & listOfArgsState) override;
     };
 

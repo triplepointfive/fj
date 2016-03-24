@@ -170,6 +170,8 @@ namespace fj {
 
     template<> struct control< method_list_of_args > :
         change_state_and_action< method_list_of_args, ListOfArgsState, nothing > {};
+    template<> struct control< method_term_access > :
+        change_state_and_action< method_term_access, MethodTermAccessState, nothing > {};
 }
 
 #endif //FJ_PARSER_RULES_H
