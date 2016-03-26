@@ -2,6 +2,8 @@
 
 #include "eval_term_visitor.h"
 #include "context.h"
+#include "ast/method_body.h"
+#include "ast/class_body.h"
 
 using namespace fj;
 

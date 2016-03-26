@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "ast/context_builder.h"
+#include "ast/class_table.h"
 
 using namespace fj;
 
@@ -18,13 +19,11 @@ TEST (context_builder, build_class_with_two_properties) {
     ParsedContext parsedContext;
     parsedContext.addClass(newClass);
 
-    Context context;
     ContextBuilder builder;
-    builder.buildAST(parsedContext, context);
+    builder.buildAST(parsedContext);
+    auto classTable = builder.getClassTable();
 
-    ASSERT_EQ(2, context.getClasses().size());
-
-    auto builtClass = context.getClasses()[ClassName("Pair")];
+    auto builtClass = classTable->getClass(ClassName("Pair"));
     Properties properties = builtClass->getProperties();
 
     EXPECT_EQ("Object", properties[PropertyName("fst")].t);
@@ -54,12 +53,11 @@ TEST (context_builder, build_class_with_a_method) {
     ParsedContext parsedContext;
     parsedContext.addClass(newClass);
 
-    Context context;
     ContextBuilder builder;
-    builder.buildAST(parsedContext, context);
+    builder.buildAST(parsedContext);
+    auto classTable = builder.getClassTable();
 
-    ASSERT_EQ(2, context.getClasses().size());
-    auto builtClass = context.getClasses()[ClassName("Pair")];
+    auto builtClass = classTable->getClass(ClassName("Pair"));
 
     auto methodBody = builtClass->getMethod(MethodName("getFst"));
     ASSERT_NE(nullptr, methodBody);
@@ -80,12 +78,11 @@ TEST (context_builder, build_class_with_parent_class) {
     parsedContext.addClass(newClass1);
     parsedContext.addClass(newClass2);
 
-    Context context;
     ContextBuilder builder;
-    builder.buildAST(parsedContext, context);
+    builder.buildAST(parsedContext);
+    auto classTable = builder.getClassTable();
 
-    ASSERT_EQ(3, context.getClasses().size());
-    auto builtClass = context.getClasses()[ClassName("B")];
+    auto builtClass = classTable->getClass(ClassName("B"));
 
     EXPECT_EQ("B", builtClass->getClassName().t);
     EXPECT_EQ("A", builtClass->getParentClass()->getClassName().t);

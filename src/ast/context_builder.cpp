@@ -4,21 +4,24 @@
 #include "ast/structures.h"
 #include "ast/context_builder.h"
 #include "ast/lexer_term_builder.h"
+#include "ast/class_table.h"
 
 using std::is_same;
 
 namespace fj {
     ContextBuilder::ContextBuilder() {
-        classTable.addClass(std::make_shared< ObjectClassBody >());
+        classTable = std::make_shared< ClassTable >();
+        classTable->addClass(std::make_shared< ObjectClassBody >());
     }
 
-    void ContextBuilder::buildAST(const ParsedContext &parsedContext,
-        Context &context) {
+    void ContextBuilder::buildAST(const ParsedContext &parsedContext) {
         for (auto elem : parsedContext.getClasses()) {
-            auto newClass = buildClass(elem);
-            classTable.addClass(newClass);
-            context.addClass(newClass);
+            classTable->addClass(buildClass(elem));
         }
+    }
+
+    std::shared_ptr< ClassTable > ContextBuilder::getClassTable() {
+        return std::move(classTable);
     }
 
     shared_ptr<ObjectClassBody> ContextBuilder::buildClass(
@@ -35,7 +38,7 @@ namespace fj {
             methods[MethodName(elem->getName())] = buildMethod(elem);
         }
 
-        auto parentClass = classTable.getClass(
+        auto parentClass = classTable->getClass(
             ClassName(classDeclaration->getParentName())
         );
 

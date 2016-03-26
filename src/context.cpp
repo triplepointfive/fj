@@ -1,49 +1,28 @@
 #include "context.h"
+#include "ast/class_table.h"
 
 namespace fj {
     using std::map;
 
-    Context::Context() {
-        addClass(std::make_shared< ObjectClassBody >());
-    }
+    Context::Context(std::shared_ptr< ClassTable > classTable) :
+        classTable(classTable) {}
 
-    bool Context::classHasProperty(ClassName className,
-                                   PropertyName propertyName) const {
-        assert((bool)classes.count(className));
-        auto classBody = classes.find(className)->second;
-        return (bool)classBody->getProperties().count(propertyName);
+    std::shared_ptr< ClassTable > Context::getClassTable() const {
+        return std::move(classTable);
     }
-
-    bool Context::isASubtype(std::string, std::string) const {
-        return true;
-    }
-
-    std::map<ClassName, std::shared_ptr< ObjectClassBody >>
-        Context::getClasses() const {
-        return std::move(classes);
-    }
-
 
     TermPtr Context::getAttribute(std::shared_ptr< Constructor > object,
         PropertyName propertyName) {
-        assert((bool)classes.count(object->getClassName()));
-        auto classBody = classes.find(object->getClassName())->second;
+        auto classBody = classTable->getClass(object->getClassName());
         return classBody->getProperty(object, propertyName);
     }
 
     std::shared_ptr< Constructor > Context::invocateMethod(
         std::shared_ptr< Constructor > object, MethodName methodName,
         MethodArguments args) {
-        assert((bool)classes.count(object->getClassName()));
-        auto classBody = classes.find(object->getClassName())->second;
+        auto classBody = classTable->getClass(object->getClassName());
         auto methodBody = classBody->getMethod(methodName);
         return methodBody->invocate(object, args, this);
-    }
-
-    void Context::addClass(std::shared_ptr< ObjectClassBody > body) {
-        classes.insert(std::pair<ClassName, std::shared_ptr< ObjectClassBody >>(
-            body->getClassName(), body
-        ));
     }
 
     void Context::setVariables(

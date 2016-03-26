@@ -16,7 +16,6 @@ namespace fj {
         return std::move(properties);
     }
 
-
     TermPtr ClassBody::getProperty(std::shared_ptr< Constructor > object,
         PropertyName propertyName) const {
         assert(className == object->getClassName());

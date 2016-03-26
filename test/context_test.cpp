@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
+#include "ast/class_body.h"
+#include "ast/class_table.h"
 
 using namespace fj;
 
 TEST (Context, includes_object_class) {
-    Context context;
+    std::shared_ptr< ClassTable > classTable = std::make_shared< ClassTable >();
+    Context context(classTable);
 
-    ASSERT_EQ(1, context.getClasses().size());
-
-    auto objectClass = context.getClasses()[ClassName("Object")];
+    auto objectClass = context.getClassTable()->getClass(ClassName("Object"));
     ASSERT_NE(nullptr, objectClass);
 }
 
@@ -30,11 +31,12 @@ TEST (Context, class_has_property) {
         pairClassName, properties, Methods(), std::move(objectClass)
     );
 
-    Context ctx;
-    ctx.addClass(std::move(pairClass));
+    std::shared_ptr< ClassTable > classTable = std::make_shared< ClassTable >();
+    classTable->addClass(std::move(pairClass));
+    Context ctx(classTable);
 
-    EXPECT_TRUE(ctx.classHasProperty(pairClassName, fst));
-    EXPECT_TRUE(ctx.classHasProperty(pairClassName, snd));
+    EXPECT_TRUE(ctx.getClassTable()->classHasProperty(pairClassName, fst));
+    EXPECT_TRUE(ctx.getClassTable()->classHasProperty(pairClassName, snd));
 }
 
 TEST (Context, setfst) {
@@ -86,12 +88,13 @@ TEST (Context, setfst) {
         pairClassName, properties, methods, objectClass
     );
 
-    Context ctx;
+    std::shared_ptr< ClassTable > classTable = std::make_shared< ClassTable >();
+    classTable->addClass(objectClass);
+    classTable->addClass(aClass);
+    classTable->addClass(bClass);
+    classTable->addClass(pairClass);
 
-    ctx.addClass(objectClass);
-    ctx.addClass(aClass);
-    ctx.addClass(bClass);
-    ctx.addClass(pairClass);
+    Context ctx(classTable);
 
     MethodArguments args;
     args.push_back(std::make_shared< Constructor >(aClassName, MethodArguments()));

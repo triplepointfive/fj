@@ -2,6 +2,7 @@
 
 #include "eval_term_visitor.h"
 #include "context.h"
+#include "ast/class_table.h"
 
 namespace fj {
 
@@ -22,7 +23,7 @@ namespace fj {
         assert(calculatedValue != NULL);
         // E-ProjNew
         // This should be found by type checker.
-        assert(context->classHasProperty(calculatedValue->getClassName(),
+        assert(context->getClassTable()->classHasProperty(calculatedValue->getClassName(),
                                          access->getPropertyName()));
         context->getAttribute(calculatedValue, access->getPropertyName())->accept(*this);
     }
@@ -67,7 +68,7 @@ namespace fj {
         assert(calculatedValue != NULL);
         // E-CastNew
         // No action for evaluation required, because type casting is about types.
-        assert(context->isASubtype(coercion->getClassName(),
+        assert(context->getClassTable()->isASubtype(coercion->getClassName(),
                                    calculatedValue->getClassName()));
     }
 

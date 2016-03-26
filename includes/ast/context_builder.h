@@ -4,21 +4,24 @@
 #include "lexer/structures.h"
 
 #include "context.h"
-#include "class_table.h"
 
 namespace fj {
     using std::shared_ptr;
 
+    class ClassTable;
+    class MethodBody;
+
     class ContextBuilder {
     public:
         ContextBuilder();
-        void buildAST(const ParsedContext &, Context &);
+        void buildAST(const ParsedContext &);
+        std::shared_ptr< ClassTable > getClassTable();
 
     private:
         shared_ptr< ObjectClassBody > buildClass(const shared_ptr <ClassDeclaration >&);
         shared_ptr< MethodBody > buildMethod(const shared_ptr< MethodDeclaration >&);
         shared_ptr< Term > buildMethodBody(const std::shared_ptr< MethodTerm >&);
-        ClassTable classTable;
+        std::shared_ptr< ClassTable > classTable{ nullptr };
     };
 }
 
