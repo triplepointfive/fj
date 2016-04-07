@@ -12,7 +12,7 @@
 
 namespace fj {
     class InteractiveCommand;
-    class Context;
+    class ClassTable;
 
     class InteractiveMode {
     public:
@@ -29,11 +29,11 @@ namespace fj {
         void addCommand(std::shared_ptr< InteractiveCommand > command) {
             commands.push_back(command);
         }
-        std::shared_ptr< Context > getContext() {
-            return this->context;
+        std::shared_ptr< ClassTable > getClassTable() {
+            return this->class_table;
         }
-        void setContext(std::shared_ptr< Context > context) {
-            this->context = context;
+        void setClassTable(std::shared_ptr< ClassTable > class_table) {
+            this->class_table = class_table;
         }
 
     private:
@@ -44,7 +44,7 @@ namespace fj {
 
         int execute_line(char *line);
         std::vector< std::shared_ptr< InteractiveCommand > > commands;
-        std::shared_ptr< Context > context{ nullptr };
+        std::shared_ptr< ClassTable > class_table{ nullptr };
     };
 }
 

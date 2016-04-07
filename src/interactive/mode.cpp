@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include "term.h"
-#include "context.h"
+#include "ast/class_table.h"
 
 #include "interactive/info_command.h"
 #include "interactive/import_command.h"
@@ -66,7 +66,7 @@ namespace fj {
         static std::map<ClassName, std::shared_ptr< ObjectClassBody >> classes;
 
         if (state == 0) {
-            classes = instance->getContext()->getClasses();
+            classes = instance->getClassTable()->getClasses();
             i = classes.begin();
         }
 
@@ -171,7 +171,7 @@ namespace fj {
     }
 
     InteractiveMode::InteractiveMode() {
-        setContext(std::make_shared< Context >());
+        setClassTable(std::make_shared< ClassTable >());
     }
 
     int InteractiveMode::run() {

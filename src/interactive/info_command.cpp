@@ -3,11 +3,11 @@
 #include "interactive/info_command.h"
 #include "interactive/mode.h"
 
-#include "ast/context_builder.h"
+#include "ast/class_table.h"
 
 namespace fj {
     int InfoCommand::execute(std::string arg) {
-        for (auto &classPair : mode->getContext()->getClasses()) {
+        for (auto &classPair : mode->getClassTable()->getClasses()) {
             if (classPair.first.t == arg) {
                 printClass(classPair.second);
                 return 0;

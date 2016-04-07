@@ -5,6 +5,7 @@
 
 #include "lexer/lexer.h"
 #include "ast/context_builder.h"
+#include "ast/class_table.h"
 
 namespace fj {
     int ImportCommand::execute(std::string arg) {
@@ -33,9 +34,9 @@ namespace fj {
                 return -2;
             }
 
-            Context context;
-            ContextBuilder().buildAST(parsedContext, context);
-            mode->setContext(std::make_shared< Context >(context));
+            ContextBuilder builder;
+            builder.buildAST(parsedContext);
+            mode->setClassTable(builder.getClassTable());
         }
         catch (const pegtl::parse_error& e) {
             std::cout << "import: " << e.what() << std::endl;

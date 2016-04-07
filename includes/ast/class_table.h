@@ -14,6 +14,10 @@ namespace fj {
 
         std::shared_ptr< ObjectClassBody > getClass(
             const ClassName & className) const;
+
+        std::map< ClassName, std::shared_ptr< ObjectClassBody > >
+            getClasses() const;
+
         void addClass(std::shared_ptr< ObjectClassBody > classBody);
 
         bool classHasProperty(ClassName className,

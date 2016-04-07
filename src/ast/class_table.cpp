@@ -16,6 +16,11 @@ namespace fj {
         classes[classBody->getClassName()] = classBody;
     }
 
+    std::map< ClassName, std::shared_ptr< ObjectClassBody > >
+        ClassTable::getClasses() const {
+        return std::move(classes);
+    }
+
     bool ClassTable::classHasProperty(ClassName className,
                                    PropertyName propertyName) const {
         assert((bool)classes.count(className));
