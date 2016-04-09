@@ -14,6 +14,7 @@
 #include "ast/class_table.h"
 
 #include "interactive/info_command.h"
+#include "interactive/interpret_command.h"
 #include "interactive/import_command.h"
 #include "interactive/help_command.h"
 #include "interactive/mode.h"
@@ -114,6 +115,8 @@ namespace fj {
             // TODO: Convert commands list into a mapping.
             if ( commandName == "info" ) {
                 return rl_completion_matches(text, info_generator);
+            } else if ( commandName == ">" ) {
+                return rl_completion_matches(text, info_generator);
             }
         }
 
@@ -181,6 +184,7 @@ namespace fj {
         instance->addCommand(std::make_shared< HelpCommand >(instance, "?"));
         instance->addCommand(std::make_shared< ImportCommand >(instance));
         instance->addCommand(std::make_shared< InfoCommand >(instance));
+        instance->addCommand(std::make_shared< InterpretCommand >(instance));
 
         int code = instance->iterate();
         instance = nullptr;

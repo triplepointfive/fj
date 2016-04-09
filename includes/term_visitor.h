@@ -6,16 +6,6 @@
 #include "ast/term.h"
 
 namespace fj {
-    class Variable;
-
-    class Access;
-
-    class Invocation;
-
-    class Constructor;
-
-    class Coercion;
-
     class TermVisitor {
     public:
         virtual ~TermVisitor() { }

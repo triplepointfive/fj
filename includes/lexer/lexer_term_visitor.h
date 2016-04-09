@@ -1,5 +1,5 @@
-#ifndef FJ_TERM_VISITOR_H
-#define FJ_TERM_VISITOR_H
+#ifndef FJ_LEXER_TERM_VISITOR_H
+#define FJ_LEXER_TERM_VISITOR_H
 
 namespace fj {
     class VariableTerm;
@@ -21,4 +21,4 @@ namespace fj {
 
 }
 
-#endif //FJ_TERM_VISITOR_H
+#endif //FJ_LEXER_TERM_VISITOR_H

@@ -43,11 +43,13 @@ add_executable(fj
         src/interactive/mode.cpp
         src/interactive/help_command.cpp
         src/interactive/info_command.cpp
+        src/interactive/interpret_command.cpp
         src/interactive/import_command.cpp
         includes/interactive/mode.h
         includes/interactive/command.h
         includes/interactive/help_command.h
         includes/interactive/info_command.h
+        includes/interactive/interpret_command.h
         includes/interactive/import_command.h
         src/main.cpp)
 target_link_libraries(fj fj_lib)
