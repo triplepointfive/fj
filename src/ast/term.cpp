@@ -9,7 +9,7 @@ using namespace std;
 namespace fj {
 
     string Invocation::show() const {
-        return object->show() + "." + methodName.t +
+        return "Method " + object->show() + "." + methodName.t +
                "(" + intercalation(args, ", ") + ")";
     }
 

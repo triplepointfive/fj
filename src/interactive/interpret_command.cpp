@@ -14,6 +14,7 @@
 
 namespace fj {
     int InterpretCommand::execute(std::string arg) {
+        std::cout << arg << std::endl;
         MethodState methodState;
 
         // TODO: Debug only;

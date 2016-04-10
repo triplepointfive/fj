@@ -36,7 +36,7 @@ namespace fj {
             this->name = name;
         }
 
-        string show() const override { return name.t; }
+        string show() const override { return "Var " + name.t; }
 
         PropertyName getName() const { return name; }
         void accept(TermVisitor &) override;
@@ -53,7 +53,7 @@ namespace fj {
         }
 
         string show() const override {
-            return "(" + object->show() + ")." + propertyName.t;
+            return "Access (" + object->show() + "," + propertyName.t + ")";
         }
 
         PropertyName getPropertyName() const { return propertyName; }

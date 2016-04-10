@@ -144,6 +144,7 @@ namespace fj {
 
     /* Execute a command line. */
     int InteractiveMode::execute_line(char *line) {
+        std::string whole_input(line);
         /* Isolate the command word. */
         int i = 0;
         while (line[i] && isspace(line[i]))
@@ -169,8 +170,7 @@ namespace fj {
             }
         }
 
-        fprintf (stderr, "%s: No such command for fj.\n", word);
-        return -1;
+        return interpretor->execute(std::string(whole_input));
     }
 
     InteractiveMode::InteractiveMode() {
@@ -184,7 +184,8 @@ namespace fj {
         instance->addCommand(std::make_shared< HelpCommand >(instance, "?"));
         instance->addCommand(std::make_shared< ImportCommand >(instance));
         instance->addCommand(std::make_shared< InfoCommand >(instance));
-        instance->addCommand(std::make_shared< InterpretCommand >(instance));
+
+        instance->interpretor = std::make_shared< InterpretCommand >(instance);
 
         int code = instance->iterate();
         instance = nullptr;

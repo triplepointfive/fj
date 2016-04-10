@@ -12,6 +12,7 @@
 
 namespace fj {
     class InteractiveCommand;
+    class InterpretCommand;
     class ClassTable;
 
     class InteractiveMode {
@@ -43,6 +44,9 @@ namespace fj {
         int com_help(std::string arg);
 
         int execute_line(char *line);
+
+        std::shared_ptr< InterpretCommand > interpretor;
+
         std::vector< std::shared_ptr< InteractiveCommand > > commands;
         std::shared_ptr< ClassTable > class_table{ nullptr };
     };
